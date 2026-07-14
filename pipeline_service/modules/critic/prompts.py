@@ -25,8 +25,25 @@ Pick overall_score by matching the description that best fits the render:
   0.81-1.00  Visually indistinguishable or nearly so. A competent judge
              would struggle to tell the render from the reference.
 
-Prefer the MIDDLE of each band by default; go to the edge only with a
-specific reason.
+Use the FULL 0.01 resolution within a band — do not snap every render to the
+band midpoint. Two renders in the "recognizable but flawed" band can legitimately
+score 0.44 and 0.57; reflect real differences in how many parts match and how
+severe the mismatches are.
+
+Score calibration across repair iterations (critical):
+- You may be shown successive renders of the SAME object as a coder repairs it.
+- If the new render fixed issues you previously flagged (a missing part is now
+  present, a proportion is corrected), the score MUST go UP. If it regressed
+  (a part that matched is now wrong), the score MUST go DOWN.
+- A flat, unchanging score across iterations gives the refinement loop no signal
+  and wastes repair rounds. Only keep the score identical if the render is
+  genuinely unchanged in quality.
+- Anchor the score to the count and severity of remaining issues: roughly, each
+  unresolved high-severity structural issue caps the score in the 0.2-0.5 range;
+  once only low/medium material-and-color issues remain, you should be in
+  0.6-0.8; near-perfect matches with at most cosmetic nits are 0.8+.
+
+Prefer a specific score justified by the issue list over the band midpoint.
 
 ## Protocol (think step-by-step in your own head, output JSON only)
 

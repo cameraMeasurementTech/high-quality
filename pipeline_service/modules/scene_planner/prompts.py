@@ -142,4 +142,17 @@ genuinely absent):
   Four different legs → four separate parts.
 - Do not describe background, lighting, camera, or mood.
 - Do not invent hidden parts that are not structurally necessary.
+
+## Quality bar (the Coder builds directly from this — be concrete)
+
+- Every part narrative MUST state an approximate proportion as a fraction of the
+  whole (e.g. "~30% of total height", "two-thirds of the width"), not just
+  "small/medium/large". Vague sizes force the Coder to guess and produce
+  wrong_proportion errors downstream.
+- Every part narrative MUST name a material that maps to a PBR family (see the
+  material phrasing list above). If unsure, say "generic".
+- `count_hint` MUST be present and specific for any repeated part. A wrong count
+  (three chair legs, five drone rotors) is a high-impact duel loss.
+- State the front/back orientation explicitly in "Layout and symmetry" so the
+  object's canonical face maps to +Z in the render.
 """

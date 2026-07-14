@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import base64
 import json
+import re
 import sys
 import time
 from pathlib import Path
@@ -14,8 +15,21 @@ GREEN = "\033[32m"
 RED = "\033[31m"
 YELLOW = "\033[33m"
 CYAN = "\033[36m"
+DIM = "\033[2m"
 BOLD = "\033[1m"
 RESET = "\033[0m"
+
+# Stage-relevant pipeline messages (skip renderer-sidecar ping noise by default).
+LOG_FILTER_RE = re.compile(
+    r"Batch (starting|done|retry|deadline|cleanup)"
+    r"|MULTIGEN|\[JS_CHECK\]|\[RENDERER\].*(start|PASS|FAIL|judge views)"
+    r"|\[2/7 Coder\]|\[5/7 Critic\]|\[Coder Repair\]|\[Judge "
+    r"|\[BRACKET |\[TOKENS Actor"
+    r"|\[TASK COMPLETED\]|\[FAIL\]|StageError"
+    r"|Pipeline initialized|models up|GenerationPipeline starting"
+    r"|\[DINO\]|Warmup",
+    re.IGNORECASE,
+)
 
 
 def log_ok(msg: str) -> None:
@@ -34,6 +48,115 @@ def log_step(msg: str) -> None:
     print(f"\n{BOLD}[step]{RESET} {msg}")
 
 
+def log_pipeline(msg: str) -> None:
+    """Print a live pipeline log line (clears the progress bar line first)."""
+    sys.stdout.write("\r\033[K")
+    print(f"  {DIM}[pipeline]{RESET} {msg}")
+
+
+def format_pipeline_log_line(raw: str) -> str:
+    """Collapse loguru file format to timestamp + message."""
+    line = raw.rstrip()
+    parts = line.split(" | ", 3)
+    if len(parts) >= 4:
+        return f"{parts[0]} | {parts[3]}"
+    return line
+
+
+def should_print_log_line(line: str, *, full_logs: bool) -> bool:
+    if not line.strip():
+        return False
+    if full_logs:
+        return True
+    if "renderer-sidecar" in line and "DEBUG" in line:
+        return False
+    return LOG_FILTER_RE.search(line) is not None
+
+
+class PipelineLogFollower:
+    """Stream new lines from GET /debug/logs while the batch runs."""
+
+    def __init__(self, client: httpx.Client, *, full_logs: bool = False) -> None:
+        self.client = client
+        self.full_logs = full_logs
+        self._offset = 0
+        self._available = True
+
+    def poll(self) -> None:
+        if not self._available:
+            return
+        try:
+            r = self.client.get("/debug/logs", timeout=10.0)
+        except httpx.HTTPError:
+            return
+        if r.status_code == 404:
+            self._available = False
+            log_info("pipeline log not available yet (/debug/logs)")
+            return
+        if r.status_code != 200:
+            return
+
+        text = r.text
+        if self._offset > len(text):
+            self._offset = 0
+        chunk = text[self._offset :]
+        self._offset = len(text)
+        if not chunk:
+            return
+
+        for raw in chunk.splitlines():
+            if not should_print_log_line(raw, full_logs=self.full_logs):
+                continue
+            log_pipeline(format_pipeline_log_line(raw))
+
+    def fetch_all(self) -> str | None:
+        try:
+            r = self.client.get("/debug/logs", timeout=30.0)
+        except httpx.HTTPError:
+            return None
+        if r.status_code != 200:
+            return None
+        return r.text
+
+
+class TaskStatusFollower:
+    """Print per-prompt stage transitions from GET /debug/tasks."""
+
+    def __init__(self, client: httpx.Client, stems: list[str]) -> None:
+        self.client = client
+        self.stems = stems
+        self._last: dict[str, str] = {}
+
+    def poll(self) -> None:
+        try:
+            r = self.client.get("/debug/tasks", timeout=10.0)
+        except httpx.HTTPError:
+            return
+        if r.status_code != 200:
+            return
+        for task in r.json().get("tasks", []):
+            stem = task.get("stem")
+            if stem not in self.stems:
+                continue
+            status = task.get("status", "unknown")
+            prev = self._last.get(stem)
+            if prev == status:
+                continue
+            self._last[stem] = status
+            if prev is None:
+                log_pipeline(f"{stem[:16]}… status={status}")
+            else:
+                log_pipeline(f"{stem[:16]}… {prev} -> {status}")
+            if task.get("failed") and task.get("failure_reason"):
+                log_pipeline(f"{stem[:16]}… FAIL: {task['failure_reason'][:160]}")
+            elif task.get("refinement", {}).get("best_score", -1) >= 0:
+                ref = task["refinement"]
+                log_pipeline(
+                    f"{stem[:16]}… score={ref.get('best_score', -1):.2f} "
+                    f"iter={ref.get('best_iter', -1)}"
+                )
+
+
 def parse_prompts(path: str) -> list[dict]:
     prompts = []
     p = Path(path)
@@ -45,6 +168,16 @@ def parse_prompts(path: str) -> list[dict]:
         if not line or line.startswith("#"):
             continue
         parts = line.split(None, 1)
+        if len(parts) == 1:
+            if line.startswith("http://") or line.startswith("https://"):
+                stem = Path(urlparse(line).path).stem
+                if stem:
+                    prompts.append({"stem": stem, "image_url": line})
+                else:
+                    print(f"{YELLOW}Skipping URL without stem: {line}{RESET}")
+                continue
+            print(f"{YELLOW}Skipping malformed line: {line}{RESET}")
+            continue
         if len(parts) < 2:
             print(f"{YELLOW}Skipping malformed line: {line}{RESET}")
             continue
@@ -97,12 +230,27 @@ def submit_batch(client: httpx.Client, prompts: list[dict], seed: int) -> bool:
     return False
 
 
-def poll_until_complete(client: httpx.Client, max_wait: int = 900) -> dict | None:
-    log_step("Polling status")
+def poll_until_complete(
+    client: httpx.Client,
+    max_wait: int = 900,
+    *,
+    follow_logs: bool = False,
+    full_logs: bool = False,
+    stems: list[str] | None = None,
+) -> dict | None:
+    log_step("Polling status" + (" (live pipeline logs below)" if follow_logs else ""))
     deadline = time.time() + max_wait
     last_progress = -1
     data: dict = {}
+    log_follower = PipelineLogFollower(client, full_logs=full_logs) if follow_logs else None
+    task_follower = TaskStatusFollower(client, stems or []) if follow_logs and stems else None
+
     while time.time() < deadline:
+        if log_follower is not None:
+            log_follower.poll()
+        if task_follower is not None:
+            task_follower.poll()
+
         r = client.get("/status")
         data = r.json()
         status = data["status"]
@@ -113,10 +261,13 @@ def poll_until_complete(client: httpx.Client, max_wait: int = 900) -> dict | Non
             bar_width = 30
             filled = int(bar_width * progress / total) if total > 0 else 0
             bar = "█" * filled + "░" * (bar_width - filled)
-            print(f"\r  [{bar}] {progress}/{total} {status}    ", end="", flush=True)
+            sys.stdout.write(f"\r  [{bar}] {progress}/{total} {status}    ")
+            sys.stdout.flush()
             last_progress = progress
 
         if status == "complete":
+            if log_follower is not None:
+                log_follower.poll()
             print()
             log_ok(f"Complete: {progress}/{total}")
             return data
@@ -126,6 +277,17 @@ def poll_until_complete(client: httpx.Client, max_wait: int = 900) -> dict | Non
     print()
     log_fail(f"Timeout after {max_wait}s (status={data.get('status')}, {data.get('progress')}/{data.get('total')})")
     return None
+
+
+def save_pipeline_log(client: httpx.Client, results_dir: Path) -> None:
+    follower = PipelineLogFollower(client, full_logs=True)
+    text = follower.fetch_all()
+    if not text:
+        log_info("pipeline.log not saved (server log unavailable)")
+        return
+    path = results_dir / "pipeline.log"
+    path.write_text(text, encoding="utf-8")
+    log_ok(f"pipeline.log saved ({path.stat().st_size:,} bytes)")
 
 
 def save_results(client: httpx.Client, results_dir: Path, stems: list[str]) -> list[dict]:
@@ -258,7 +420,23 @@ def main() -> None:
     parser.add_argument(
         "--name",
         default="test",
-        help="output folder name (under the prompts file directory); files are written there",
+        help="output folder name (under --out-dir or the prompts file directory)",
+    )
+    parser.add_argument(
+        "--out-dir",
+        default=None,
+        help="directory to write run outputs (default: parent of prompts file)",
+    )
+    parser.add_argument(
+        "--follow-logs",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="stream pipeline stage logs while waiting (default: on)",
+    )
+    parser.add_argument(
+        "--full-logs",
+        action="store_true",
+        help="with --follow-logs, print all log lines (default: stage-relevant only)",
     )
     args = parser.parse_args()
 
@@ -268,10 +446,13 @@ def main() -> None:
         sys.exit(1)
 
     if args.limit:
-        prompts = prompts[:args.limit]
+        prompts = prompts[: args.limit]
 
     stems = [p["stem"] for p in prompts]
-    results_dir = Path(args.prompts_file).parent / args.name
+    if args.out_dir:
+        results_dir = Path(args.out_dir) / args.name
+    else:
+        results_dir = Path(args.prompts_file).parent / args.name
 
     base_url = f"http://{args.host}:{args.port}"
     print(f"\n{BOLD}Pipeline Test{RESET}")
@@ -279,6 +460,9 @@ def main() -> None:
     print(f"  Prompts: {len(prompts)} from {args.prompts_file}")
     print(f"  Output: {results_dir}/ (--name={args.name})")
     print(f"  Seed: {args.seed}")
+    if args.follow_logs:
+        mode = "full" if args.full_logs else "stages only"
+        print(f"  Logs: follow-logs={mode} -> also saved as pipeline.log")
 
     client = httpx.Client(base_url=base_url, timeout=30.0)
 
@@ -294,11 +478,19 @@ def main() -> None:
         if not submit_batch(client, prompts, args.seed):
             sys.exit(1)
 
-        if poll_until_complete(client, max_wait=args.timeout) is None:
+        if poll_until_complete(
+            client,
+            max_wait=args.timeout,
+            follow_logs=args.follow_logs,
+            full_logs=args.full_logs,
+            stems=stems,
+        ) is None:
             sys.exit(1)
 
         elapsed = time.time() - t_start
 
+        results_dir.mkdir(parents=True, exist_ok=True)
+        save_pipeline_log(client, results_dir)
         records = save_results(client, results_dir, stems)
         show_results(records, results_dir, elapsed)
 

@@ -226,6 +226,25 @@ Proportion tuning shortcut:
   `mesh.scale.set(sx, sy, sz)` BEFORE adding to group, NOT rebuilding the
   geometry with new params. Rebuilding is necessary only when the primitive
   type itself must change (e.g. cylinder → cone, box → extrude).
+
+Multi-view and duel awareness (how your output is scored):
+- Your module is rendered from MULTIPLE camera angles (a 2x2 grid plus extra
+  side/back views), then compared against the reference by a VLM judge. The
+  FRONT view carries the most weight, but the side and back views are also
+  checked: a model that looks correct from the front but is hollow, flat, or
+  garbage from the side is penalized by the judge's side-guard stage.
+- Therefore build a genuinely 3D object, not a flat billboard. Give every major
+  part real depth along Z. Do not leave the back completely empty unless the
+  reference object is genuinely one-sided (e.g. a wall-mounted plate).
+- Orientation is scored: keep Y-up and the object's natural front facing +Z so
+  the front view matches the reference's canonical view.
+- Grounding: objects that rest on a surface (furniture, vehicles, bottles)
+  should have their lowest point near y = -0.5 after fit-to-cube, standing
+  upright — not floating mid-frame or sunk below the floor. Center the object
+  horizontally (x,z ~ 0).
+- Silhouette first: the single highest-impact factor is a correct silhouette
+  and part layout in the front view. Get object class, part count, and
+  proportions right before spending effort on fine trim, logos, or micro-detail.
 """
     + "\n\n---\n\n"
     + THREEJS_OUTPUT_SPEC_REFERENCE

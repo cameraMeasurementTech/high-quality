@@ -1,0 +1,903 @@
+2026-07-14 09:50:24 | INFO     | __main__:lifespan:77 | No local vLLM clients in llm_clients — cloud-only mode (no health probes)
+2026-07-14 09:50:24 | INFO     | pipeline.generation_pipeline:startup:64 | GenerationPipeline starting
+2026-07-14 09:50:24 | INFO     | pipeline.generation_pipeline:startup:78 | llm client ready | name=openrouter base_url=https://openrouter.ai/api/v1 local=False
+2026-07-14 09:50:24 | INFO     | modules.renderer.module:startup:51 | [RENDERER] starting 2 sidecar(s) | node=node runner=/home/404-gen-subnet/shiny-guide/pipeline_service/modules/renderer/render_service/render_runner.mjs base_port=8003 cwd=/home/404-gen-subnet/shiny-guide/docker pool_size_per_sidecar=1
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr] node:internal/errors:496
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     ErrorCaptureStackTrace(err);
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     ^
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr] Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'puppeteer' imported from /home/404-gen-subnet/shiny-guide/pipeline_service/modules/renderer/render_service/browser.js
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at new NodeError (node:internal/errors:405:5)
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at packageResolve (node:internal/modules/esm/resolve:916:9)
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at moduleResolve (node:internal/modules/esm/resolve:973:20)
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at defaultResolve (node:internal/modules/esm/resolve:1193:11)
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:403:12)
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at ModuleLoader.resolve (node:internal/modules/esm/loader:372:25)
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at ModuleLoader.getModuleJob (node:internal/modules/esm/loader:249:38)
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at ModuleWrap.<anonymous> (node:internal/modules/esm/module_job:76:39)
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at link (node:internal/modules/esm/module_job:75:36) {
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]   code: 'ERR_MODULE_NOT_FOUND'
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr] }
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr] Node.js v18.19.1
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr] node:internal/errors:496
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     ErrorCaptureStackTrace(err);
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     ^
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr] Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'puppeteer' imported from /home/404-gen-subnet/shiny-guide/pipeline_service/modules/renderer/render_service/browser.js
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at new NodeError (node:internal/errors:405:5)
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at packageResolve (node:internal/modules/esm/resolve:916:9)
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at moduleResolve (node:internal/modules/esm/resolve:973:20)
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at defaultResolve (node:internal/modules/esm/resolve:1193:11)
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:403:12)
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at ModuleLoader.resolve (node:internal/modules/esm/loader:372:25)
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at ModuleLoader.getModuleJob (node:internal/modules/esm/loader:249:38)
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at ModuleWrap.<anonymous> (node:internal/modules/esm/module_job:76:39)
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at link (node:internal/modules/esm/module_job:75:36) {
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]   code: 'ERR_MODULE_NOT_FOUND'
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr] }
+2026-07-14 09:50:24 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr] Node.js v18.19.1
+2026-07-14 09:51:41 | INFO     | __main__:lifespan:77 | No local vLLM clients in llm_clients — cloud-only mode (no health probes)
+2026-07-14 09:51:41 | INFO     | pipeline.generation_pipeline:startup:64 | GenerationPipeline starting
+2026-07-14 09:51:41 | INFO     | pipeline.generation_pipeline:startup:78 | llm client ready | name=openrouter base_url=https://openrouter.ai/api/v1 local=False
+2026-07-14 09:51:41 | INFO     | modules.renderer.module:startup:51 | [RENDERER] starting 2 sidecar(s) | node=node runner=/home/404-gen-subnet/shiny-guide/pipeline_service/modules/renderer/render_service/render_runner.mjs base_port=8003 cwd=/home/404-gen-subnet/shiny-guide/docker pool_size_per_sidecar=1
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr] node:internal/errors:496
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     ErrorCaptureStackTrace(err);
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     ^
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr] Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'puppeteer' imported from /home/404-gen-subnet/shiny-guide/pipeline_service/modules/renderer/render_service/browser.js
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at new NodeError (node:internal/errors:405:5)
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at packageResolve (node:internal/modules/esm/resolve:916:9)
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at moduleResolve (node:internal/modules/esm/resolve:973:20)
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at defaultResolve (node:internal/modules/esm/resolve:1193:11)
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:403:12)
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at ModuleLoader.resolve (node:internal/modules/esm/loader:372:25)
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at ModuleLoader.getModuleJob (node:internal/modules/esm/loader:249:38)
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at ModuleWrap.<anonymous> (node:internal/modules/esm/module_job:76:39)
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]     at link (node:internal/modules/esm/module_job:75:36) {
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr]   code: 'ERR_MODULE_NOT_FOUND'
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr] }
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #1/stderr] Node.js v18.19.1
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr] node:internal/errors:496
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     ErrorCaptureStackTrace(err);
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     ^
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr] Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'puppeteer' imported from /home/404-gen-subnet/shiny-guide/pipeline_service/modules/renderer/render_service/browser.js
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at new NodeError (node:internal/errors:405:5)
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at packageResolve (node:internal/modules/esm/resolve:916:9)
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at moduleResolve (node:internal/modules/esm/resolve:973:20)
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at defaultResolve (node:internal/modules/esm/resolve:1193:11)
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:403:12)
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at ModuleLoader.resolve (node:internal/modules/esm/loader:372:25)
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at ModuleLoader.getModuleJob (node:internal/modules/esm/loader:249:38)
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at ModuleWrap.<anonymous> (node:internal/modules/esm/module_job:76:39)
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at link (node:internal/modules/esm/module_job:75:36) {
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]   code: 'ERR_MODULE_NOT_FOUND'
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr] }
+2026-07-14 09:51:41 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr] Node.js v18.19.1
+2026-07-14 09:53:20 | INFO     | __main__:lifespan:77 | No local vLLM clients in llm_clients — cloud-only mode (no health probes)
+2026-07-14 09:53:20 | INFO     | pipeline.generation_pipeline:startup:64 | GenerationPipeline starting
+2026-07-14 09:53:20 | INFO     | pipeline.generation_pipeline:startup:78 | llm client ready | name=openrouter base_url=https://openrouter.ai/api/v1 local=False
+2026-07-14 09:53:20 | INFO     | modules.renderer.module:startup:51 | [RENDERER] starting 2 sidecar(s) | node=node runner=/home/404-gen-subnet/shiny-guide/pipeline_service/modules/renderer/render_service/render_runner.mjs base_port=8003 cwd=/home/404-gen-subnet/shiny-guide/docker pool_size_per_sidecar=1
+2026-07-14 09:53:20 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] starting static server...
+2026-07-14 09:53:20 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr] [render_runner] fatal startup error: Error: listen EADDRINUSE: address already in use 127.0.0.1:3000
+2026-07-14 09:53:20 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+2026-07-14 09:53:20 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at listenInCluster (node:net:1965:12)
+2026-07-14 09:53:20 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at doListen (node:net:2139:7)
+2026-07-14 09:53:20 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]     at process.processTicksAndRejections (node:internal/process/task_queues:83:21) {
+2026-07-14 09:53:20 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]   code: 'EADDRINUSE',
+2026-07-14 09:53:20 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]   errno: -98,
+2026-07-14 09:53:20 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]   syscall: 'listen',
+2026-07-14 09:53:20 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]   address: '127.0.0.1',
+2026-07-14 09:53:20 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr]   port: 3000
+2026-07-14 09:53:20 | WARNING  | modules.renderer.module:_pipe_logger:422 | [renderer-sidecar #0/stderr] }
+2026-07-14 09:53:20 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] starting static server...
+2026-07-14 09:53:20 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] launching browser...
+2026-07-14 09:53:20 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] listening on 127.0.0.1:8004
+2026-07-14 09:53:22 | INFO     | modules.renderer.module:_spawn_sidecar:99 | [RENDERER] sidecar #1 ready on port 8004
+2026-07-14 09:55:11 | INFO     | __main__:lifespan:77 | No local vLLM clients in llm_clients — cloud-only mode (no health probes)
+2026-07-14 09:55:11 | INFO     | pipeline.generation_pipeline:startup:64 | GenerationPipeline starting
+2026-07-14 09:55:11 | INFO     | pipeline.generation_pipeline:startup:78 | llm client ready | name=openrouter base_url=https://openrouter.ai/api/v1 local=False
+2026-07-14 09:55:11 | INFO     | modules.renderer.module:startup:51 | [RENDERER] starting 2 sidecar(s) | node=node runner=/home/404-gen-subnet/shiny-guide/pipeline_service/modules/renderer/render_service/render_runner.mjs base_port=8003 cwd=/home/404-gen-subnet/shiny-guide/docker pool_size_per_sidecar=1
+2026-07-14 09:55:12 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] starting static server...
+2026-07-14 09:55:12 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] launching browser...
+2026-07-14 09:55:12 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] listening on 127.0.0.1:8004
+2026-07-14 09:55:12 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] starting static server...
+2026-07-14 09:55:12 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] launching browser...
+2026-07-14 09:55:12 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] listening on 127.0.0.1:8003
+2026-07-14 09:55:12 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] ready
+2026-07-14 09:55:12 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] ready
+2026-07-14 09:55:13 | INFO     | modules.renderer.module:_spawn_sidecar:99 | [RENDERER] sidecar #1 ready on port 8004
+2026-07-14 09:55:13 | INFO     | modules.renderer.module:_spawn_sidecar:99 | [RENDERER] sidecar #0 ready on port 8003
+2026-07-14 09:55:13 | INFO     | modules.renderer.module:startup:65 | [RENDERER] 2 sidecar(s) ready, total slots=2
+2026-07-14 09:55:13 | INFO     | pipeline.generation_pipeline:startup:98 | [Pipeline initialized — waiting for models]
+2026-07-14 09:55:13 | INFO     | pipeline.generation_pipeline:startup:102 | Planner: DISABLED (pipeline.use_planner=false — pure-image coder)
+2026-07-14 09:55:13 | INFO     | pipeline.generation_pipeline:startup:103 | Coder: openrouter | Model: google/gemini-2.5-pro-preview | multimodal=True | ensemble_size=3 | ensemble_temperature=0.65
+2026-07-14 09:55:13 | INFO     | pipeline.generation_pipeline:startup:108 | Critic: openrouter | Model: google/gemini-2.5-pro-preview
+2026-07-14 09:55:13 | INFO     | pipeline.generation_pipeline:startup:110 | Judge: openrouter | Model: google/gemini-2.5-pro-preview
+2026-07-14 09:55:13 | INFO     | pipeline.generation_pipeline:startup:113 | Iter cap: 2 | Deadline: 3600s | Threshold: 0.55
+2026-07-14 09:55:13 | INFO     | modules.monitoring.orchestrator:_watch_models:76 | [Warmup] running warmup generation
+2026-07-14 09:55:13 | SUCCESS  | modules.monitoring.orchestrator:_watch_models:87 | [Warmup] completed successfully
+2026-07-14 09:55:13 | INFO     | modules.monitoring.orchestrator:_watch_models:89 | models up — ready (0 probed)
+2026-07-14 09:56:10 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] SIGTERM received, shutting down...
+2026-07-14 09:56:10 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] SIGTERM received, shutting down...
+2026-07-14 09:56:10 | INFO     | pipeline.generation_pipeline:shutdown:116 | [Pipeline shutting down]
+2026-07-14 09:56:10 | INFO     | modules.renderer.module:shutdown:210 | [RENDERER] terminating sidecar #0
+2026-07-14 09:56:10 | INFO     | modules.renderer.module:shutdown:210 | [RENDERER] terminating sidecar #1
+2026-07-14 09:57:08 | INFO     | __main__:lifespan:77 | No local vLLM clients in llm_clients — cloud-only mode (no health probes)
+2026-07-14 09:57:08 | INFO     | pipeline.generation_pipeline:startup:64 | GenerationPipeline starting
+2026-07-14 09:57:08 | INFO     | pipeline.generation_pipeline:startup:78 | llm client ready | name=openrouter base_url=https://openrouter.ai/api/v1 local=False
+2026-07-14 09:57:08 | INFO     | modules.renderer.module:startup:51 | [RENDERER] starting 2 sidecar(s) | node=node runner=/home/404-gen-subnet/shiny-guide/pipeline_service/modules/renderer/render_service/render_runner.mjs base_port=8003 cwd=/home/404-gen-subnet/shiny-guide/docker pool_size_per_sidecar=1
+2026-07-14 09:57:09 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] starting static server...
+2026-07-14 09:57:09 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] starting static server...
+2026-07-14 09:57:09 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] launching browser...
+2026-07-14 09:57:09 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] launching browser...
+2026-07-14 09:57:09 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] listening on 127.0.0.1:8003
+2026-07-14 09:57:09 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] listening on 127.0.0.1:8004
+2026-07-14 09:57:09 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] ready
+2026-07-14 09:57:10 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] ready
+2026-07-14 09:57:10 | INFO     | modules.renderer.module:_spawn_sidecar:99 | [RENDERER] sidecar #1 ready on port 8004
+2026-07-14 09:57:10 | INFO     | modules.renderer.module:_spawn_sidecar:99 | [RENDERER] sidecar #0 ready on port 8003
+2026-07-14 09:57:10 | INFO     | modules.renderer.module:startup:65 | [RENDERER] 2 sidecar(s) ready, total slots=2
+2026-07-14 09:57:10 | INFO     | pipeline.generation_pipeline:startup:98 | [Pipeline initialized — waiting for models]
+2026-07-14 09:57:10 | INFO     | pipeline.generation_pipeline:startup:102 | Planner: DISABLED (pipeline.use_planner=false — pure-image coder)
+2026-07-14 09:57:10 | INFO     | pipeline.generation_pipeline:startup:103 | Coder: openrouter | Model: google/gemini-2.5-pro-preview | multimodal=True | ensemble_size=3 | ensemble_temperature=0.65
+2026-07-14 09:57:10 | INFO     | pipeline.generation_pipeline:startup:108 | Critic: openrouter | Model: google/gemini-2.5-pro-preview
+2026-07-14 09:57:10 | INFO     | pipeline.generation_pipeline:startup:110 | Judge: openrouter | Model: google/gemini-2.5-pro-preview
+2026-07-14 09:57:10 | INFO     | pipeline.generation_pipeline:startup:113 | Iter cap: 2 | Deadline: 3600s | Threshold: 0.55
+2026-07-14 09:57:10 | INFO     | modules.monitoring.orchestrator:_watch_models:76 | [Warmup] running warmup generation
+2026-07-14 09:57:10 | SUCCESS  | modules.monitoring.orchestrator:_watch_models:87 | [Warmup] completed successfully
+2026-07-14 09:57:10 | INFO     | modules.monitoring.orchestrator:_watch_models:89 | models up — ready (0 probed)
+2026-07-14 09:57:32 | INFO     | pipeline.generation_pipeline:run_batch:155 | [Batch seed] Agents updated | seed=42 (planner=n/a, coder=42, critic=42, judge=42)
+2026-07-14 09:57:32 | INFO     | pipeline.generation_pipeline:run_batch:176 | [Batch starting] 1 tasks | budget=14400s
+2026-07-14 09:57:32 | INFO     | pipeline.stages:multigen_first_iter:472 | [MULTIGEN] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb K=3 | temperature=0.65 | multimodal=True | osd=no
+2026-07-14 09:57:32 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k0 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 09:57:34 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k1 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 09:57:34 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k2 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 09:57:38 | WARNING  | modules.judge.dino:_load_sync:49 | [DINO] failed to load model 'facebook/dinov3-vits16-pretrain-lvd1689m' on cpu: OSError('You are trying to access a gated repo.\nMake sure to have access to it at https://huggingface.co/facebook/dinov3-vits16-pretrain-lvd1689m.\n401 Client Error. (Request ID: Root=1-6a560812-22953cf82abed27c014da567;8d67f533-84a4-493f-a1e8-c89f0f669bd8)\n\nCannot access gated repo for url https://huggingface.co/facebook/dinov3-vits16-pretrain-lvd1689m/resolve/main/processor_config.json.\nAccess to model facebook/dinov3-vits16-pretrain-lvd1689m is restricted. You must have access to it and be authenticated to access it. Please log in.'); S2BV disabled
+2026-07-14 09:57:42 | WARNING  | pipeline.stages:multigen_first_iter:518 | [MULTIGEN] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb K=3 | drops=['coder:AuthenticationError', 'coder:AuthenticationError', 'coder:AuthenticationError'] | ALL CANDIDATES FAILED
+2026-07-14 09:57:42 | ERROR    | pipeline.orchestrator:run_one:219 | [FAIL] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb stage=multigen
+Traceback (most recent call last):
+
+  File "/home/404-gen-subnet/shiny-guide/pipeline_service/serve.py", line 302, in <module>
+    uvicorn.run(app, host=settings.api.host, port=settings.api.port, reload=False)
+    │       │   │         │        │   │          │        │   └ 10006
+    │       │   │         │        │   │          │        └ APIConfig(host='0.0.0.0', port=10006, debug=True)
+    │       │   │         │        │   │          └ SettingsConf(api=APIConfig(host='0.0.0.0', port=10006, debug=True), pipeline=PipelineConfig(batch_time_budget=14400.0, prompt...
+    │       │   │         │        │   └ '0.0.0.0'
+    │       │   │         │        └ APIConfig(host='0.0.0.0', port=10006, debug=True)
+    │       │   │         └ SettingsConf(api=APIConfig(host='0.0.0.0', port=10006, debug=True), pipeline=PipelineConfig(batch_time_budget=14400.0, prompt...
+    │       │   └ <fastapi.applications.FastAPI object at 0x763649d406e0>
+    │       └ <function run at 0x763649db7240>
+    └ <module 'uvicorn' from '/home/404-gen-subnet/local-eval/.venv/lib/python3.12/site-packages/uvicorn/__init__.py'>
+
+  File "/home/404-gen-subnet/local-eval/.venv/lib/python3.12/site-packages/uvicorn/main.py", line 594, in run
+    server.run()
+    │      └ <function Server.run at 0x763649db7420>
+    └ <uvicorn.server.Server object at 0x7636563ba780>
+  File "/home/404-gen-subnet/local-eval/.venv/lib/python3.12/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+           │           │    │             │                      │    │      └ <function Config.get_loop_factory at 0x763649db6de0>
+           │           │    │             │                      │    └ <uvicorn.config.Config object at 0x763649ecfb90>
+           │           │    │             │                      └ <uvicorn.server.Server object at 0x7636563ba780>
+           │           │    │             └ None
+           │           │    └ <function Server.serve at 0x763649db74c0>
+           │           └ <uvicorn.server.Server object at 0x7636563ba780>
+           └ <function run at 0x76365b9222a0>
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x763649dd2180>
+           │      └ <function Runner.run at 0x76365af1c2c0>
+           └ <asyncio.runners.Runner object at 0x763649c12420>
+  File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /home/404-gen-subnet/local-eval/.venv/lib/python3.12/site-package...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x763649dade40>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x763649c12420>
+
+> File "/home/404-gen-subnet/shiny-guide/pipeline_service/pipeline/orchestrator.py", line 200, in run_one
+    await self._run(task)
+          │    │    └ PipelineTask(stem='00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb', image_url='https://sn12domain.org/procg...
+          │    └ <function Pipeline._run at 0x76364c140860>
+          └ <pipeline.orchestrator.Pipeline object at 0x7636563ba720>
+
+  File "/home/404-gen-subnet/shiny-guide/pipeline_service/pipeline/orchestrator.py", line 118, in _run
+    await multigen_first_iter(
+          └ <function multigen_first_iter at 0x76364c1402c0>
+
+  File "/home/404-gen-subnet/shiny-guide/pipeline_service/pipeline/stages.py", line 521, in multigen_first_iter
+    raise StageError("multigen", RuntimeError("all candidates failed"))
+          └ <class 'pipeline.stages.StageError'>
+
+pipeline.stages.StageError: multigen: RuntimeError: all candidates failed
+2026-07-14 09:57:42 | SUCCESS  | pipeline.orchestrator:run_one:230 | [TASK COMPLETED] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Scores: [] | Best Score: -1.00 | Best Iter: -1 | Elapsed: 10.1s
+2026-07-14 09:57:42 | INFO     | pipeline.generation_pipeline:run_one:173 | [Batch retry] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | attempt=1
+2026-07-14 09:57:42 | INFO     | pipeline.stages:multigen_first_iter:472 | [MULTIGEN] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb K=3 | temperature=0.65 | multimodal=True | osd=no
+2026-07-14 09:57:42 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k0 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 09:57:42 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k1 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 09:57:42 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k2 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 09:57:50 | WARNING  | pipeline.stages:multigen_first_iter:518 | [MULTIGEN] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb K=3 | drops=['coder:AuthenticationError', 'coder:AuthenticationError', 'coder:AuthenticationError'] | ALL CANDIDATES FAILED
+2026-07-14 09:57:50 | ERROR    | pipeline.orchestrator:run_one:219 | [FAIL] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb stage=multigen
+Traceback (most recent call last):
+
+  File "/home/404-gen-subnet/shiny-guide/pipeline_service/serve.py", line 302, in <module>
+    uvicorn.run(app, host=settings.api.host, port=settings.api.port, reload=False)
+    │       │   │         │        │   │          │        │   └ 10006
+    │       │   │         │        │   │          │        └ APIConfig(host='0.0.0.0', port=10006, debug=True)
+    │       │   │         │        │   │          └ SettingsConf(api=APIConfig(host='0.0.0.0', port=10006, debug=True), pipeline=PipelineConfig(batch_time_budget=14400.0, prompt...
+    │       │   │         │        │   └ '0.0.0.0'
+    │       │   │         │        └ APIConfig(host='0.0.0.0', port=10006, debug=True)
+    │       │   │         └ SettingsConf(api=APIConfig(host='0.0.0.0', port=10006, debug=True), pipeline=PipelineConfig(batch_time_budget=14400.0, prompt...
+    │       │   └ <fastapi.applications.FastAPI object at 0x763649d406e0>
+    │       └ <function run at 0x763649db7240>
+    └ <module 'uvicorn' from '/home/404-gen-subnet/local-eval/.venv/lib/python3.12/site-packages/uvicorn/__init__.py'>
+
+  File "/home/404-gen-subnet/local-eval/.venv/lib/python3.12/site-packages/uvicorn/main.py", line 594, in run
+    server.run()
+    │      └ <function Server.run at 0x763649db7420>
+    └ <uvicorn.server.Server object at 0x7636563ba780>
+  File "/home/404-gen-subnet/local-eval/.venv/lib/python3.12/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+           │           │    │             │                      │    │      └ <function Config.get_loop_factory at 0x763649db6de0>
+           │           │    │             │                      │    └ <uvicorn.config.Config object at 0x763649ecfb90>
+           │           │    │             │                      └ <uvicorn.server.Server object at 0x7636563ba780>
+           │           │    │             └ None
+           │           │    └ <function Server.serve at 0x763649db74c0>
+           │           └ <uvicorn.server.Server object at 0x7636563ba780>
+           └ <function run at 0x76365b9222a0>
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x763649dd2180>
+           │      └ <function Runner.run at 0x76365af1c2c0>
+           └ <asyncio.runners.Runner object at 0x763649c12420>
+  File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /home/404-gen-subnet/local-eval/.venv/lib/python3.12/site-package...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x763649dade40>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x763649c12420>
+
+> File "/home/404-gen-subnet/shiny-guide/pipeline_service/pipeline/orchestrator.py", line 200, in run_one
+    await self._run(task)
+          │    │    └ PipelineTask(stem='00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb', image_url='https://sn12domain.org/procg...
+          │    └ <function Pipeline._run at 0x76364c140860>
+          └ <pipeline.orchestrator.Pipeline object at 0x7636563ba720>
+
+  File "/home/404-gen-subnet/shiny-guide/pipeline_service/pipeline/orchestrator.py", line 118, in _run
+    await multigen_first_iter(
+          └ <function multigen_first_iter at 0x76364c1402c0>
+
+  File "/home/404-gen-subnet/shiny-guide/pipeline_service/pipeline/stages.py", line 521, in multigen_first_iter
+    raise StageError("multigen", RuntimeError("all candidates failed"))
+          └ <class 'pipeline.stages.StageError'>
+
+pipeline.stages.StageError: multigen: RuntimeError: all candidates failed
+2026-07-14 09:57:50 | SUCCESS  | pipeline.orchestrator:run_one:230 | [TASK COMPLETED] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Scores: [] | Best Score: -1.00 | Best Iter: -1 | Elapsed: 8.2s
+2026-07-14 09:57:50 | INFO     | pipeline.generation_pipeline:_cleanup_batch_memory:136 | [Batch cleanup] sessions=3 task_status=1 gc_collected=914
+2026-07-14 09:57:50 | INFO     | pipeline.generation_pipeline:run_batch:196 | [Batch done] 0 ok, 1 failed
+2026-07-14 10:02:02 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] SIGINT received, shutting down...
+2026-07-14 10:02:02 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] SIGINT received, shutting down...
+2026-07-14 10:02:02 | INFO     | pipeline.generation_pipeline:shutdown:116 | [Pipeline shutting down]
+2026-07-14 10:03:30 | INFO     | __main__:lifespan:77 | No local vLLM clients in llm_clients — cloud-only mode (no health probes)
+2026-07-14 10:03:30 | INFO     | pipeline.generation_pipeline:startup:64 | GenerationPipeline starting
+2026-07-14 10:03:30 | INFO     | pipeline.generation_pipeline:startup:78 | llm client ready | name=openrouter base_url=https://openrouter.ai/api/v1 local=False
+2026-07-14 10:03:30 | INFO     | modules.renderer.module:startup:51 | [RENDERER] starting 2 sidecar(s) | node=node runner=/home/404-gen-subnet/shiny-guide/pipeline_service/modules/renderer/render_service/render_runner.mjs base_port=8003 cwd=/home/404-gen-subnet/shiny-guide/docker pool_size_per_sidecar=1
+2026-07-14 10:03:31 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] starting static server...
+2026-07-14 10:03:31 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] launching browser...
+2026-07-14 10:03:31 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] listening on 127.0.0.1:8003
+2026-07-14 10:03:31 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] starting static server...
+2026-07-14 10:03:31 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] launching browser...
+2026-07-14 10:03:31 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] listening on 127.0.0.1:8004
+2026-07-14 10:03:31 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] ready
+2026-07-14 10:03:31 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] ready
+2026-07-14 10:03:32 | INFO     | modules.renderer.module:_spawn_sidecar:99 | [RENDERER] sidecar #1 ready on port 8004
+2026-07-14 10:03:32 | INFO     | modules.renderer.module:_spawn_sidecar:99 | [RENDERER] sidecar #0 ready on port 8003
+2026-07-14 10:03:32 | INFO     | modules.renderer.module:startup:65 | [RENDERER] 2 sidecar(s) ready, total slots=2
+2026-07-14 10:03:32 | INFO     | pipeline.generation_pipeline:startup:98 | [Pipeline initialized — waiting for models]
+2026-07-14 10:03:32 | INFO     | pipeline.generation_pipeline:startup:102 | Planner: DISABLED (pipeline.use_planner=false — pure-image coder)
+2026-07-14 10:03:32 | INFO     | pipeline.generation_pipeline:startup:103 | Coder: openrouter | Model: google/gemini-2.5-pro-preview | multimodal=True | ensemble_size=3 | ensemble_temperature=0.65
+2026-07-14 10:03:32 | INFO     | pipeline.generation_pipeline:startup:108 | Critic: openrouter | Model: google/gemini-2.5-pro-preview
+2026-07-14 10:03:32 | INFO     | pipeline.generation_pipeline:startup:110 | Judge: openrouter | Model: google/gemini-2.5-pro-preview
+2026-07-14 10:03:32 | INFO     | pipeline.generation_pipeline:startup:113 | Iter cap: 2 | Deadline: 3600s | Threshold: 0.55
+2026-07-14 10:03:32 | INFO     | modules.monitoring.orchestrator:_watch_models:76 | [Warmup] running warmup generation
+2026-07-14 10:03:32 | SUCCESS  | modules.monitoring.orchestrator:_watch_models:87 | [Warmup] completed successfully
+2026-07-14 10:03:32 | INFO     | modules.monitoring.orchestrator:_watch_models:89 | models up — ready (0 probed)
+2026-07-14 10:03:38 | INFO     | pipeline.generation_pipeline:run_batch:155 | [Batch seed] Agents updated | seed=42 (planner=n/a, coder=42, critic=42, judge=42)
+2026-07-14 10:03:38 | INFO     | pipeline.generation_pipeline:run_batch:176 | [Batch starting] 1 tasks | budget=14400s
+2026-07-14 10:03:39 | INFO     | pipeline.stages:multigen_first_iter:472 | [MULTIGEN] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb K=3 | temperature=0.65 | multimodal=True | osd=no
+2026-07-14 10:03:39 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k0 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 10:03:40 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k1 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 10:03:40 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k2 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 10:03:44 | WARNING  | modules.judge.dino:_load_sync:49 | [DINO] failed to load model 'facebook/dinov3-vits16-pretrain-lvd1689m' on cpu: OSError('You are trying to access a gated repo.\nMake sure to have access to it at https://huggingface.co/facebook/dinov3-vits16-pretrain-lvd1689m.\n403 Client Error. (Request ID: Root=1-6a560980-179310c175559c826a00d35e;eb42d8a0-977b-468c-8015-17807862b260)\n\nCannot access gated repo for url https://huggingface.co/facebook/dinov3-vits16-pretrain-lvd1689m/resolve/main/processor_config.json.\nAccess to model facebook/dinov3-vits16-pretrain-lvd1689m is restricted and you are not in the authorized list. Visit https://huggingface.co/facebook/dinov3-vits16-pretrain-lvd1689m to ask for access.'); S2BV disabled
+2026-07-14 10:05:47 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k2 Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb Iteration:0] | Prompt: 7995 | Completion: 15506 | Total: 23501 | Finish Reason: stop | Max Tokens Cap: 24576
+2026-07-14 10:05:47 | INFO     | modules.scene_coder.agent:code:118 | [2/7 Coder] Finished Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k2 | Elapsed: 126.3s | Bytes: 5852 | Lines: 153
+2026-07-14 10:06:06 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k0 Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb Iteration:0] | Prompt: 7995 | Completion: 17687 | Total: 25682 | Finish Reason: stop | Max Tokens Cap: 24576
+2026-07-14 10:06:06 | INFO     | modules.scene_coder.agent:code:118 | [2/7 Coder] Finished Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k0 | Elapsed: 147.5s | Bytes: 5224 | Lines: 132
+2026-07-14 10:06:06 | INFO     | modules.js_checker.module:process:34 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k0' start | mode=with_object | js_code=5224 bytes
+2026-07-14 10:06:06 | WARNING  | modules.js_checker.module:process:67 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k0' FAIL | stages=[] | errors=["EXECUTION_THREW: node:internal/modules/esm/resolve:854\n  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);\n        ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '@babel/parser' imported from /home/404-gen-subnet/shiny-guide/pipeline_service/modules/js_checker/validator/parse.js\n    at pa"]
+2026-07-14 10:06:10 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k1 Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb Iteration:0] | Prompt: 7995 | Completion: 17051 | Total: 25046 | Finish Reason: stop | Max Tokens Cap: 24576
+2026-07-14 10:06:10 | INFO     | modules.scene_coder.agent:code:118 | [2/7 Coder] Finished Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k1 | Elapsed: 149.5s | Bytes: 5679 | Lines: 145
+2026-07-14 10:06:10 | INFO     | modules.js_checker.module:process:34 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k1' start | mode=with_object | js_code=5679 bytes
+2026-07-14 10:06:10 | INFO     | modules.js_checker.module:process:34 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k2' start | mode=with_object | js_code=5852 bytes
+2026-07-14 10:06:10 | WARNING  | modules.js_checker.module:process:67 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k1' FAIL | stages=[] | errors=["EXECUTION_THREW: node:internal/modules/esm/resolve:854\n  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);\n        ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '@babel/parser' imported from /home/404-gen-subnet/shiny-guide/pipeline_service/modules/js_checker/validator/parse.js\n    at pa"]
+2026-07-14 10:06:10 | WARNING  | modules.js_checker.module:process:67 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k2' FAIL | stages=[] | errors=["EXECUTION_THREW: node:internal/modules/esm/resolve:854\n  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);\n        ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '@babel/parser' imported from /home/404-gen-subnet/shiny-guide/pipeline_service/modules/js_checker/validator/parse.js\n    at pa"]
+2026-07-14 10:06:10 | WARNING  | pipeline.stages:multigen_first_iter:518 | [MULTIGEN] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb K=3 | drops=['checker', 'checker', 'checker'] | ALL CANDIDATES FAILED
+2026-07-14 10:06:10 | ERROR    | pipeline.orchestrator:run_one:219 | [FAIL] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb stage=multigen
+Traceback (most recent call last):
+
+  File "/home/404-gen-subnet/shiny-guide/pipeline_service/serve.py", line 302, in <module>
+    uvicorn.run(app, host=settings.api.host, port=settings.api.port, reload=False)
+    │       │   │         │        │   │          │        │   └ 10006
+    │       │   │         │        │   │          │        └ APIConfig(host='0.0.0.0', port=10006, debug=True)
+    │       │   │         │        │   │          └ SettingsConf(api=APIConfig(host='0.0.0.0', port=10006, debug=True), pipeline=PipelineConfig(batch_time_budget=14400.0, prompt...
+    │       │   │         │        │   └ '0.0.0.0'
+    │       │   │         │        └ APIConfig(host='0.0.0.0', port=10006, debug=True)
+    │       │   │         └ SettingsConf(api=APIConfig(host='0.0.0.0', port=10006, debug=True), pipeline=PipelineConfig(batch_time_budget=14400.0, prompt...
+    │       │   └ <fastapi.applications.FastAPI object at 0x7f4c9a22c620>
+    │       └ <function run at 0x7f4c9a2a3240>
+    └ <module 'uvicorn' from '/home/404-gen-subnet/local-eval/.venv/lib/python3.12/site-packages/uvicorn/__init__.py'>
+
+  File "/home/404-gen-subnet/local-eval/.venv/lib/python3.12/site-packages/uvicorn/main.py", line 594, in run
+    server.run()
+    │      └ <function Server.run at 0x7f4c9a2a3420>
+    └ <uvicorn.server.Server object at 0x7f4c9a22e630>
+  File "/home/404-gen-subnet/local-eval/.venv/lib/python3.12/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+           │           │    │             │                      │    │      └ <function Config.get_loop_factory at 0x7f4c9a2a2de0>
+           │           │    │             │                      │    └ <uvicorn.config.Config object at 0x7f4c9a3bfb90>
+           │           │    │             │                      └ <uvicorn.server.Server object at 0x7f4c9a22e630>
+           │           │    │             └ None
+           │           │    └ <function Server.serve at 0x7f4c9a2a34c0>
+           │           └ <uvicorn.server.Server object at 0x7f4c9a22e630>
+           └ <function run at 0x7f4cabf1e2a0>
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7f4c9a2be180>
+           │      └ <function Runner.run at 0x7f4cab4142c0>
+           └ <asyncio.runners.Runner object at 0x7f4c9a2b7b60>
+  File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /home/404-gen-subnet/local-eval/.venv/lib/python3.12/site-package...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7f4c9a299e40>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7f4c9a2b7b60>
+
+> File "/home/404-gen-subnet/shiny-guide/pipeline_service/pipeline/orchestrator.py", line 200, in run_one
+    await self._run(task)
+          │    │    └ PipelineTask(stem='00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb', image_url='https://sn12domain.org/procg...
+          │    └ <function Pipeline._run at 0x7f4ca612c860>
+          └ <pipeline.orchestrator.Pipeline object at 0x7f4c99d84e90>
+
+  File "/home/404-gen-subnet/shiny-guide/pipeline_service/pipeline/orchestrator.py", line 118, in _run
+    await multigen_first_iter(
+          └ <function multigen_first_iter at 0x7f4ca612c2c0>
+
+  File "/home/404-gen-subnet/shiny-guide/pipeline_service/pipeline/stages.py", line 521, in multigen_first_iter
+    raise StageError("multigen", RuntimeError("all candidates failed"))
+          └ <class 'pipeline.stages.StageError'>
+
+pipeline.stages.StageError: multigen: RuntimeError: all candidates failed
+2026-07-14 10:06:10 | SUCCESS  | pipeline.orchestrator:run_one:230 | [TASK COMPLETED] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Scores: [] | Best Score: -1.00 | Best Iter: -1 | Elapsed: 151.5s
+2026-07-14 10:06:10 | INFO     | pipeline.generation_pipeline:run_one:173 | [Batch retry] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | attempt=1
+2026-07-14 10:06:10 | INFO     | pipeline.stages:multigen_first_iter:472 | [MULTIGEN] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb K=3 | temperature=0.65 | multimodal=True | osd=no
+2026-07-14 10:06:10 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k0 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 10:06:10 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k1 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 10:06:10 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k2 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 10:07:56 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k1 Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb Iteration:0] | Prompt: 9610 | Completion: 11970 | Total: 21580 | Finish Reason: stop | Max Tokens Cap: 24576
+2026-07-14 10:07:56 | INFO     | modules.scene_coder.agent:code:118 | [2/7 Coder] Finished Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k1 | Elapsed: 105.6s | Bytes: 6001 | Lines: 153
+2026-07-14 10:08:29 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k2 Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb Iteration:0] | Prompt: 8781 | Completion: 614 | Total: 9395 | Finish Reason: error | Max Tokens Cap: 24576
+2026-07-14 10:08:40 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k0 Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb Iteration:0] | Prompt: 9473 | Completion: 17467 | Total: 26940 | Finish Reason: stop | Max Tokens Cap: 24576
+2026-07-14 10:08:40 | INFO     | modules.scene_coder.agent:code:118 | [2/7 Coder] Finished Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k0 | Elapsed: 149.8s | Bytes: 5722 | Lines: 147
+2026-07-14 10:08:40 | INFO     | modules.js_checker.module:process:34 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k0' start | mode=with_object | js_code=5722 bytes
+2026-07-14 10:08:40 | INFO     | modules.js_checker.module:process:34 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k1' start | mode=with_object | js_code=6001 bytes
+2026-07-14 10:08:40 | WARNING  | modules.js_checker.module:process:67 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k0' FAIL | stages=[] | errors=["EXECUTION_THREW: node:internal/modules/esm/resolve:854\n  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);\n        ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '@babel/parser' imported from /home/404-gen-subnet/shiny-guide/pipeline_service/modules/js_checker/validator/parse.js\n    at pa"]
+2026-07-14 10:08:40 | WARNING  | modules.js_checker.module:process:67 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k1' FAIL | stages=[] | errors=["EXECUTION_THREW: node:internal/modules/esm/resolve:854\n  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);\n        ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '@babel/parser' imported from /home/404-gen-subnet/shiny-guide/pipeline_service/modules/js_checker/validator/parse.js\n    at pa"]
+2026-07-14 10:09:26 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k2 Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb Iteration:0] | Prompt: 10295 | Completion: 6299 | Total: 16594 | Finish Reason: stop | Max Tokens Cap: 24576
+2026-07-14 10:09:26 | INFO     | modules.scene_coder.agent:code:118 | [2/7 Coder] Finished Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k2 | Elapsed: 196.2s | Bytes: 5852 | Lines: 153
+2026-07-14 10:09:26 | INFO     | modules.js_checker.module:process:34 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k2' start | mode=with_object | js_code=5852 bytes
+2026-07-14 10:09:27 | WARNING  | modules.js_checker.module:process:67 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k2' FAIL | stages=[] | errors=["EXECUTION_THREW: node:internal/modules/esm/resolve:854\n  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);\n        ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '@babel/parser' imported from /home/404-gen-subnet/shiny-guide/pipeline_service/modules/js_checker/validator/parse.js\n    at pa"]
+2026-07-14 10:09:27 | WARNING  | pipeline.stages:multigen_first_iter:518 | [MULTIGEN] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb K=3 | drops=['checker', 'checker', 'checker'] | ALL CANDIDATES FAILED
+2026-07-14 10:09:27 | ERROR    | pipeline.orchestrator:run_one:219 | [FAIL] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb stage=multigen
+Traceback (most recent call last):
+
+  File "/home/404-gen-subnet/shiny-guide/pipeline_service/serve.py", line 302, in <module>
+    uvicorn.run(app, host=settings.api.host, port=settings.api.port, reload=False)
+    │       │   │         │        │   │          │        │   └ 10006
+    │       │   │         │        │   │          │        └ APIConfig(host='0.0.0.0', port=10006, debug=True)
+    │       │   │         │        │   │          └ SettingsConf(api=APIConfig(host='0.0.0.0', port=10006, debug=True), pipeline=PipelineConfig(batch_time_budget=14400.0, prompt...
+    │       │   │         │        │   └ '0.0.0.0'
+    │       │   │         │        └ APIConfig(host='0.0.0.0', port=10006, debug=True)
+    │       │   │         └ SettingsConf(api=APIConfig(host='0.0.0.0', port=10006, debug=True), pipeline=PipelineConfig(batch_time_budget=14400.0, prompt...
+    │       │   └ <fastapi.applications.FastAPI object at 0x7f4c9a22c620>
+    │       └ <function run at 0x7f4c9a2a3240>
+    └ <module 'uvicorn' from '/home/404-gen-subnet/local-eval/.venv/lib/python3.12/site-packages/uvicorn/__init__.py'>
+
+  File "/home/404-gen-subnet/local-eval/.venv/lib/python3.12/site-packages/uvicorn/main.py", line 594, in run
+    server.run()
+    │      └ <function Server.run at 0x7f4c9a2a3420>
+    └ <uvicorn.server.Server object at 0x7f4c9a22e630>
+  File "/home/404-gen-subnet/local-eval/.venv/lib/python3.12/site-packages/uvicorn/server.py", line 67, in run
+    return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+           │           │    │             │                      │    │      └ <function Config.get_loop_factory at 0x7f4c9a2a2de0>
+           │           │    │             │                      │    └ <uvicorn.config.Config object at 0x7f4c9a3bfb90>
+           │           │    │             │                      └ <uvicorn.server.Server object at 0x7f4c9a22e630>
+           │           │    │             └ None
+           │           │    └ <function Server.serve at 0x7f4c9a2a34c0>
+           │           └ <uvicorn.server.Server object at 0x7f4c9a22e630>
+           └ <function run at 0x7f4cabf1e2a0>
+  File "/usr/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           │      │   └ <coroutine object Server.serve at 0x7f4c9a2be180>
+           │      └ <function Runner.run at 0x7f4cab4142c0>
+           └ <asyncio.runners.Runner object at 0x7f4c9a2b7b60>
+  File "/usr/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /home/404-gen-subnet/local-eval/.venv/lib/python3.12/site-package...
+           │    │     └ <cyfunction Loop.run_until_complete at 0x7f4c9a299e40>
+           │    └ <uvloop.Loop running=True closed=False debug=False>
+           └ <asyncio.runners.Runner object at 0x7f4c9a2b7b60>
+
+> File "/home/404-gen-subnet/shiny-guide/pipeline_service/pipeline/orchestrator.py", line 200, in run_one
+    await self._run(task)
+          │    │    └ PipelineTask(stem='00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb', image_url='https://sn12domain.org/procg...
+          │    └ <function Pipeline._run at 0x7f4ca612c860>
+          └ <pipeline.orchestrator.Pipeline object at 0x7f4c99d84e90>
+
+  File "/home/404-gen-subnet/shiny-guide/pipeline_service/pipeline/orchestrator.py", line 118, in _run
+    await multigen_first_iter(
+          └ <function multigen_first_iter at 0x7f4ca612c2c0>
+
+  File "/home/404-gen-subnet/shiny-guide/pipeline_service/pipeline/stages.py", line 521, in multigen_first_iter
+    raise StageError("multigen", RuntimeError("all candidates failed"))
+          └ <class 'pipeline.stages.StageError'>
+
+pipeline.stages.StageError: multigen: RuntimeError: all candidates failed
+2026-07-14 10:09:27 | SUCCESS  | pipeline.orchestrator:run_one:230 | [TASK COMPLETED] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Scores: [] | Best Score: -1.00 | Best Iter: -1 | Elapsed: 196.7s
+2026-07-14 10:09:27 | INFO     | pipeline.generation_pipeline:_cleanup_batch_memory:136 | [Batch cleanup] sessions=3 task_status=1 gc_collected=773
+2026-07-14 10:09:27 | INFO     | pipeline.generation_pipeline:run_batch:196 | [Batch done] 0 ok, 1 failed
+2026-07-14 12:06:07 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] SIGINT received, shutting down...
+2026-07-14 12:06:07 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] SIGINT received, shutting down...
+2026-07-14 12:06:07 | INFO     | pipeline.generation_pipeline:shutdown:116 | [Pipeline shutting down]
+2026-07-14 12:06:23 | INFO     | __main__:lifespan:77 | No local vLLM clients in llm_clients — cloud-only mode (no health probes)
+2026-07-14 12:06:23 | INFO     | pipeline.generation_pipeline:startup:64 | GenerationPipeline starting
+2026-07-14 12:06:23 | INFO     | pipeline.generation_pipeline:startup:78 | llm client ready | name=openrouter base_url=https://openrouter.ai/api/v1 local=False
+2026-07-14 12:06:23 | INFO     | modules.renderer.module:startup:51 | [RENDERER] starting 2 sidecar(s) | node=node runner=/home/404-gen-subnet/shiny-guide/pipeline_service/modules/renderer/render_service/render_runner.mjs base_port=8003 cwd=/home/404-gen-subnet/shiny-guide/docker pool_size_per_sidecar=1
+2026-07-14 12:06:23 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] starting static server...
+2026-07-14 12:06:23 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] launching browser...
+2026-07-14 12:06:23 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] listening on 127.0.0.1:8004
+2026-07-14 12:06:23 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] starting static server...
+2026-07-14 12:06:23 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] launching browser...
+2026-07-14 12:06:23 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] listening on 127.0.0.1:8003
+2026-07-14 12:06:24 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] ready
+2026-07-14 12:06:24 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] ready
+2026-07-14 12:06:24 | INFO     | modules.renderer.module:_spawn_sidecar:99 | [RENDERER] sidecar #0 ready on port 8003
+2026-07-14 12:06:24 | INFO     | modules.renderer.module:_spawn_sidecar:99 | [RENDERER] sidecar #1 ready on port 8004
+2026-07-14 12:06:24 | INFO     | modules.renderer.module:startup:65 | [RENDERER] 2 sidecar(s) ready, total slots=2
+2026-07-14 12:06:24 | INFO     | pipeline.generation_pipeline:startup:98 | [Pipeline initialized — waiting for models]
+2026-07-14 12:06:24 | INFO     | pipeline.generation_pipeline:startup:102 | Planner: DISABLED (pipeline.use_planner=false — pure-image coder)
+2026-07-14 12:06:24 | INFO     | pipeline.generation_pipeline:startup:103 | Coder: openrouter | Model: google/gemini-2.5-pro-preview | multimodal=True | ensemble_size=3 | ensemble_temperature=0.65
+2026-07-14 12:06:24 | INFO     | pipeline.generation_pipeline:startup:108 | Critic: openrouter | Model: google/gemini-2.5-pro-preview
+2026-07-14 12:06:24 | INFO     | pipeline.generation_pipeline:startup:110 | Judge: openrouter | Model: google/gemini-2.5-pro-preview
+2026-07-14 12:06:24 | INFO     | pipeline.generation_pipeline:startup:113 | Iter cap: 2 | Deadline: 3600s | Threshold: 0.55
+2026-07-14 12:06:24 | INFO     | modules.monitoring.orchestrator:_watch_models:76 | [Warmup] running warmup generation
+2026-07-14 12:06:24 | SUCCESS  | modules.monitoring.orchestrator:_watch_models:87 | [Warmup] completed successfully
+2026-07-14 12:06:24 | INFO     | modules.monitoring.orchestrator:_watch_models:89 | models up — ready (0 probed)
+2026-07-14 12:06:28 | INFO     | pipeline.generation_pipeline:run_batch:155 | [Batch seed] Agents updated | seed=42 (planner=n/a, coder=42, critic=42, judge=42)
+2026-07-14 12:06:28 | INFO     | pipeline.generation_pipeline:run_batch:176 | [Batch starting] 1 tasks | budget=14400s
+2026-07-14 12:06:29 | INFO     | pipeline.stages:multigen_first_iter:472 | [MULTIGEN] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb K=3 | temperature=0.65 | multimodal=True | osd=no
+2026-07-14 12:06:29 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k0 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 12:06:30 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k1 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 12:06:30 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k2 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 12:06:37 | INFO     | modules.judge.dino:_load_sync:60 | [DINO] loaded facebook/dinov3-vits16-pretrain-lvd1689m on cpu
+2026-07-14 12:08:47 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k2 Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb Iteration:0] | Prompt: 7995 | Completion: 16605 | Total: 24600 | Finish Reason: stop | Max Tokens Cap: 24576
+2026-07-14 12:08:47 | INFO     | modules.scene_coder.agent:code:118 | [2/7 Coder] Finished Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k2 | Elapsed: 137.1s | Bytes: 5782 | Lines: 148
+2026-07-14 12:09:02 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k1 Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb Iteration:0] | Prompt: 6706 | Completion: 1599 | Total: 8305 | Finish Reason: error | Max Tokens Cap: 24576
+2026-07-14 12:09:34 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k0 Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb Iteration:0] | Prompt: 6706 | Completion: 1062 | Total: 7768 | Finish Reason: error | Max Tokens Cap: 24576
+2026-07-14 12:10:36 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k1 Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb Iteration:0] | Prompt: 9373 | Completion: 11746 | Total: 21119 | Finish Reason: stop | Max Tokens Cap: 24576
+2026-07-14 12:10:36 | INFO     | modules.scene_coder.agent:code:118 | [2/7 Coder] Finished Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Actor: coder#k1 | Elapsed: 246.4s | Bytes: 5584 | Lines: 134
+2026-07-14 12:12:08 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k0 Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb Iteration:0] | Prompt: 7815 | Completion: 5579 | Total: 13394 | Finish Reason: error | Max Tokens Cap: 24576
+2026-07-14 12:15:37 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k0 Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb Iteration:0] | Prompt: 13442 | Completion: 2714 | Total: 16156 | Finish Reason: error | Max Tokens Cap: 24576
+2026-07-14 12:15:37 | INFO     | modules.js_checker.module:process:34 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k2' start | mode=with_object | js_code=5782 bytes
+2026-07-14 12:15:37 | INFO     | modules.js_checker.module:process:34 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k1' start | mode=with_object | js_code=5584 bytes
+2026-07-14 12:15:37 | INFO     | modules.js_checker.module:process:95 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k2' PASS | vertices=4311 drawCalls=7 depth=2 instances=0 texBytes=0 | bbox=[-0.25,-0.12,-0.48]→[0.25,0.12,0.47] | timing: load=0.0s exec=0.0s total=0.1s
+2026-07-14 12:15:37 | INFO     | modules.renderer.module:process:278 | [RENDERER] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k2' start | sidecar=#0 | path=object | scene_json
+2026-07-14 12:15:37 | INFO     | modules.js_checker.module:process:95 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k1' PASS | vertices=4429 drawCalls=5 depth=2 instances=0 texBytes=0 | bbox=[-0.43,-0.47,-0.23]→[0.43,0.47,0.23] | timing: load=0.0s exec=0.1s total=0.2s
+2026-07-14 12:15:37 | INFO     | modules.renderer.module:process:278 | [RENDERER] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k1' start | sidecar=#1 | path=object | scene_json
+2026-07-14 12:15:49 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] /render/object ok: 70133B in 11883ms
+2026-07-14 12:15:49 | INFO     | modules.renderer.module:process:300 | [RENDERER] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k2' PASS sidecar=#0 | png=70133B render=11.9s
+2026-07-14 12:15:49 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] /render/object ok: 89326B in 11782ms
+2026-07-14 12:15:49 | INFO     | modules.renderer.module:process:300 | [RENDERER] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k1' PASS sidecar=#1 | png=89326B render=11.8s
+2026-07-14 12:16:01 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] /render/views ok: 8 views 115886B in 11839ms
+2026-07-14 12:16:02 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] /render/views ok: 8 views 177891B in 12281ms
+2026-07-14 12:16:12 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] /render/views ok: 1 views 14473B in 11295ms
+2026-07-14 12:16:12 | INFO     | modules.renderer.module:render_judge_views:368 | [RENDERER] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k2' judge views | white=8 gray=1 | 23.1s
+2026-07-14 12:16:13 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] /render/views ok: 1 views 33199B in 11421ms
+2026-07-14 12:16:13 | INFO     | modules.renderer.module:render_judge_views:368 | [RENDERER] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb#k1' judge views | white=8 gray=1 | 23.7s
+2026-07-14 12:16:14 | INFO     | modules.judge.agent:compare:121 | [Judge R1 k1-vs-k2] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Model: google/gemini-2.5-pro-preview | max_stage=4 | Ref KB: 1045.4 | A KB: 87.2 | B KB: 68.5 | white A/B: 8/8
+2026-07-14 12:16:20 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | explain: attempt 1/3 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n```json'
+2026-07-14 12:16:26 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | explain: attempt 2/3 failed: ValueError: Unparseable VLM response: '{'
+2026-07-14 12:16:27 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 5,\n  "penalty_2": 7,\n  "issues":'
+2026-07-14 12:16:28 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 5,\n  "penalty_2": 7,\n  "issues": "Model '
+2026-07-14 12:16:30 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 5,\n  "penalty_2": 3,\n  "issues":'
+2026-07-14 12:16:33 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | explain: attempt 3/3 failed: ValueError: Unparseable VLM response: '{'
+2026-07-14 12:16:33 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | explain: all 3 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 12:16:39 | INFO     | modules.judge.multi_stage:_safe_chat_json:493 | s1_prompt_match: JSON parsed on attempt 2/5
+2026-07-14 12:16:39 | INFO     | modules.judge.multi_stage:_safe_chat_json:493 | s1_prompt_match: JSON parsed on attempt 2/5
+2026-07-14 12:16:46 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 2/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 5,\n  "penalty_2": 7,\n  "issues'
+2026-07-14 12:17:01 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 3/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 6,\n  "'
+2026-07-14 12:17:16 | INFO     | modules.judge.multi_stage:_safe_chat_json:493 | s1_prompt_match: JSON parsed on attempt 4/5
+2026-07-14 12:17:16 | DEBUG    | modules.judge.multi_stage:evaluate_duel:1453 | 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb R1 k1-vs-k2: S1 -> draw (61.6s)
+2026-07-14 12:17:23 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s2cl_decompose: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n'
+2026-07-14 12:17:30 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s2cl_decompose: attempt 2/5 failed: ValueError: Unparseable VLM response: '{\n  "'
+2026-07-14 12:17:37 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s2cl_decompose: attempt 3/5 failed: ValueError: Unparseable VLM response: '{\n  "main'
+2026-07-14 12:17:46 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s2cl_decompose: attempt 4/5 failed: ValueError: Unparseable VLM response: '{\n  "'
+2026-07-14 12:17:54 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s2cl_decompose: attempt 5/5 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 12:17:54 | ERROR    | modules.judge.multi_stage:_s2cl_run:982 | s2cl decompose failed: ValueError("Unparseable VLM response: 'Here is the JSON requested:\\n'")
+2026-07-14 12:17:54 | DEBUG    | modules.judge.multi_stage:evaluate_duel:1505 | 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb R1 k1-vs-k2: S2 -> draw via consensus [bv=None,ac=B,cl=None] (37.9s)
+2026-07-14 12:18:08 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s3_gray_ba: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "'
+2026-07-14 12:18:19 | INFO     | modules.judge.multi_stage:_safe_chat_json:493 | s3_gray_ba: JSON parsed on attempt 2/5
+2026-07-14 12:18:19 | DEBUG    | modules.judge.multi_stage:evaluate_duel:1546 | 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb R1 k1-vs-k2: S3 -> B (fired=True, 25.6s)
+2026-07-14 12:18:23 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 1/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:'
+2026-07-14 12:18:24 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 1/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested'
+2026-07-14 12:18:24 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 1/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n```'
+2026-07-14 12:18:24 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 1/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested'
+2026-07-14 12:18:24 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 1/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 12:18:24 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 1/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:'
+2026-07-14 12:18:24 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 1/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 12:18:24 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 1/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:'
+2026-07-14 12:18:28 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 2/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON'
+2026-07-14 12:18:28 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 2/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:'
+2026-07-14 12:18:29 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 2/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 12:18:29 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 2/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 12:18:29 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 2/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:'
+2026-07-14 12:18:29 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 2/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 12:18:29 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 2/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:'
+2026-07-14 12:18:30 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 2/4 failed: ValueError: Unparseable VLM response: 'Here'
+2026-07-14 12:18:33 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 3/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n```'
+2026-07-14 12:18:34 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 3/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested'
+2026-07-14 12:18:34 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 3/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 12:18:34 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 3/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested'
+2026-07-14 12:18:34 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 3/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:'
+2026-07-14 12:18:34 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 3/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested'
+2026-07-14 12:18:34 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 3/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n```'
+2026-07-14 12:18:35 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 3/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n```'
+2026-07-14 12:18:39 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 4/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 12:18:39 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s4_per_angle: all 4 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 12:18:39 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 4/4 failed: ValueError: Unparseable VLM response: 'Here is'
+2026-07-14 12:18:39 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s4_per_angle: all 4 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 12:18:39 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 4/4 failed: ValueError: Unparseable VLM response: 'Here'
+2026-07-14 12:18:39 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s4_per_angle: all 4 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 12:18:40 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 4/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 12:18:40 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s4_per_angle: all 4 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 12:18:40 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 4/4 failed: ValueError: Unparseable VLM response: 'Here is the'
+2026-07-14 12:18:40 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s4_per_angle: all 4 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 12:18:40 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 4/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 12:18:40 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s4_per_angle: all 4 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 12:18:40 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 4/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON'
+2026-07-14 12:18:40 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s4_per_angle: all 4 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 12:18:41 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 4/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n```'
+2026-07-14 12:18:41 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s4_per_angle: all 4 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 12:18:41 | DEBUG    | modules.judge.multi_stage:evaluate_duel:1569 | 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb R1 k1-vs-k2: S4 -> B (applied=False, primary=B, 21.4s)
+2026-07-14 12:18:41 | INFO     | modules.judge.multi_stage:evaluate_duel:1578 | 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb R1 k1-vs-k2: winner=right (decided by S3 gray-rescue, duel 146.4s)
+2026-07-14 12:18:41 | INFO     | modules.judge.agent:compare:165 | [Judge R1 k1-vs-k2] Finished Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | duel_winner=right -> B | decided_by=S3 gray-rescue | confidence=0.65 | reason=decided by S3 gray-rescue
+2026-07-14 12:18:41 | INFO     | pipeline.stages:_judge_duel:234 | [BRACKET R1 k1-vs-k2] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb -> k2
+2026-07-14 12:18:41 | INFO     | pipeline.stages:multigen_first_iter:527 | [MULTIGEN] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb K=3 | unique=2 | survivors=[1, 2] | drops=['coder:ValueError', None, None]
+2026-07-14 12:18:41 | INFO     | pipeline.stages:multigen_first_iter:533 | [MULTIGEN] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb winner=k2 | js_bytes=5782
+2026-07-14 12:18:41 | INFO     | modules.critic.agent:run_critic:158 | [5/7 Critic] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Model: google/gemini-2.5-pro-preview | Image KB: 1045.4 | Render KB: 68.5 | Artifact Context: 3
+2026-07-14 12:19:02 | DEBUG    | modules.critic.agent:_call:217 | [TOKENS Actor: critic Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb] | Prompt: 2773 | Completion: 1823 | Total: 4596 | Finish Reason: stop | Max Tokens Cap: 6144
+2026-07-14 12:19:02 | INFO     | modules.critic.agent:_call:225 | [5/7 Critic] Finished Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Elapsed: 21.4s | Score: 0.45 | Issues: 5 | Seed: 42
+2026-07-14 12:19:02 | INFO     | modules.scene_coder.agent:code_critic_repair:221 | [6/7 Patcher] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Repair: critic | Issues: 5 | Score: 0.45 | Multimodal: True
+2026-07-14 12:20:27 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb Iteration:0] | Prompt: 11467 | Completion: 9590 | Total: 21057 | Finish Reason: stop | Max Tokens Cap: 24576
+2026-07-14 12:20:27 | INFO     | modules.scene_coder.agent:code_critic_repair:227 | [6/7 Patcher] Finished Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Elapsed: 84.6s | Bytes: 7016
+2026-07-14 12:20:27 | INFO     | modules.js_checker.module:process:34 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb' start | mode=with_object | js_code=7016 bytes
+2026-07-14 12:20:27 | INFO     | modules.js_checker.module:process:95 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb' PASS | vertices=5670 drawCalls=7 depth=2 instances=0 texBytes=0 | bbox=[-0.33,-0.09,-0.47]→[0.33,0.09,0.48] | timing: load=0.0s exec=0.0s total=0.1s
+2026-07-14 12:20:27 | INFO     | modules.renderer.module:process:278 | [RENDERER] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb' start | sidecar=#0 | path=object | scene_json
+2026-07-14 12:20:28 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] /render/object ok: 89762B in 484ms
+2026-07-14 12:20:28 | INFO     | modules.renderer.module:process:300 | [RENDERER] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb' PASS sidecar=#0 | png=89762B render=0.5s
+2026-07-14 12:20:28 | INFO     | modules.critic.agent:run_critic:158 | [5/7 Critic] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Model: google/gemini-2.5-pro-preview | Image KB: 1045.4 | Render KB: 87.7 | Artifact Context: 3
+2026-07-14 12:20:52 | DEBUG    | modules.critic.agent:_call:217 | [TOKENS Actor: critic Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb] | Prompt: 2775 | Completion: 1953 | Total: 4728 | Finish Reason: stop | Max Tokens Cap: 6144
+2026-07-14 12:20:52 | INFO     | modules.critic.agent:_call:225 | [5/7 Critic] Finished Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Elapsed: 23.8s | Score: 0.45 | Issues: 4 | Seed: 42
+2026-07-14 12:20:52 | INFO     | modules.scene_coder.agent:code_critic_repair:221 | [6/7 Patcher] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Repair: critic | Issues: 4 | Score: 0.45 | Multimodal: True
+2026-07-14 12:22:43 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb Iteration:0] | Prompt: 16226 | Completion: 12414 | Total: 28640 | Finish Reason: stop | Max Tokens Cap: 24576
+2026-07-14 12:22:43 | INFO     | modules.scene_coder.agent:code_critic_repair:227 | [6/7 Patcher] Finished Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Elapsed: 111.2s | Bytes: 5766
+2026-07-14 12:22:43 | INFO     | modules.js_checker.module:process:34 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb' start | mode=with_object | js_code=5766 bytes
+2026-07-14 12:22:43 | INFO     | modules.js_checker.module:process:95 | [JS_CHECK] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb' PASS | vertices=7881 drawCalls=8 depth=3 instances=0 texBytes=0 | bbox=[-0.24,-0.10,-0.47]→[0.24,0.10,0.48] | timing: load=0.0s exec=0.0s total=0.2s
+2026-07-14 12:22:43 | INFO     | modules.renderer.module:process:278 | [RENDERER] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb' start | sidecar=#1 | path=object | scene_json
+2026-07-14 12:22:44 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] /render/object ok: 84666B in 637ms
+2026-07-14 12:22:44 | INFO     | modules.renderer.module:process:300 | [RENDERER] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb' PASS sidecar=#1 | png=84666B render=0.6s
+2026-07-14 12:22:44 | INFO     | modules.critic.agent:run_critic:158 | [5/7 Critic] Started Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Model: google/gemini-2.5-pro-preview | Image KB: 1045.4 | Render KB: 82.7 | Artifact Context: 3
+2026-07-14 12:23:12 | DEBUG    | modules.critic.agent:_call:217 | [TOKENS Actor: critic Task:00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb] | Prompt: 2815 | Completion: 2739 | Total: 5554 | Finish Reason: stop | Max Tokens Cap: 6144
+2026-07-14 12:23:12 | INFO     | modules.critic.agent:_call:225 | [5/7 Critic] Finished Task 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Elapsed: 28.0s | Score: 0.45 | Issues: 5 | Seed: 42
+2026-07-14 12:23:12 | SUCCESS  | pipeline.orchestrator:run_one:230 | [TASK COMPLETED] 00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb | Scores: [0.45, 0.45, 0.45] | Best Score: 0.45 | Best Iter: 0 | Elapsed: 1003.7s
+2026-07-14 12:23:12 | INFO     | pipeline.generation_pipeline:_cleanup_batch_memory:136 | [Batch cleanup] sessions=1 task_status=1 gc_collected=1166
+2026-07-14 12:23:12 | INFO     | pipeline.generation_pipeline:run_batch:196 | [Batch done] 1 ok, 0 failed
+2026-07-14 12:51:38 | INFO     | modules.renderer.module:startup:51 | [RENDERER] starting 1 sidecar(s) | node=node runner=/home/404-gen-subnet/my-agent/pipeline_service/modules/renderer/render_service/render_runner.mjs base_port=8033 cwd=/home/404-gen-subnet/my-agent/docker pool_size_per_sidecar=1
+2026-07-14 12:51:38 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] starting static server...
+2026-07-14 12:51:38 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] launching browser...
+2026-07-14 12:51:38 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] listening on 127.0.0.1:8033
+2026-07-14 12:51:39 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] ready
+2026-07-14 12:51:39 | INFO     | modules.renderer.module:_spawn_sidecar:99 | [RENDERER] sidecar #0 ready on port 8033
+2026-07-14 12:51:39 | INFO     | modules.renderer.module:startup:65 | [RENDERER] 1 sidecar(s) ready, total slots=1
+2026-07-14 12:51:39 | INFO     | modules.renderer.module:process:278 | [RENDERER] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb' start | sidecar=#0 | path=code | js_code=5782 bytes
+2026-07-14 12:51:46 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] /render/grid ok: 70133B in 6395ms
+2026-07-14 12:51:46 | INFO     | modules.renderer.module:process:300 | [RENDERER] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb' PASS sidecar=#0 | png=70133B render=6.4s
+2026-07-14 12:51:52 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] /render/views ok: 8 views 115886B in 6052ms
+2026-07-14 12:51:57 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] /render/views ok: 1 views 14473B in 5589ms
+2026-07-14 12:51:57 | INFO     | modules.renderer.module:render_judge_views:368 | [RENDERER] '00023f2c265ca55189f7a2e71eea016b90496212469850353abffa8bdd920bdb' judge views | white=8 gray=1 | 11.7s
+2026-07-14 12:51:57 | INFO     | modules.renderer.module:shutdown:210 | [RENDERER] terminating sidecar #0
+2026-07-14 12:51:57 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] SIGTERM received, shutting down...
+2026-07-14 12:56:28 | INFO     | __main__:lifespan:77 | No local vLLM clients in llm_clients — cloud-only mode (no health probes)
+2026-07-14 12:56:28 | INFO     | pipeline.generation_pipeline:startup:64 | GenerationPipeline starting
+2026-07-14 12:56:28 | INFO     | pipeline.generation_pipeline:startup:78 | llm client ready | name=openrouter base_url=https://openrouter.ai/api/v1 local=False
+2026-07-14 12:56:28 | INFO     | modules.renderer.module:startup:51 | [RENDERER] starting 2 sidecar(s) | node=node runner=/home/404-gen-subnet/my-agent/pipeline_service/modules/renderer/render_service/render_runner.mjs base_port=8003 cwd=/home/404-gen-subnet/shiny-guide/docker pool_size_per_sidecar=1
+2026-07-14 12:56:28 | INFO     | modules.renderer.module:_spawn_sidecar:99 | [RENDERER] sidecar #0 ready on port 8003
+2026-07-14 12:56:28 | INFO     | modules.renderer.module:_spawn_sidecar:99 | [RENDERER] sidecar #1 ready on port 8004
+2026-07-14 12:56:28 | INFO     | modules.renderer.module:startup:65 | [RENDERER] 2 sidecar(s) ready, total slots=2
+2026-07-14 12:56:28 | INFO     | pipeline.generation_pipeline:startup:98 | [Pipeline initialized — waiting for models]
+2026-07-14 12:56:28 | INFO     | pipeline.generation_pipeline:startup:102 | Planner: DISABLED (pipeline.use_planner=false — pure-image coder)
+2026-07-14 12:56:28 | INFO     | pipeline.generation_pipeline:startup:103 | Coder: openrouter | Model: google/gemini-2.5-pro-preview | multimodal=True | ensemble_size=3 | ensemble_temperature=0.65
+2026-07-14 12:56:28 | INFO     | pipeline.generation_pipeline:startup:108 | Critic: openrouter | Model: google/gemini-2.5-pro-preview
+2026-07-14 12:56:28 | INFO     | pipeline.generation_pipeline:startup:110 | Judge: openrouter | Model: google/gemini-2.5-pro-preview
+2026-07-14 12:56:28 | INFO     | pipeline.generation_pipeline:startup:113 | Iter cap: 2 | Deadline: 3600s | Threshold: 0.55
+2026-07-14 12:56:28 | INFO     | modules.monitoring.orchestrator:_watch_models:76 | [Warmup] running warmup generation
+2026-07-14 12:56:28 | SUCCESS  | modules.monitoring.orchestrator:_watch_models:87 | [Warmup] completed successfully
+2026-07-14 12:56:28 | INFO     | modules.monitoring.orchestrator:_watch_models:89 | models up — ready (0 probed)
+2026-07-14 12:56:28 | INFO     | pipeline.generation_pipeline:shutdown:116 | [Pipeline shutting down]
+2026-07-14 12:56:28 | INFO     | modules.renderer.module:shutdown:210 | [RENDERER] terminating sidecar #0
+2026-07-14 12:56:28 | INFO     | modules.renderer.module:shutdown:210 | [RENDERER] terminating sidecar #1
+2026-07-14 12:59:15 | INFO     | __main__:lifespan:77 | No local vLLM clients in llm_clients — cloud-only mode (no health probes)
+2026-07-14 12:59:15 | INFO     | pipeline.generation_pipeline:startup:64 | GenerationPipeline starting
+2026-07-14 12:59:15 | INFO     | pipeline.generation_pipeline:startup:78 | llm client ready | name=openrouter base_url=https://openrouter.ai/api/v1 local=False
+2026-07-14 12:59:15 | INFO     | modules.renderer.module:startup:51 | [RENDERER] starting 2 sidecar(s) | node=node runner=/home/404-gen-subnet/my-agent/pipeline_service/modules/renderer/render_service/render_runner.mjs base_port=8013 cwd=/home/404-gen-subnet/my-agent/docker pool_size_per_sidecar=1
+2026-07-14 12:59:15 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] starting static server...
+2026-07-14 12:59:15 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] launching browser...
+2026-07-14 12:59:15 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] listening on 127.0.0.1:8013
+2026-07-14 12:59:15 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] starting static server...
+2026-07-14 12:59:15 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] launching browser...
+2026-07-14 12:59:15 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] listening on 127.0.0.1:8014
+2026-07-14 12:59:15 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] ready
+2026-07-14 12:59:16 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] ready
+2026-07-14 12:59:16 | INFO     | modules.renderer.module:_spawn_sidecar:99 | [RENDERER] sidecar #0 ready on port 8013
+2026-07-14 12:59:16 | INFO     | modules.renderer.module:_spawn_sidecar:99 | [RENDERER] sidecar #1 ready on port 8014
+2026-07-14 12:59:16 | INFO     | modules.renderer.module:startup:65 | [RENDERER] 2 sidecar(s) ready, total slots=2
+2026-07-14 12:59:16 | INFO     | pipeline.generation_pipeline:startup:98 | [Pipeline initialized — waiting for models]
+2026-07-14 12:59:16 | INFO     | pipeline.generation_pipeline:startup:102 | Planner: DISABLED (pipeline.use_planner=false — pure-image coder)
+2026-07-14 12:59:16 | INFO     | pipeline.generation_pipeline:startup:103 | Coder: openrouter | Model: google/gemini-2.5-pro-preview | multimodal=True | ensemble_size=3 | ensemble_temperature=0.65
+2026-07-14 12:59:16 | INFO     | pipeline.generation_pipeline:startup:108 | Critic: openrouter | Model: google/gemini-2.5-pro-preview
+2026-07-14 12:59:16 | INFO     | pipeline.generation_pipeline:startup:110 | Judge: openrouter | Model: google/gemini-2.5-pro-preview
+2026-07-14 12:59:16 | INFO     | pipeline.generation_pipeline:startup:113 | Iter cap: 2 | Deadline: 3600s | Threshold: 0.60
+2026-07-14 12:59:16 | INFO     | modules.monitoring.orchestrator:_watch_models:76 | [Warmup] running warmup generation
+2026-07-14 12:59:16 | SUCCESS  | modules.monitoring.orchestrator:_watch_models:87 | [Warmup] completed successfully
+2026-07-14 12:59:16 | INFO     | modules.monitoring.orchestrator:_watch_models:89 | models up — ready (0 probed)
+2026-07-14 13:14:21 | INFO     | pipeline.generation_pipeline:run_batch:155 | [Batch seed] Agents updated | seed=42 (planner=n/a, coder=42, critic=42, judge=42)
+2026-07-14 13:14:21 | INFO     | pipeline.generation_pipeline:run_batch:176 | [Batch starting] 1 tasks | budget=14400s
+2026-07-14 13:14:21 | INFO     | pipeline.stages:multigen_first_iter:472 | [MULTIGEN] 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 K=3 | temperature=0.65 | multimodal=True | osd=no
+2026-07-14 13:14:21 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Actor: coder#k0 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 13:14:22 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Actor: coder#k1 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 13:14:22 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Actor: coder#k2 | Model: google/gemini-2.5-pro-preview | OSD Parts: none | Multimodal: True
+2026-07-14 13:14:27 | INFO     | modules.judge.dino:_load_sync:60 | [DINO] loaded facebook/dinov3-vits16-pretrain-lvd1689m on cpu
+2026-07-14 13:16:23 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k1 Task:00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 Iteration:0] | Prompt: 8315 | Completion: 14621 | Total: 22936 | Finish Reason: stop | Max Tokens Cap: 24576
+2026-07-14 13:16:23 | INFO     | modules.scene_coder.agent:code:118 | [2/7 Coder] Finished Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Actor: coder#k1 | Elapsed: 120.7s | Bytes: 6664 | Lines: 179
+2026-07-14 13:16:45 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k0 Task:00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 Iteration:0] | Prompt: 7033 | Completion: 309 | Total: 7342 | Finish Reason: error | Max Tokens Cap: 24576
+2026-07-14 13:17:55 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k0 Task:00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 Iteration:0] | Prompt: 8619 | Completion: 8586 | Total: 17205 | Finish Reason: stop | Max Tokens Cap: 24576
+2026-07-14 13:17:55 | INFO     | modules.scene_coder.agent:code:118 | [2/7 Coder] Finished Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Actor: coder#k0 | Elapsed: 214.2s | Bytes: 6541 | Lines: 194
+2026-07-14 13:17:55 | INFO     | modules.js_checker.module:process:34 | [JS_CHECK] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465#k0' start | mode=with_object | js_code=6541 bytes
+2026-07-14 13:17:55 | INFO     | modules.js_checker.module:process:34 | [JS_CHECK] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465#k1' start | mode=with_object | js_code=6664 bytes
+2026-07-14 13:17:56 | INFO     | modules.js_checker.module:process:95 | [JS_CHECK] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465#k0' PASS | vertices=9112 drawCalls=11 depth=2 instances=0 texBytes=0 | bbox=[-0.38,-0.47,-0.15]→[0.38,0.47,0.15] | timing: load=0.0s exec=0.1s total=0.2s
+2026-07-14 13:17:56 | INFO     | modules.renderer.module:process:278 | [RENDERER] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465#k0' start | sidecar=#0 | path=object | scene_json
+2026-07-14 13:17:56 | INFO     | modules.js_checker.module:process:95 | [JS_CHECK] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465#k1' PASS | vertices=9159 drawCalls=12 depth=2 instances=0 texBytes=0 | bbox=[-0.42,-0.47,-0.13]→[0.42,0.47,0.13] | timing: load=0.0s exec=0.1s total=0.2s
+2026-07-14 13:17:56 | INFO     | modules.renderer.module:process:278 | [RENDERER] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465#k1' start | sidecar=#1 | path=object | scene_json
+2026-07-14 13:18:03 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k2 Task:00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 Iteration:0] | Prompt: 7033 | Completion: 8833 | Total: 15866 | Finish Reason: error | Max Tokens Cap: 24576
+2026-07-14 13:18:08 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] /render/object ok: 94208B in 12034ms
+2026-07-14 13:18:08 | INFO     | modules.renderer.module:process:300 | [RENDERER] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465#k0' PASS sidecar=#0 | png=94208B render=12.0s
+2026-07-14 13:18:08 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] /render/object ok: 79846B in 12072ms
+2026-07-14 13:18:08 | INFO     | modules.renderer.module:process:300 | [RENDERER] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465#k1' PASS sidecar=#1 | png=79846B render=12.1s
+2026-07-14 13:18:20 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] /render/views ok: 8 views 202439B in 12023ms
+2026-07-14 13:18:20 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] /render/views ok: 8 views 166061B in 12342ms
+2026-07-14 13:18:31 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] /render/views ok: 1 views 37049B in 11348ms
+2026-07-14 13:18:31 | INFO     | modules.renderer.module:render_judge_views:368 | [RENDERER] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465#k0' judge views | white=8 gray=1 | 23.4s
+2026-07-14 13:18:31 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] /render/views ok: 1 views 28311B in 10992ms
+2026-07-14 13:18:31 | INFO     | modules.renderer.module:render_judge_views:368 | [RENDERER] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465#k1' judge views | white=8 gray=1 | 23.4s
+2026-07-14 13:18:58 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder#k2 Task:00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 Iteration:0] | Prompt: 15709 | Completion: 6528 | Total: 22237 | Finish Reason: stop | Max Tokens Cap: 24576
+2026-07-14 13:18:58 | INFO     | modules.scene_coder.agent:code:118 | [2/7 Coder] Finished Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Actor: coder#k2 | Elapsed: 276.2s | Bytes: 5872 | Lines: 162
+2026-07-14 13:18:58 | INFO     | modules.js_checker.module:process:34 | [JS_CHECK] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465#k2' start | mode=with_object | js_code=5872 bytes
+2026-07-14 13:18:59 | INFO     | modules.js_checker.module:process:95 | [JS_CHECK] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465#k2' PASS | vertices=4516 drawCalls=9 depth=2 instances=0 texBytes=0 | bbox=[-0.42,-0.47,-0.13]→[0.42,0.47,0.13] | timing: load=0.0s exec=0.0s total=0.2s
+2026-07-14 13:18:59 | INFO     | modules.renderer.module:process:278 | [RENDERER] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465#k2' start | sidecar=#0 | path=object | scene_json
+2026-07-14 13:19:00 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] /render/object ok: 68161B in 480ms
+2026-07-14 13:19:00 | INFO     | modules.renderer.module:process:300 | [RENDERER] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465#k2' PASS sidecar=#0 | png=68161B render=0.5s
+2026-07-14 13:19:05 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] /render/views ok: 8 views 138457B in 5906ms
+2026-07-14 13:19:11 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] /render/views ok: 1 views 23282B in 5625ms
+2026-07-14 13:19:11 | INFO     | modules.renderer.module:render_judge_views:368 | [RENDERER] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465#k2' judge views | white=8 gray=1 | 11.5s
+2026-07-14 13:19:12 | INFO     | modules.judge.agent:compare:121 | [Judge R1 k1-vs-k2] Started Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Model: google/gemini-2.5-pro-preview | max_stage=4 | Ref KB: 893.5 | A KB: 78.0 | B KB: 66.6 | white A/B: 8/8
+2026-07-14 13:19:18 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | explain: attempt 1/3 failed: ValueError: Unparseable VLM response: ''
+2026-07-14 13:19:25 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | explain: attempt 2/3 failed: ValueError: Unparseable VLM response: '{'
+2026-07-14 13:19:26 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 10,\n  "issues": "'
+2026-07-14 13:19:26 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues":'
+2026-07-14 13:19:26 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 5,\n  "issues":'
+2026-07-14 13:19:27 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 7,\n  "issues": "Both models are'
+2026-07-14 13:19:27 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 9,\n  "penalty_2": 10,\n  "issues'
+2026-07-14 13:19:32 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | explain: attempt 3/3 failed: ValueError: Unparseable VLM response: '{'
+2026-07-14 13:19:32 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | explain: all 3 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:19:38 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 2/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 7,\n  "issues": "'
+2026-07-14 13:19:40 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 2/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "Model 1 is an extremely simplified version of the reference, lacking all facial
+2026-07-14 13:19:40 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 2/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "Both models'
+2026-07-14 13:19:41 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 2/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 9,\n  "issues": "Both models'
+2026-07-14 13:19:42 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 2/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 9,\n  "penalty_2": 9,\n  "'
+2026-07-14 13:19:54 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 3/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 7,\n  "issues": "Both models'
+2026-07-14 13:19:55 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 3/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 7,\n  "issues": "Both'
+2026-07-14 13:19:55 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 3/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 6,\n  "issues": "Both models'
+2026-07-14 13:19:56 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 3/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 9,\n  "issues":'
+2026-07-14 13:19:57 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 3/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 9,\n  "'
+2026-07-14 13:20:09 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 4/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 7,\n  "issues": "'
+2026-07-14 13:20:10 | INFO     | modules.judge.multi_stage:_safe_chat_json:493 | s1_prompt_match: JSON parsed on attempt 4/5
+2026-07-14 13:20:12 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 4/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "'
+2026-07-14 13:20:12 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 4/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 9,\n  "issues": "Both models are extremely low-detail,'
+2026-07-14 13:20:13 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 4/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "Both'
+2026-07-14 13:20:26 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 5/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 7,\n  "issues": "Both'
+2026-07-14 13:20:26 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s1_prompt_match: all 5 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:20:26 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 5/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 9,\n  "issues": "'
+2026-07-14 13:20:26 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s1_prompt_match: all 5 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:20:28 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 5/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "Both'
+2026-07-14 13:20:28 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s1_prompt_match: all 5 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:22:24 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 5/5 failed: ValueError: Unparseable VLM response: ''
+2026-07-14 13:22:24 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s1_prompt_match: all 5 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:22:24 | DEBUG    | modules.judge.multi_stage:evaluate_duel:1453 | 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 R1 k1-vs-k2: S1 -> B (191.9s)
+2026-07-14 13:22:24 | INFO     | modules.judge.multi_stage:evaluate_duel:1458 | 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 R1 k1-vs-k2: winner=right (decided by S1, duel 191.9s)
+2026-07-14 13:22:24 | INFO     | modules.judge.agent:compare:165 | [Judge R1 k1-vs-k2] Finished Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | duel_winner=right -> B | decided_by=S1 | confidence=0.85 | reason=decided by S1
+2026-07-14 13:22:24 | INFO     | pipeline.stages:_judge_duel:234 | [BRACKET R1 k1-vs-k2] 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 -> k2
+2026-07-14 13:22:24 | INFO     | modules.judge.agent:compare:121 | [Judge R2 k0-vs-k2] Started Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Model: google/gemini-2.5-pro-preview | max_stage=4 | Ref KB: 893.5 | A KB: 92.0 | B KB: 66.6 | white A/B: 8/8
+2026-07-14 13:22:30 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | explain: attempt 1/3 failed: ValueError: Unparseable VLM response: ''
+2026-07-14 13:22:37 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "Both models'
+2026-07-14 13:22:37 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "Both models'
+2026-07-14 13:22:37 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | explain: attempt 2/3 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n```json'
+2026-07-14 13:22:38 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "'
+2026-07-14 13:22:38 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "Both models'
+2026-07-14 13:22:38 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "'
+2026-07-14 13:22:38 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 9,\n  "'
+2026-07-14 13:22:39 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 9,\n  "issues'
+2026-07-14 13:22:44 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | explain: attempt 3/3 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n```json'
+2026-07-14 13:22:44 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | explain: all 3 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:22:49 | INFO     | modules.judge.multi_stage:_safe_chat_json:493 | s1_prompt_match: JSON parsed on attempt 2/5
+2026-07-14 13:22:52 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 2/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 9,\n  "issues": "Both models'
+2026-07-14 13:22:53 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 2/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 6,\n  "issues": "Both'
+2026-07-14 13:22:53 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 2/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 9,\n  "issues": "Both'
+2026-07-14 13:22:54 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 2/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 9,\n  "issues": "Both'
+2026-07-14 13:22:56 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 2/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "Both models are'
+2026-07-14 13:23:02 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 2/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "Both'
+2026-07-14 13:23:07 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 3/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 7,\n  "issues":'
+2026-07-14 13:23:07 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 3/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 6,\n  "penalty_2": 8,\n  "issues": "Both'
+2026-07-14 13:23:08 | INFO     | modules.judge.multi_stage:_safe_chat_json:493 | s1_prompt_match: JSON parsed on attempt 3/5
+2026-07-14 13:23:10 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 3/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 9,\n  "issues": "Both models are'
+2026-07-14 13:23:12 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 3/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 6,\n  "penalty_2": 8,\n  "issues": "Both'
+2026-07-14 13:23:16 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 3/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 9,\n  "issues":'
+2026-07-14 13:23:21 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 4/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues":'
+2026-07-14 13:23:21 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 4/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 6,\n  "issues": "'
+2026-07-14 13:23:25 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 4/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 9,\n  "issues": "Both'
+2026-07-14 13:23:28 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 4/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "Both models'
+2026-07-14 13:23:31 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 4/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 9,\n  "issues": "Both'
+2026-07-14 13:23:36 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 5/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 6,\n  "penalty_2": 7,\n  "issues": "Both'
+2026-07-14 13:23:36 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s1_prompt_match: all 5 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:23:37 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 5/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 8,\n  "penalty_2": 9,\n  "issues": "Both models are'
+2026-07-14 13:23:37 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s1_prompt_match: all 5 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:23:41 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 5/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "Both'
+2026-07-14 13:23:41 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s1_prompt_match: all 5 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:23:44 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s1_prompt_match: attempt 5/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "'
+2026-07-14 13:23:44 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s1_prompt_match: all 5 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:23:46 | INFO     | modules.judge.multi_stage:_safe_chat_json:493 | s1_prompt_match: JSON parsed on attempt 5/5
+2026-07-14 13:23:46 | DEBUG    | modules.judge.multi_stage:evaluate_duel:1453 | 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 R2 k0-vs-k2: S1 -> draw (82.3s)
+2026-07-14 13:23:53 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s2cl_decompose: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  '
+2026-07-14 13:24:00 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s2ac_ba: attempt 1/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 7,\n  "penalty_2": 8,\n  "issues": "Both models fail to capture the details of the prompt. The colors are wrong; th
+2026-07-14 13:24:00 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s2cl_decompose: attempt 2/5 failed: ValueError: Unparseable VLM response: '{\n'
+2026-07-14 13:24:08 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s2cl_decompose: attempt 3/5 failed: ValueError: Unparseable VLM response: ''
+2026-07-14 13:24:16 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s2ac_ba: attempt 2/5 failed: ValueError: Unparseable VLM response: '{\n  "penalty_1": 6,\n  "penalty_2": 7,\n  "issues": "Both'
+2026-07-14 13:24:16 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s2cl_decompose: attempt 4/5 failed: ValueError: Unparseable VLM response: '{\n  "main'
+2026-07-14 13:24:25 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s2cl_decompose: attempt 5/5 failed: ValueError: Unparseable VLM response: '{\n  "main'
+2026-07-14 13:24:25 | ERROR    | modules.judge.multi_stage:_s2cl_run:982 | s2cl decompose failed: ValueError('Unparseable VLM response: \'{\\n  "main\'')
+2026-07-14 13:26:27 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s2ac_ba: attempt 3/5 failed: ValueError: Unparseable VLM response: ''
+2026-07-14 13:26:42 | INFO     | modules.judge.multi_stage:_safe_chat_json:493 | s2ac_ba: JSON parsed on attempt 4/5
+2026-07-14 13:26:42 | DEBUG    | modules.judge.multi_stage:evaluate_duel:1505 | 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 R2 k0-vs-k2: S2 -> draw via consensus [bv=None,ac=None,cl=None] (175.8s)
+2026-07-14 13:26:42 | DEBUG    | modules.judge.multi_stage:evaluate_duel:1546 | 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 R2 k0-vs-k2: S3 -> no_change (fired=False, 0.4s)
+2026-07-14 13:26:46 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 1/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:'
+2026-07-14 13:26:46 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 1/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested'
+2026-07-14 13:26:46 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 1/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 13:26:47 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 1/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested'
+2026-07-14 13:26:47 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 1/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:'
+2026-07-14 13:26:47 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 1/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 13:26:47 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 1/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested'
+2026-07-14 13:26:47 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 1/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON'
+2026-07-14 13:26:51 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 2/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:'
+2026-07-14 13:26:51 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 2/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 13:26:51 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 2/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested'
+2026-07-14 13:26:51 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 2/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 13:26:52 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 2/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:'
+2026-07-14 13:26:52 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 2/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested'
+2026-07-14 13:26:52 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 2/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 13:26:52 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 2/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 13:26:55 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 3/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:'
+2026-07-14 13:26:56 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 3/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 13:26:56 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 3/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:'
+2026-07-14 13:26:57 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 3/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON'
+2026-07-14 13:26:57 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 3/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:'
+2026-07-14 13:26:57 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 3/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 13:26:57 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 3/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n```'
+2026-07-14 13:26:58 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 3/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n```'
+2026-07-14 13:27:01 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 4/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 13:27:01 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s4_per_angle: all 4 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:27:01 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 4/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested'
+2026-07-14 13:27:01 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s4_per_angle: all 4 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:27:02 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 4/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON'
+2026-07-14 13:27:02 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s4_per_angle: all 4 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:27:02 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 4/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n```'
+2026-07-14 13:27:02 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s4_per_angle: all 4 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:27:02 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 4/4 failed: ValueError: Unparseable VLM response: 'Here is the'
+2026-07-14 13:27:02 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s4_per_angle: all 4 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:27:03 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 4/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested'
+2026-07-14 13:27:03 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s4_per_angle: all 4 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:27:03 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 4/4 failed: ValueError: Unparseable VLM response: 'Here is the'
+2026-07-14 13:27:03 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s4_per_angle: all 4 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:27:04 | WARNING  | modules.judge.multi_stage:_safe_chat_json:501 | s4_per_angle: attempt 4/4 failed: ValueError: Unparseable VLM response: 'Here is the JSON requested:\n'
+2026-07-14 13:27:04 | ERROR    | modules.judge.multi_stage:_safe_chat_json:509 | s4_per_angle: all 4 attempts failed; falling back to neutral. Last err: ValueError
+2026-07-14 13:27:04 | DEBUG    | modules.judge.multi_stage:evaluate_duel:1569 | 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 R2 k0-vs-k2: S4 -> draw (applied=False, primary=draw, 21.8s)
+2026-07-14 13:27:04 | INFO     | modules.judge.multi_stage:evaluate_duel:1578 | 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 R2 k0-vs-k2: winner=draw (decided by S3 (gate did not fire) -> draw, duel 280.4s)
+2026-07-14 13:27:04 | INFO     | modules.judge.agent:compare:165 | [Judge R2 k0-vs-k2] Finished Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | duel_winner=draw -> B | decided_by=S3 (gate did not fire) -> draw | DINO tie-break (simA=0.475 simB=0.506 -> B) | confidence=0.55 | reason=DINO tie-break (simA=0.475 simB=0.506 -> B)
+2026-07-14 13:27:04 | INFO     | pipeline.stages:_judge_duel:234 | [BRACKET R2 k0-vs-k2] 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 -> k2
+2026-07-14 13:27:04 | INFO     | pipeline.stages:multigen_first_iter:527 | [MULTIGEN] 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 K=3 | unique=3 | survivors=[0, 1, 2] | drops=[None, None, None]
+2026-07-14 13:27:04 | INFO     | pipeline.stages:multigen_first_iter:533 | [MULTIGEN] 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 winner=k2 | js_bytes=5872
+2026-07-14 13:27:04 | INFO     | modules.critic.agent:run_critic:158 | [5/7 Critic] Started Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Model: google/gemini-2.5-pro-preview | Image KB: 893.5 | Render KB: 66.6 | Artifact Context: 3
+2026-07-14 13:27:27 | DEBUG    | modules.critic.agent:_call:217 | [TOKENS Actor: critic Task:00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465] | Prompt: 3117 | Completion: 2174 | Total: 5291 | Finish Reason: stop | Max Tokens Cap: 6144
+2026-07-14 13:27:27 | INFO     | modules.critic.agent:_call:225 | [5/7 Critic] Finished Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Elapsed: 22.9s | Score: 0.45 | Issues: 4 | Seed: 42
+2026-07-14 13:27:27 | INFO     | modules.scene_coder.agent:code_critic_repair:221 | [6/7 Patcher] Started Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Repair: critic | Issues: 4 | Score: 0.45 | Multimodal: True
+2026-07-14 13:28:48 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder Task:00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 Iteration:0] | Prompt: 19280 | Completion: 9371 | Total: 28651 | Finish Reason: stop | Max Tokens Cap: 24576
+2026-07-14 13:28:48 | INFO     | modules.scene_coder.agent:code_critic_repair:227 | [6/7 Patcher] Finished Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Elapsed: 80.8s | Bytes: 7034
+2026-07-14 13:28:48 | INFO     | modules.js_checker.module:process:34 | [JS_CHECK] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465' start | mode=with_object | js_code=7034 bytes
+2026-07-14 13:28:48 | INFO     | modules.js_checker.module:process:95 | [JS_CHECK] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465' PASS | vertices=6469 drawCalls=11 depth=2 instances=0 texBytes=0 | bbox=[-0.41,-0.48,-0.11]→[0.41,0.48,0.11] | timing: load=0.0s exec=0.0s total=0.1s
+2026-07-14 13:28:48 | INFO     | modules.renderer.module:process:278 | [RENDERER] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465' start | sidecar=#0 | path=object | scene_json
+2026-07-14 13:28:49 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] /render/object ok: 82632B in 519ms
+2026-07-14 13:28:49 | INFO     | modules.renderer.module:process:300 | [RENDERER] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465' PASS sidecar=#0 | png=82632B render=0.5s
+2026-07-14 13:28:49 | INFO     | modules.critic.agent:run_critic:158 | [5/7 Critic] Started Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Model: google/gemini-2.5-pro-preview | Image KB: 893.5 | Render KB: 80.7 | Artifact Context: 3
+2026-07-14 13:29:14 | DEBUG    | modules.critic.agent:_call:217 | [TOKENS Actor: critic Task:00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465] | Prompt: 3163 | Completion: 2485 | Total: 5648 | Finish Reason: stop | Max Tokens Cap: 6144
+2026-07-14 13:29:14 | INFO     | modules.critic.agent:_call:225 | [5/7 Critic] Finished Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Elapsed: 24.8s | Score: 0.43 | Issues: 5 | Seed: 42
+2026-07-14 13:29:14 | INFO     | modules.scene_coder.agent:code_critic_repair:221 | [6/7 Patcher] Started Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Repair: critic | Issues: 5 | Score: 0.43 | Multimodal: True
+2026-07-14 13:29:33 | INFO     | llm.session:_chat_with_tool_loop:219 | [TOKENS Actor: coder Task:00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 Iteration:0] | Prompt: 24426 | Completion: 2848 | Total: 27274 | Finish Reason: stop | Max Tokens Cap: 24576
+2026-07-14 13:29:33 | INFO     | modules.scene_coder.agent:code_critic_repair:227 | [6/7 Patcher] Finished Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Elapsed: 19.1s | Bytes: 7148
+2026-07-14 13:29:33 | INFO     | modules.js_checker.module:process:34 | [JS_CHECK] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465' start | mode=with_object | js_code=7148 bytes
+2026-07-14 13:29:33 | INFO     | modules.js_checker.module:process:95 | [JS_CHECK] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465' PASS | vertices=6469 drawCalls=11 depth=2 instances=0 texBytes=0 | bbox=[-0.44,-0.48,-0.10]→[0.44,0.48,0.10] | timing: load=0.0s exec=0.0s total=0.2s
+2026-07-14 13:29:33 | INFO     | modules.renderer.module:process:278 | [RENDERER] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465' start | sidecar=#1 | path=object | scene_json
+2026-07-14 13:29:34 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] /render/object ok: 82749B in 502ms
+2026-07-14 13:29:34 | INFO     | modules.renderer.module:process:300 | [RENDERER] '00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465' PASS sidecar=#1 | png=82749B render=0.5s
+2026-07-14 13:29:34 | INFO     | modules.critic.agent:run_critic:158 | [5/7 Critic] Started Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Model: google/gemini-2.5-pro-preview | Image KB: 893.5 | Render KB: 80.8 | Artifact Context: 3
+2026-07-14 13:29:52 | DEBUG    | modules.critic.agent:_call:217 | [TOKENS Actor: critic Task:00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465] | Prompt: 3163 | Completion: 1916 | Total: 5079 | Finish Reason: stop | Max Tokens Cap: 6144
+2026-07-14 13:29:52 | INFO     | modules.critic.agent:_call:225 | [5/7 Critic] Finished Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Elapsed: 18.5s | Score: 0.35 | Issues: 5 | Seed: 42
+2026-07-14 13:29:52 | SUCCESS  | pipeline.orchestrator:run_one:230 | [TASK COMPLETED] 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Scores: [0.45, 0.43, 0.35] | Best Score: 0.45 | Best Iter: 0 | Elapsed: 931.7s
+2026-07-14 13:29:53 | INFO     | pipeline.generation_pipeline:_cleanup_batch_memory:136 | [Batch cleanup] sessions=1 task_status=1 gc_collected=540
+2026-07-14 13:29:53 | INFO     | pipeline.generation_pipeline:run_batch:196 | [Batch done] 1 ok, 0 failed
+2026-07-14 13:37:40 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] SIGINT received, shutting down...
+2026-07-14 13:37:40 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] SIGINT received, shutting down...
+2026-07-14 13:37:40 | INFO     | pipeline.generation_pipeline:shutdown:116 | [Pipeline shutting down]
+2026-07-14 13:37:49 | INFO     | __main__:lifespan:77 | No local vLLM clients in llm_clients — cloud-only mode (no health probes)
+2026-07-14 13:37:49 | INFO     | pipeline.generation_pipeline:startup:64 | GenerationPipeline starting
+2026-07-14 13:37:49 | INFO     | pipeline.generation_pipeline:startup:78 | llm client ready | name=openrouter base_url=https://openrouter.ai/api/v1 local=False
+2026-07-14 13:37:49 | INFO     | modules.renderer.module:startup:51 | [RENDERER] starting 2 sidecar(s) | node=node runner=/home/404-gen-subnet/my-agent/pipeline_service/modules/renderer/render_service/render_runner.mjs base_port=8013 cwd=/home/404-gen-subnet/my-agent/docker pool_size_per_sidecar=1
+2026-07-14 13:37:50 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] starting static server...
+2026-07-14 13:37:50 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] launching browser...
+2026-07-14 13:37:50 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] listening on 127.0.0.1:8013
+2026-07-14 13:37:50 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] starting static server...
+2026-07-14 13:37:50 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] launching browser...
+2026-07-14 13:37:50 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] listening on 127.0.0.1:8014
+2026-07-14 13:37:50 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #0/stdout] [render_runner] ready
+2026-07-14 13:37:50 | DEBUG    | modules.renderer.module:_pipe_logger:424 | [renderer-sidecar #1/stdout] [render_runner] ready
+2026-07-14 13:37:50 | INFO     | modules.renderer.module:_spawn_sidecar:99 | [RENDERER] sidecar #1 ready on port 8014
+2026-07-14 13:37:50 | INFO     | modules.renderer.module:_spawn_sidecar:99 | [RENDERER] sidecar #0 ready on port 8013
+2026-07-14 13:37:50 | INFO     | modules.renderer.module:startup:65 | [RENDERER] 2 sidecar(s) ready, total slots=2
+2026-07-14 13:37:50 | INFO     | pipeline.generation_pipeline:startup:98 | [Pipeline initialized — waiting for models]
+2026-07-14 13:37:50 | INFO     | pipeline.generation_pipeline:startup:102 | Planner: DISABLED (pipeline.use_planner=false — pure-image coder)
+2026-07-14 13:37:50 | INFO     | pipeline.generation_pipeline:startup:103 | Coder: openrouter | Model: openai/gpt-5.5 | multimodal=True | ensemble_size=3 | ensemble_temperature=0.65
+2026-07-14 13:37:50 | INFO     | pipeline.generation_pipeline:startup:108 | Critic: openrouter | Model: anthropic/claude-opus-4.7
+2026-07-14 13:37:50 | INFO     | pipeline.generation_pipeline:startup:110 | Judge: openrouter | Model: google/gemini-3.5-flash
+2026-07-14 13:37:50 | INFO     | pipeline.generation_pipeline:startup:113 | Iter cap: 2 | Deadline: 3600s | Threshold: 0.60
+2026-07-14 13:37:50 | INFO     | modules.monitoring.orchestrator:_watch_models:76 | [Warmup] running warmup generation
+2026-07-14 13:37:50 | SUCCESS  | modules.monitoring.orchestrator:_watch_models:87 | [Warmup] completed successfully
+2026-07-14 13:37:50 | INFO     | modules.monitoring.orchestrator:_watch_models:89 | models up — ready (0 probed)
+2026-07-14 13:56:05 | INFO     | pipeline.generation_pipeline:run_batch:155 | [Batch seed] Agents updated | seed=42 (planner=n/a, coder=42, critic=42, judge=42)
+2026-07-14 13:56:05 | INFO     | pipeline.generation_pipeline:run_batch:176 | [Batch starting] 1 tasks | budget=14400s
+2026-07-14 13:56:05 | INFO     | pipeline.stages:multigen_first_iter:472 | [MULTIGEN] 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 K=3 | temperature=0.65 | multimodal=True | osd=no
+2026-07-14 13:56:05 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Actor: coder#k0 | Model: openai/gpt-5.5 | OSD Parts: none | Multimodal: True
+2026-07-14 13:56:07 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Actor: coder#k1 | Model: openai/gpt-5.5 | OSD Parts: none | Multimodal: True
+2026-07-14 13:56:07 | INFO     | modules.scene_coder.agent:code:111 | [2/7 Coder] Started Task 00438f48a8f35b09c8a6577e8217b1b7da62151808e5f19d222a60a31e93e465 | Actor: coder#k2 | Model: openai/gpt-5.5 | OSD Parts: none | Multimodal: True
+2026-07-14 13:56:11 | INFO     | modules.judge.dino:_load_sync:60 | [DINO] loaded facebook/dinov3-vits16-pretrain-lvd1689m on cpu

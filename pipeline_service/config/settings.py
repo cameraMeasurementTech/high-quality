@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import yaml
@@ -11,8 +12,12 @@ from modules.judge.embedder_settings import EmbedderConfig
 from modules.renderer.settings import RendererConfig
 
 _here = Path(__file__).parent.parent
-config_file_dir = _here / "configuration.yaml"
-if not config_file_dir.exists():
+_config_env = os.environ.get("CONFIG_FILE", "").strip()
+if _config_env:
+    config_file_dir = Path(_config_env)
+elif (_here / "configuration.yaml").exists():
+    config_file_dir = _here / "configuration.yaml"
+else:
     config_file_dir = _here.parent / "configuration.yaml"
 
 
