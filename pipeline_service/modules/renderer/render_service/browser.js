@@ -35,12 +35,23 @@ export async function ensureBrowser() {
     try { await browser.close(); } catch {}
   }
   const protocolTimeout = parseInt(process.env.PROTOCOL_TIMEOUT_MS || '60000', 10);
-  browser = await puppeteer.launch({
-    headless: 'new',
-    args: [...BASE_ARGS, ...GPU_ARGS],
-    protocolTimeout,
-  });
-  return browser;
+  const attempts = 3;
+  let lastErr;
+  for (let i = 1; i <= attempts; i++) {
+    try {
+      browser = await puppeteer.launch({
+        headless: 'new',
+        args: [...BASE_ARGS, ...GPU_ARGS],
+        protocolTimeout,
+      });
+      return browser;
+    } catch (err) {
+      lastErr = err;
+      console.error(`[browser] launch attempt ${i}/${attempts} failed: ${err?.message || err}`);
+      await new Promise((r) => setTimeout(r, 500 * i));
+    }
+  }
+  throw lastErr;
 }
 
 export async function restartBrowser() {

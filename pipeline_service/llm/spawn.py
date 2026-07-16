@@ -288,9 +288,27 @@ def _bin_exists(path: str) -> bool:
     return shutil.which(path) is not None
 
 
+def _ensure_exec_tmpdir(env: dict[str, str]) -> None:
+    """Triton/Inductor write .so files under TMPDIR; /tmp is often noexec here."""
+    root = os.environ.get("NATIVE_CACHE_ROOT") or "/home/high-quality/.cache"
+    tmp = env.get("TMPDIR") or os.path.join(root, "tmp")
+    for key, sub in (
+        ("TMPDIR", "tmp"),
+        ("TRITON_CACHE_DIR", "triton"),
+        ("TORCHINDUCTOR_CACHE_DIR", "torchinductor"),
+        ("VLLM_CACHE_ROOT", "vllm"),
+    ):
+        path = env.get(key) or os.path.join(root, sub)
+        os.makedirs(path, exist_ok=True)
+        env[key] = path
+    # Prefer the exec-capable TMPDIR we just set.
+    env.setdefault("TMPDIR", tmp)
+
+
 def _spawn_one(job: VllmJob) -> subprocess.Popen:
     env = os.environ.copy()
     env["CUDA_VISIBLE_DEVICES"] = job.gpu_ids
+    _ensure_exec_tmpdir(env)
     cmd = _build_cmd(job)
     print(
         f"[vllm-spawn] Starting vLLM Client: {job.name} | Model: {job.model} | Port: {job.port} | "

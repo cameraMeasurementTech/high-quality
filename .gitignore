@@ -3,6 +3,7 @@ __pycache__/
 *.pyo
 .env
 .venv/
+.venvs/
 node_modules
 node_modules/
 generated_outputs/
@@ -13,7 +14,10 @@ build/
 .vscode/
 results.json
 results
-
+runs/
+rounds/*/
+!rounds/.gitkeep
+.cache/
 # Tests
 tests/**/*.js
 tests/**/*.png

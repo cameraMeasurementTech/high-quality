@@ -11,6 +11,9 @@ pipeline:
   refinement_enabled: false
 
 benchmark: true
+# Warmup runs 40 concurrent Coder generations on startup (K=40, max_tokens=24576).
+# First run is slow (15-30 min) because Triton/flashinfer JIT into cold caches.
+# Subsequent restarts are fast — caches persist under /home/.../.cache.
 warmup: true
 
 llm_clients:
@@ -23,11 +26,18 @@ llm_clients:
     base_url: "http://localhost:8001/v1"
     api_key: "local"
     vllm:
-      model: "Tooony133/Qwen-3.6-27B-AstroWolf"
+      model: "handsometiger0202/Qwen-3.6-27B-AstroWolf"
       gpu_ids: "0,1"
+      vllm_bin: "/home/high-quality/.venvs/vllm-env/bin/vllm"
       tensor_parallel_size: 2
       gpu_memory_utilization: 0.9
       max_model_len: 81920
+      # 128 = ~3 tasks pipelined through Coder (ensemble_size=40 each).
+      # Measured KV cache: 799,680 tokens total, avg request ~15k → 128 streams
+      # use ~30% of KV, well under the 10% peak we saw at 40 streams.
+      # This is the sweet spot on the H200 tok/s vs. concurrency curve for a
+      # 27B BF16 model on TP=2 (aggregate ~3000 tok/s, ~19% memory-bandwidth
+      # utilisation — near the practical ceiling for decode).
       max_num_seqs: 128
   judge-critic-instance:
     enabled: true
@@ -39,16 +49,22 @@ llm_clients:
       tensor_parallel_size: 2
       gpu_memory_utilization: 0.9
       max_model_len: 81920
-      max_num_seqs: 128
-      vllm_bin: "/opt/vllm-glm-env/bin/vllm"
+      # Judge duels heavily cancel in-flight requests once consensus is reached.
+      # vLLM 0.23 v1 async scheduler has a race on cancellation that crashes
+      # EngineCore with `KeyError: 'chatcmpl-...'` in scheduler.update_from_output.
+      # Disable async scheduling + cap concurrency so the race window closes.
+      max_num_seqs: 32
+      vllm_bin: "/home/high-quality/.venvs/vllm-glm-env/bin/vllm"
       trust_remote_code: true
       reasoning_parser: null
+      extra_args:
+        - "--no-async-scheduling"
 
 
 actors:
   planner:
     client: "coder-instance"
-    model: "Tooony133/Qwen-3.6-27B-AstroWolf"
+    model: "handsometiger0202/Qwen-3.6-27B-AstroWolf"
     workers: 128
     queue_size: 64
     max_tokens: 32768
@@ -66,9 +82,12 @@ actors:
       allow_fallbacks: true
   coder:
     client: "coder-instance"
-    model: "Tooony133/Qwen-3.6-27B-AstroWolf"
+    model: "handsometiger0202/Qwen-3.6-27B-AstroWolf"
+    # Matches Qwen's max_num_seqs=128. This lets ~3 tasks pipeline through
+    # Coder concurrently (128 / ensemble_size 40 = 3.2), which is the amount
+    # needed to hit the 4h budget for 128 prompts.
     workers: 128
-    queue_size: 64
+    queue_size: 128
     max_tokens: 24576
     temperature: 0.6
     top_p: 0.95
@@ -85,12 +104,16 @@ actors:
       order: []
       allow_fallbacks: true
   patcher:
-    workers: 64
+    workers: 16
     queue_size: 64
   critic:
     client: "judge-critic-instance"
     model: "zai-org/GLM-4.6V-Flash"
-    workers: 128
+    # Critic + Judge share GLM. Combined worker cap must stay under GLM's
+    # max_num_seqs (32) so we don't queue on the server, and small enough
+    # that concurrent httpx/tokenizer thread count stays inside pod pids.max.
+    # 16 + 16 = 32 saturates GLM without over-fanning Python threads.
+    workers: 16
     queue_size: 64
     max_tokens: 6144
     temperature: 0.6
@@ -109,7 +132,8 @@ actors:
   judge:
     client: "judge-critic-instance"
     model: "zai-org/GLM-4.6V-Flash"
-    workers: 128
+    # See critic note — 16 + 16 = GLM max_num_seqs (32).
+    workers: 16
     queue_size: 64
     max_tokens: 8192
     temperature: 0.0
@@ -118,11 +142,14 @@ actors:
       order: []
       allow_fallbacks: true
   checker:
-    workers: 32
-    queue_size: 32
-  renderer:
     workers: 16
     queue_size: 32
+  renderer:
+    # 6 sidecars × 2 tabs = 12 hardware slots (see renderer.sidecar_count).
+    # 3 pipelined Coder tasks → up to 120 renders in flight; 12 slots at
+    # ~4-5 s/render = ~50 s per task's render burst, fits within a Coder cycle.
+    workers: 12
+    queue_size: 64
 
 event_bus:
   max_iter: 2
@@ -142,7 +169,12 @@ renderer:
   img_size: 518
   grid_gap: 5
   bg_color: null
-  sidecar_count: 8
+  # 6 sidecars × 2 tabs = 12 Chromes. Each Chrome ~100-150 threads → ~1500
+  # threads for the whole renderer pool. With coder concurrency of 128, thread
+  # budget check: 2×vLLM (~2400) + 128 in-flight coder POSTs × 15 = ~1900 +
+  # 32 GLM POSTs × 15 = 480 + Chromes 1500 + FastAPI ~200 = ~6500. Well under
+  # pod cgroup pids.max = 16384.
+  sidecar_count: 6
   pool_size: 2
   render_timeout_ms: 60000
   protocol_timeout_ms: 60000

@@ -5,7 +5,10 @@ PYBIN="${PYBIN:-python3.11}"
 VLLM_VERSION="${VLLM_VERSION:-0.23.0}"
 VLLM_CUDA_TAG="${VLLM_CUDA_TAG:-cu129}"
 MANYLINUX="${MANYLINUX:-manylinux_2_28}"
-TORCH_BACKEND="${TORCH_BACKEND:-cu128}"
+# Must match VLLM_CUDA_TAG. Forcing cu128 onto a +cu129 wheel breaks vllm._C
+# (undefined symbol CUDAStream::query). Driver 570 (CUDA 12.8) can still run
+# cu129 via CUDA 12.x minor-version compatibility — no host driver bump needed.
+TORCH_BACKEND="${TORCH_BACKEND:-cu129}"
 TRANSFORMERS_SPEC="${TRANSFORMERS_SPEC:-transformers>=5.0.0rc0}"
 FASTAPI_SPEC="${FASTAPI_SPEC:-fastapi<0.137}"
 MODEL="${MODEL:-zai-org/GLM-4.6V-Flash}"

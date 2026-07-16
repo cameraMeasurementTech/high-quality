@@ -35,8 +35,10 @@ else
 fi
 
 
-# vLLM spawn
+# vLLM spawn (log to file so failures are visible after Ctrl+C)
 echo "=== STAGE 3: vLLM spawn ==="
-python -m llm.spawn || echo "[run.sh] vllm spawn returned non-zero — FastAPI continues for diagnostics" >&2
+SPAWN_LOG="${SPAWN_LOG:-$SCRIPT_DIR/logs/vllm_spawn.log}"
+mkdir -p "$(dirname "$SPAWN_LOG")"
+python -m llm.spawn 2>&1 | tee "$SPAWN_LOG" || echo "[run.sh] vllm spawn returned non-zero — FastAPI continues for diagnostics" >&2
 
 wait $SERVE_PID

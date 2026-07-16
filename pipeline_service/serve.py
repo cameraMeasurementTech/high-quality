@@ -286,17 +286,27 @@ async def debug_task(stem: str):
         "meta": task.meta,
     }
 @app.get("/debug/logs")
-async def debug_logs():
+async def debug_logs(tail_kb: int | None = None):
     log_path = "logs/pipeline.log"
     if not os.path.exists(log_path):
-        raise HTTPException(404,"Log file not found")
-    
-    return FileResponse(
-        path=log_path,
-        filename="logs.txt",
-        media_type ="text/plain"
+        raise HTTPException(404, "Log file not found")
+
+    with open(log_path, "rb") as fh:
+        fh.seek(0, os.SEEK_END)
+        end = fh.tell()
+        if tail_kb is not None and tail_kb > 0:
+            start = max(0, end - tail_kb * 1024)
+        else:
+            start = 0
+        fh.seek(start)
+        body = fh.read(end - start)
+
+    return Response(
+        content=body,
+        media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="logs.txt"'},
     )
- 
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host=settings.api.host, port=settings.api.port, reload=False)

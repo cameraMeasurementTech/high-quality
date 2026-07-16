@@ -54,10 +54,16 @@ class RendererModule(BaseModule):
             f"pool_size_per_sidecar={self.config.pool_size}"
         )
 
+        # Parallel Chrome launches race the DevTools WebSocket (socket hang up /
+        # ECONNRESET). Spawn one-at-a-time with retries so startup is reliable
+        # under Sysbox / nested cgroup thread pressure.
         try:
-            self._sidecars = await asyncio.gather(
-                *[self._spawn_sidecar(i) for i in range(count)]
-            )
+            sidecars: list[_Sidecar] = []
+            for i in range(count):
+                sidecars.append(await self._spawn_sidecar_with_retry(i))
+                if i + 1 < count:
+                    await asyncio.sleep(0.4)
+            self._sidecars = sidecars
         except Exception:
             await self.shutdown()
             raise
@@ -68,6 +74,21 @@ class RendererModule(BaseModule):
         )
 
         self._watchdog_task = asyncio.create_task(self._watchdog())
+
+    async def _spawn_sidecar_with_retry(self, idx: int, attempts: int = 3) -> _Sidecar:
+        last_exc: Exception | None = None
+        for attempt in range(1, attempts + 1):
+            try:
+                return await self._spawn_sidecar(idx)
+            except Exception as exc:
+                last_exc = exc
+                logger.warning(
+                    f"[RENDERER] sidecar #{idx} spawn attempt {attempt}/{attempts} "
+                    f"failed: {exc}"
+                )
+                await asyncio.sleep(1.0 * attempt)
+        assert last_exc is not None
+        raise last_exc
 
     async def _spawn_sidecar(self, idx: int) -> _Sidecar:
         port = self.config.sidecar_port + idx
@@ -95,7 +116,22 @@ class RendererModule(BaseModule):
             self._pipe_logger(proc.stderr, f"#{idx}/stderr")
         )
         client = httpx.AsyncClient(timeout=self.config.request_timeout_s)
-        await self._wait_ready_for(proc, client, port, idx)
+        try:
+            await self._wait_ready_for(proc, client, port, idx)
+        except Exception:
+            # Kill the half-started Chrome tree before retrying the same port.
+            try:
+                proc.kill()
+            except ProcessLookupError:
+                pass
+            try:
+                await proc.wait()
+            except Exception:
+                pass
+            for t in (stdout_task, stderr_task):
+                t.cancel()
+            await client.aclose()
+            raise
         logger.info(f"[RENDERER] sidecar #{idx} ready on port {port}")
         return _Sidecar(idx=idx, port=port, proc=proc, client=client,
                         log_tasks=[stdout_task, stderr_task])
