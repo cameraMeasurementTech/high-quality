@@ -111,7 +111,7 @@ learning_rate: 1.0e-6   # lower than LoRA
 
 | Phase | `HF_TOKEN` | `OPENROUTER_API_KEY` |
 |-------|------------|----------------------|
-| Bootstrap (model download) | ✅ | ❌ |
+| Bootstrap (model download) | ✅ ([`docs/CODER_MODEL.md`](docs/CODER_MODEL.md)) | ❌ |
 | Pipeline data gen | ✅ | ✅ (critic/judge only) |
 | **DPO duel-scored prep** | ✅ | ✅ (**multiview S1–S4 judge**) |
 | DPO/GRPO training (`cheap` reward) | ✅ | ❌ |

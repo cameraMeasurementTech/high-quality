@@ -9,7 +9,7 @@ training/
 ├── vendor/shiny-guide/          ← git clone (pipeline + vLLM)
 ├── vendor/pipeline_prompts/     ← coder prompt snapshot
 ├── data/prompts.txt             ← ~99k validator URLs
-├── data/models/...              ← AstroWolf weights
+├── data/models/Qwen-3.6-27B-AstroWolf/  ← coder base model (see docs/CODER_MODEL.md)
 ├── third_party/miner-reference/ ← bundled validate.js
 ├── pipeline/                    ← native launcher scripts
 ├── run/                         ← bootstrap, install, prep, train
@@ -53,6 +53,20 @@ ALIGN=dpo ./run/01_prepare_shiny_align.sh
 | Train | `training/` | `./run/03_dpo.sh` | stop pipeline first |
 | Eval | `training/` | `./pipeline/run-eval.sh data/splits/duel.txt` | pipeline running |
 
+## Coder base model
+
+Download and save path for **Tooony133/Qwen-3.6-27B-AstroWolf**:
+
+→ **[`docs/CODER_MODEL.md`](docs/CODER_MODEL.md)** (HF token, default path, manual download, verify)
+
+Quick:
+
+```bash
+# in .env: HF_TOKEN=hf_...
+./run/00_bootstrap_assets.sh
+# saves to: training/data/models/Qwen-3.6-27B-AstroWolf/
+```
+
 ## API keys
 
 | Key | Required? |
@@ -88,6 +102,7 @@ CONFIG=configs/dpo_shiny_27b_duel.yaml ./run/03_dpo.sh
 | `shiny-guide not found` | `./run/00_bootstrap_assets.sh` |
 | `prompts.txt not found` | same |
 | `validate.js not found` | `./run/00_install_all.sh` |
+| Model download fails | See [`docs/CODER_MODEL.md`](docs/CODER_MODEL.md) — `HF_TOKEN`, disk ~60GB |
 | OOM on 4× H200 | lower `max_num_seqs` in `configuration.h200x4-dpo.yaml` |
 | Train OOM | `./pipeline/stop-native.sh` before `./run/03_dpo.sh` |
 

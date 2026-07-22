@@ -12,7 +12,7 @@ INSTALL_SYSTEM=1 ./run/00_install_all.sh
 source .env && ./run/run_all.sh
 ```
 
-Full guide: [`STANDALONE.md`](STANDALONE.md)
+Full guide: [`STANDALONE.md`](STANDALONE.md) · **Model:** [`docs/CODER_MODEL.md`](docs/CODER_MODEL.md)
 
 | Hardware | Profile |
 |----------|---------|
