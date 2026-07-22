@@ -6,23 +6,29 @@ import sys
 import types
 from pathlib import Path
 
+from paths import pipeline_root_for_prompts, shiny_guide_root, vendor_prompts_scene_coder_dir
 
-from paths import pipeline_root_for_prompts
+
+def _scene_coder_dir() -> Path:
+    vend = vendor_prompts_scene_coder_dir()
+    if (vend / "prompts.py").is_file():
+        return vend
+    sg = shiny_guide_root()
+    scene = sg / "pipeline_service" / "modules" / "scene_coder"
+    if (scene / "prompts.py").is_file():
+        return scene
+    raise FileNotFoundError(
+        f"coder prompts missing. Run ./run/00_bootstrap_assets.sh\n"
+        f"  tried: {vend}\n"
+        f"  tried: {scene}"
+    )
 
 
 def load_coder_prompts() -> tuple[str, str]:
-    pipeline_root = pipeline_root_for_prompts()
-    scene_coder_dir = pipeline_root / "pipeline_service" / "modules" / "scene_coder"
+    _ = pipeline_root_for_prompts()  # validate PROMPTS_ROOT
+    scene_coder_dir = _scene_coder_dir()
     prompts_path = scene_coder_dir / "prompts.py"
-    if not prompts_path.is_file():
-        raise FileNotFoundError(prompts_path)
 
-    ps = pipeline_root / "pipeline_service"
-    if str(ps) not in sys.path:
-        sys.path.insert(0, str(ps))
-
-    # Stub packages so `from modules.scene_coder.X` does NOT execute __init__.py
-    # (which would pull SceneCoderAgent → pydantic → full stack).
     if "modules" not in sys.modules:
         sys.modules["modules"] = types.ModuleType("modules")
     if "modules.scene_coder" not in sys.modules:
@@ -35,6 +41,8 @@ def load_coder_prompts() -> tuple[str, str]:
         if mod_name in sys.modules:
             continue
         leaf = scene_coder_dir / f"{name}.py"
+        if not leaf.is_file():
+            raise FileNotFoundError(f"missing {leaf} — re-run ./run/00_bootstrap_assets.sh")
         leaf_spec = importlib.util.spec_from_file_location(mod_name, leaf)
         assert leaf_spec and leaf_spec.loader
         leaf_mod = importlib.util.module_from_spec(leaf_spec)

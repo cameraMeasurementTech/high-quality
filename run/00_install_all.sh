@@ -20,14 +20,21 @@ if [[ -f "$TRAINING_ROOT/.env" ]]; then
 fi
 
 detect_ws() {
+  if [[ -d "${TRAINING_ROOT}/vendor/shiny-guide/pipeline_service" ]]; then
+    echo "$TRAINING_ROOT"
+    return
+  fi
   if [[ -n "${WORKSPACE_ROOT:-}" && -d "${WORKSPACE_ROOT}/shiny-guide" ]]; then echo "$WORKSPACE_ROOT"; return; fi
   local p g; p="$(dirname "$TRAINING_ROOT")"; g="$(dirname "$p")"
   [[ -d "$p/shiny-guide" ]] && { echo "$p"; return; }
   [[ -d "$g/shiny-guide" ]] && { echo "$g"; return; }
-  echo "$p"
+  echo "$TRAINING_ROOT"
 }
 WS="$(detect_ws)"
-SG="${SHINY_GUIDE_ROOT:-$WS/shiny-guide}"
+SG="${SHINY_GUIDE_ROOT:-$TRAINING_ROOT/vendor/shiny-guide}"
+if [[ ! -d "$SG/pipeline_service" && -d "$WS/shiny-guide/pipeline_service" ]]; then
+  SG="$WS/shiny-guide"
+fi
 
 need_bootstrap=0
 [[ -d "$SG/pipeline_service" ]] || need_bootstrap=1

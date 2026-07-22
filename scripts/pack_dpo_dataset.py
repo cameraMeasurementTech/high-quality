@@ -4,6 +4,7 @@
 Sources (--source):
   candidates  Score K JS per stem; chosen=best, rejected=worst (score margin filter)
   duel        Parse local-eval duel_detailed.json; winner vs loser JS per stem
+  duel-scored Multiview S1–S4 scored pairs from duel_score_candidates.py JSON
   dirs        Explicit chosen-dir vs rejected-dir flat JS folders (same stems)
 
 Output columns for TRL DPOTrainer (VLM):
@@ -240,6 +241,65 @@ def pairs_from_duel(
     return rows, skipped
 
 
+def pairs_from_duel_scored(
+    duel_json: Path,
+    images_dir: Path,
+    allow_stems: set[str] | None,
+    skip_draws: bool = True,
+) -> tuple[list[dict], dict]:
+    """Build DPO pairs from multiview duel scores (chosen_file / rejected_file per stem)."""
+    system, user_tpl = load_coder_prompts()
+    payload = json.loads(duel_json.read_text(encoding="utf-8"))
+    rows: list[dict] = []
+    skipped = {"draw": 0, "missing": 0, "filtered": 0}
+
+    for rec in tqdm(payload.get("records", []), desc="pair-duel-scored"):
+        stem = rec["stem"]
+        if allow_stems is not None and stem not in allow_stems:
+            continue
+        if skip_draws and rec.get("winner") in {"draw", None}:
+            skipped["draw"] += 1
+            continue
+        chosen_path = rec.get("chosen_file")
+        rejected_path = rec.get("rejected_file")
+        if not chosen_path or not rejected_path:
+            skipped["draw"] += 1
+            continue
+        chosen_path = Path(chosen_path)
+        rejected_path = Path(rejected_path)
+        img_path = images_dir / f"{stem}.png"
+        if not chosen_path.is_file() or not rejected_path.is_file() or not img_path.is_file():
+            skipped["missing"] += 1
+            continue
+
+        chosen_js = chosen_path.read_text(encoding="utf-8").strip()
+        rejected_js = rejected_path.read_text(encoding="utf-8").strip()
+        if chosen_js == rejected_js:
+            skipped["filtered"] += 1
+            continue
+
+        prompt = build_prompt_messages(system, user_tpl)
+        rows.append(
+            {
+                "stem": stem,
+                "image": str(img_path.resolve()),
+                "prompt": prompt,
+                "chosen": assistant_message(chosen_js),
+                "rejected": assistant_message(rejected_js),
+                "reward_chosen": None,
+                "reward_rejected": None,
+                "pair_source": "duel_scored",
+                "chosen_file": str(chosen_path),
+                "rejected_file": str(rejected_path),
+                "duel_winner": rec.get("winner"),
+                "ab_decided_by": rec.get("ab_decided_by"),
+                "ba_decided_by": rec.get("ba_decided_by"),
+            }
+        )
+
+    return rows, skipped
+
+
 def pairs_from_dirs(
     chosen_dir: Path,
     rejected_dir: Path,
@@ -351,7 +411,7 @@ def save_dataset(rows: list[dict], out: Path, meta_extra: dict) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="Pack DPO preference dataset")
-    ap.add_argument("--source", required=True, choices=["candidates", "duel", "dirs"])
+    ap.add_argument("--source", required=True, choices=["candidates", "duel", "duel-scored", "dirs"])
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--list", type=Path, default=None, help="optional stem allow-list")
     ap.add_argument("--images", type=Path, default=default_data_root() / "images")
@@ -362,6 +422,7 @@ def main() -> None:
     ap.add_argument("--rejected-dir", type=Path, default=None)
     ap.add_argument("--prefer-label", type=str, default="", help="e.g. shiny-guide for teacher pairs")
     ap.add_argument("--only-losses", action="store_true", help="duel: only stems prefer-label lost")
+    ap.add_argument("--include-draws", action="store_true", help="duel-scored: keep draw pairs")
 
     ap.add_argument("--reward-mode", type=str, default="cheap", choices=["cheap", "render", "s1"])
     ap.add_argument("--min-margin", type=float, default=0.15)
@@ -405,6 +466,21 @@ def main() -> None:
             args.only_losses,
         )
         meta_extra = {"source": "duel", "skipped": skipped, "duel_json": str(args.duel_json)}
+    elif args.source == "duel-scored":
+        if not args.duel_json:
+            raise SystemExit("--duel-json required for source=duel-scored")
+        rows, skipped = pairs_from_duel_scored(
+            args.duel_json,
+            args.images,
+            allow,
+            skip_draws=not args.include_draws,
+        )
+        meta_extra = {
+            "source": "duel-scored",
+            "skipped": skipped,
+            "duel_json": str(args.duel_json),
+            "judge": "multiview S1-S4 via OpenRouter",
+        }
     else:
         if not args.chosen_dir or not args.rejected_dir:
             raise SystemExit("--chosen-dir and --rejected-dir required for source=dirs")

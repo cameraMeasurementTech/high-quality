@@ -1,17 +1,14 @@
-# Native GPU profile for shiny-guide (NO Docker, NO full monorepo).
-# Local vLLM serves AstroWolf for the coder; critic/judge use OpenRouter.
+# Native GPU profile — standalone training/ (no monorepo, no Docker).
 #
-# Use with:
-#   source ../.env
-#   ./setup-native.sh && ./run-native.sh
+# Assets (from ./run/00_bootstrap_assets.sh):
+#   vendor/shiny-guide/     pipeline + vLLM spawn
+#   data/models/...         local AstroWolf
+#   data/prompts.txt        image pool
 #
-# Local model (after download):
-#   export MODEL_PATH=/path/to/Qwen-3.6-27B-AstroWolf
-#   ./run-native.sh
-#
-# GPU layout:
+# GPU layouts:
 #   1× GPU: gpu_ids "0", tensor_parallel_size 1
 #   2× GPU: gpu_ids "0,1", tensor_parallel_size 2
+#   4× GPU: gpu_ids "0,1,2,3", tensor_parallel_size 4  (see configuration.h200x4-dpo.yaml)
 
 api:
   host: "0.0.0.0"
@@ -30,7 +27,7 @@ warmup: true
 
 llm_clients:
   openrouter:
-    enabled: true
+    enabled: false
     base_url: "https://openrouter.ai/api/v1"
     api_key_env: "OPENROUTER_API_KEY"
   coder-instance:
@@ -41,7 +38,7 @@ llm_clients:
       model: "Tooony133/Qwen-3.6-27B-AstroWolf"
       gpu_ids: "0"
       tensor_parallel_size: 1
-      gpu_memory_utilization: 0.92
+      gpu_memory_utilization: 0.90
       max_model_len: 32768
       max_num_seqs: 32
       vllm_bin: "/opt/vllm-env/bin/vllm"
@@ -58,8 +55,8 @@ actors:
   coder:
     client: "coder-instance"
     model: "Tooony133/Qwen-3.6-27B-AstroWolf"
-    workers: 8
-    queue_size: 16
+    workers: 32
+    queue_size: 64
     max_tokens: 24576
     temperature: 0.6
     top_p: 0.95
@@ -89,11 +86,11 @@ actors:
     temperature: 0.0
     seed: 42
   checker:
-    workers: 4
-    queue_size: 8
+    workers: 8
+    queue_size: 16
   renderer:
-    workers: 4
-    queue_size: 8
+    workers: 8
+    queue_size: 16
 
 event_bus:
   max_iter: 2
@@ -115,12 +112,12 @@ renderer:
   sidecar_count: 2
   static_port_base: 13000
   pool_size: 1
-  judge_multiview: true
+  judge_multiview: false
   render_timeout_ms: 90000
   protocol_timeout_ms: 90000
 
 embedder:
-  enabled: true
+  enabled: false
   model_id: "facebook/dinov3-vits16-pretrain-lvd1689m"
   revision: "main"
   device: "cpu"

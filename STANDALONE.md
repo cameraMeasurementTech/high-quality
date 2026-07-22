@@ -1,147 +1,94 @@
-# Standalone training — everything in `training/`
+# Standalone training — self-contained in `training/`
 
-Run the full loop from a **single folder**. No monorepo, no Docker, no `my-agent` / `local-eval`.
+Copy **only this folder** to a GPU machine. No monorepo, no `my-agent`, no `local-eval`, no sibling repos required.
 
-## New machine — start here
+Bootstrap clones everything else **into `training/`**:
+
+```text
+training/
+├── vendor/shiny-guide/          ← git clone (pipeline + vLLM)
+├── vendor/pipeline_prompts/     ← coder prompt snapshot
+├── data/prompts.txt             ← ~99k validator URLs
+├── data/models/...              ← AstroWolf weights
+├── third_party/miner-reference/ ← bundled validate.js
+├── pipeline/                    ← native launcher scripts
+├── run/                         ← bootstrap, install, prep, train
+└── scripts/                     ← Python tooling
+```
+
+## Quick start (new 4× H200 box)
 
 ```bash
 cd training
 cp .env.template .env
+# edit .env: HF_TOKEN=hf_...  (OPENROUTER optional for cheap DPO)
 
-# 1. Match config to your GPU box
-./run/00_configure_profile.sh              # list options
-./run/00_configure_profile.sh h200x2-dpo     # example: 2× H200 DPO
-
-# 2. API keys (edit .env)
-#    OPENROUTER_API_KEY — pipeline data gen only (critic/judge)
-#    HF_TOKEN           — model download + training
-
-# 3. Full automated run
+./run/00_configure_profile.sh h200x4-dpo   # or h200x2-dpo
 chmod +x run/*.sh pipeline/*.sh
-./run/run_all.sh
+INSTALL_SYSTEM=1 ./run/run_all.sh
 ```
 
-**Profile guide:** [`MACHINE_PROFILES.md`](MACHINE_PROFILES.md)
-
-| Your hardware | Profile |
-|---------------|---------|
-| 2× H200 | `h200x2-dpo` ⭐ |
-| 2× H100 80GB | `h100x2-dpo` |
-| 4× H100 GRPO | `h100x4-grpo` |
-| 8× H200 full FT | `h200x8-fullft` |
-| 1 GPU test | `smoke` |
-| Dataset ready | `train-only` |
-
----
-
-## One command
+Or step-by-step:
 
 ```bash
-./run/run_all.sh
-```
-
-Smoke: `SMOKE=1 ./run/run_all.sh` (or apply `smoke` profile first)
-
----
-
-## What `run_all.sh` does
-
-| Step | Script | Action |
-|------|--------|--------|
-| 0 | `00_configure_profile.sh` | **You run this first** — sets `.env` + pipeline GPUs |
-| 1 | `00_bootstrap_assets.sh` | Clone shiny-guide, prompts.txt, AstroWolf |
-| 2 | `00_install_all.sh` | Validator npm, training venv, pipeline venv + vLLM |
-| 3 | `pipeline/start-native-bg.sh` | King pipeline on `:10006` |
-| 4 | `01_prepare_shiny_align.sh` | Datasets (sizes from profile / `.env`) |
-| 5 | `03_dpo.sh` / `03_grpo.sh` | bf16 LoRA training (`CONFIG` from profile) |
-
-Skip flags: `SKIP_BOOTSTRAP=1`, `SKIP_INSTALL=1`, `SKIP_PIPELINE=1`, `SKIP_PREP=1`, `SKIP_TRAIN=1`
-
----
-
-## Step-by-step (manual control)
-
-### 0 — Configure for your machine
-
-```bash
-cp .env.template .env
-./run/00_configure_profile.sh h200x2-dpo
-# edit .env: OPENROUTER_API_KEY, HF_TOKEN
-```
-
-Profile writes to `.env`:
-
-| Variable | Example (h200x2-dpo) |
-|----------|----------------------|
-| `TRAIN_N` | 6000 |
-| `TRAIN` | dpo |
-| `CONFIG` | configs/dpo_shiny_27b.yaml |
-| `CONFIG_FILE` | pipeline/configuration.local.yaml |
-
-And creates `pipeline/configuration.local.yaml` with `gpu_ids: "0,1"`, `tensor_parallel_size: 2`.
-
-### 1 — Bootstrap assets
-
-```bash
+./run/00_configure_profile.sh h200x4-dpo
 ./run/00_bootstrap_assets.sh
-```
+INSTALL_SYSTEM=1 ./run/00_install_all.sh
 
-### 2 — Install packages
-
-```bash
-INSTALL_SYSTEM=1 ./run/00_install_all.sh   # Ubuntu: Chromium libs
-```
-
-### 3 — Data generation (needs OPENROUTER)
-
-```bash
-source .env
+source .env && source .venv/bin/activate
 ./pipeline/start-native-bg.sh && ./pipeline/wait-ready.sh
-source .venv/bin/activate
-./run/01_prepare_shiny_align.sh    # uses TRAIN_N from .env
-./pipeline/stop-native.sh         # free GPUs before training
+ALIGN=dpo ./run/01_prepare_shiny_align.sh
+./pipeline/stop-native.sh
+./run/03_dpo.sh
 ```
 
-### 4 — Train (OPENROUTER not needed)
+## What runs where
+
+| Phase | Directory | Command | Needs |
+|-------|-----------|---------|-------|
+| Bootstrap | `training/` | `./run/00_bootstrap_assets.sh` | git, HF_TOKEN, network |
+| Install | `training/` | `./run/00_install_all.sh` | Node ≥20, CUDA, sudo (optional) |
+| Pipeline | `training/` | `./pipeline/start-native-bg.sh` | 4× GPU for h200x4 profile |
+| Dataset | `training/` | `./run/01_prepare_shiny_align.sh` | pipeline on `:10006` |
+| Train | `training/` | `./run/03_dpo.sh` | stop pipeline first |
+| Eval | `training/` | `./pipeline/run-eval.sh data/splits/duel.txt` | pipeline running |
+
+## API keys
+
+| Key | Required? |
+|-----|-----------|
+| `HF_TOKEN` | **Yes** — model download + training |
+| `OPENROUTER_API_KEY` | **Only** for duel-scored DPO or refinement/critic paths |
+
+Cheap DPO prep (`refinement_enabled: false`, `openrouter.enabled: false`) does **not** call OpenRouter.
+
+## Profiles
+
+| Hardware | Profile |
+|----------|---------|
+| 4× H200 DPO prep | `h200x4-dpo` |
+| 2× H200 DPO | `h200x2-dpo` |
+| 1 GPU smoke | `smoke` |
+| Pre-built dataset | `train-only` |
+
+See [`MACHINE_PROFILES.md`](MACHINE_PROFILES.md).
+
+## Duel-scored DPO (optional, needs OpenRouter)
 
 ```bash
-source .venv/bin/activate
-source .env
-./run/03_dpo.sh                   # uses CONFIG from .env
+# enable openrouter in pipeline/configuration.duel-judge.yaml
+./run/01_prepare_dpo_duel_scored.sh
+CONFIG=configs/dpo_shiny_27b_duel.yaml ./run/03_dpo.sh
 ```
-
-### 5 — Merge + eval
-
-```bash
-./run/04_merge_and_eval.sh
-export MODEL_PATH=$PWD/data/checkpoints/merged_shiny_coder
-./pipeline/stop-native.sh && ./pipeline/start-native-bg.sh && ./pipeline/wait-ready.sh
-./pipeline/run-eval.sh data/splits/duel.txt --limit 100 --name merged
-```
-
----
-
-## Capacity quick reference
-
-See [`MACHINE_PROFILES.md`](MACHINE_PROFILES.md) for the full matrix.
-
-| Method | Min GPUs | Recommended | Dataset |
-|--------|----------|-------------|---------|
-| DPO bf16 LoRA | 2× 80 GB | 2× H200 | 5k–6k prompts → 2k+ pairs |
-| GRPO bf16 LoRA | 2× 80 GB (tight) | 4× H100 | 4k–5k prompts |
-| Full SFT 27B | 8× H100 + ZeRO-3 | 8× H200 | 8k–12k validated JS |
-
-Default yaml: `load_in_4bit: false`, `use_lora: true` (bf16 LoRA).
-
----
 
 ## Troubleshooting
 
 | Issue | Fix |
 |-------|-----|
-| Wrong GPU layout | Re-run `./run/00_configure_profile.sh <profile>` |
-| OOM training | See profile notes in `MACHINE_PROFILES.md`; lower `max_completion_length` |
-| OOM same box | Stop pipeline before `./run/03_dpo.sh` |
-| No OPENROUTER for train-only | Use `train-only` profile |
+| `shiny-guide not found` | `./run/00_bootstrap_assets.sh` |
+| `prompts.txt not found` | same |
+| `validate.js not found` | `./run/00_install_all.sh` |
+| OOM on 4× H200 | lower `max_num_seqs` in `configuration.h200x4-dpo.yaml` |
+| Train OOM | `./pipeline/stop-native.sh` before `./run/03_dpo.sh` |
 
-See also [`SHINY_GUIDE_TRAINING.md`](SHINY_GUIDE_TRAINING.md).
+See also: [`SHINY_GUIDE_TRAINING.md`](SHINY_GUIDE_TRAINING.md) · [`docs/DPO_DUEL_SCORING.md`](docs/DPO_DUEL_SCORING.md)

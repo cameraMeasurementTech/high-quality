@@ -1,25 +1,23 @@
-# Shiny-guide training — standalone
+# Standalone DPO / GRPO training for the 404-GEN coder VLM
 
-Everything in this folder: **profile → bootstrap → install → data prep → train → eval**.
-
-**New machine:** [`MACHINE_PROFILES.md`](MACHINE_PROFILES.md) — pick hardware profile first.
-
-## Quick start
+**Self-contained:** copy only this `training/` directory to a GPU box.  
+Bootstrap fetches shiny-guide, prompts, and AstroWolf into `vendor/` and `data/`.
 
 ```bash
 cd training
-cp .env.template .env
-./run/00_configure_profile.sh h200x2-dpo   # match your GPU box
-# edit .env: OPENROUTER_API_KEY + HF_TOKEN
-chmod +x run/*.sh pipeline/*.sh
-./run/run_all.sh
+cp .env.template .env          # set HF_TOKEN
+./run/00_configure_profile.sh h200x4-dpo
+./run/00_bootstrap_assets.sh
+INSTALL_SYSTEM=1 ./run/00_install_all.sh
+source .env && ./run/run_all.sh
 ```
 
-| GPUs | Profile |
-|------|---------|
-| 2× H200 (DPO) | `h200x2-dpo` |
-| 2× H100 (DPO) | `h100x2-dpo` |
-| 4× H100 (GRPO) | `h100x4-grpo` |
-| 8× H200 (full FT) | `h200x8-fullft` |
+Full guide: [`STANDALONE.md`](STANDALONE.md)
 
-Full guide: [`STANDALONE.md`](STANDALONE.md) · Phases: [`SHINY_GUIDE_TRAINING.md`](SHINY_GUIDE_TRAINING.md)
+| Hardware | Profile |
+|----------|---------|
+| 4× H200 DPO prep | `h200x4-dpo` |
+| 2× H200 DPO | `h200x2-dpo` |
+| 1 GPU smoke | `smoke` |
+
+Docs: [`MACHINE_PROFILES.md`](MACHINE_PROFILES.md) · [`docs/DPO_DUEL_SCORING.md`](docs/DPO_DUEL_SCORING.md)

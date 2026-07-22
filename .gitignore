@@ -8,4 +8,7 @@ wandb/
 pipeline/.venv/
 pipeline/.vllm-env/
 pipeline/runs/
+pipeline/configuration.local.yaml
 third_party/**/node_modules/
+vendor/shiny-guide/
+vendor/pipeline_prompts/

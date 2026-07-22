@@ -19,7 +19,8 @@ cp .env.template .env
 |---------|------|--------|-----------------|---------------|---------------|
 | **smoke** | 1× any | DPO LoRA | 100 prompts | 1 (`tp=1`) | same box, sequential |
 | **h100x2-dpo** | 2× H100 80GB | DPO bf16 LoRA | 5k → ~2k pairs | 2 (`tp=2`) | 2 (stop pipeline first) |
-| **h200x2-dpo** ⭐ | 2× H200 141GB | DPO bf16 LoRA | 6k → ~2.5k pairs | 2 (`tp=2`) | 2 |
+| **h200x2-dpo-duel** ⭐ | 2× H200 | DPO duel-scored | 3k × 2 JS | 2 (`tp=2`) | 2 (sequential phases) |
+| **h200x4-dpo** | 4× H200 | DPO bf16 LoRA prep | 5k → ~2k pairs | 4 (`tp=4`) | 2 (stop pipeline first) |
 | **h100x4-grpo** | 4× H100 80GB | GRPO bf16 LoRA | 5k prompts | 2 (`tp=2`) | 4 |
 | **h200x2-grpo** | 2× H200 | GRPO bf16 LoRA | 4k prompts | 2 (`tp=2`) | 2 (tight; `num_generations: 2`) |
 | **h200x8-fullft** | 8× H200 | Full SFT | 10k validated JS | 4 (`tp=4`) | 8 + ZeRO-3 |
@@ -112,6 +113,7 @@ learning_rate: 1.0e-6   # lower than LoRA
 |-------|------------|----------------------|
 | Bootstrap (model download) | ✅ | ❌ |
 | Pipeline data gen | ✅ | ✅ (critic/judge only) |
+| **DPO duel-scored prep** | ✅ | ✅ (**multiview S1–S4 judge**) |
 | DPO/GRPO training (`cheap` reward) | ✅ | ❌ |
 | GRPO `reward_mode: s1` | ✅ | optional (judge) |
 | Train-only profile | ✅ | ❌ |
@@ -187,4 +189,4 @@ Already have dataset?
 └─ train-only profile → skip pipeline + OPENROUTER
 ```
 
-See also: [`STANDALONE.md`](STANDALONE.md), [`SHINY_GUIDE_TRAINING.md`](SHINY_GUIDE_TRAINING.md).
+See also: [`STANDALONE.md`](STANDALONE.md), [`SHINY_GUIDE_TRAINING.md`](SHINY_GUIDE_TRAINING.md), [`docs/DPO_DUEL_SCORING.md`](docs/DPO_DUEL_SCORING.md).

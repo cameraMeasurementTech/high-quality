@@ -19,7 +19,8 @@ if [[ -f "$PID_FILE" ]]; then
 fi
 
 mkdir -p "$PIPELINE_DIR/runs"
-: "${OPENROUTER_API_KEY:?Set OPENROUTER_API_KEY in $TRAINING_ROOT/.env}"
+require_shiny_guide
+require_openrouter_if_needed
 
 echo "==> Starting pipeline in background"
 echo "    log: $LOG_FILE"

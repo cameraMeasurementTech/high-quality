@@ -1,0 +1,68 @@
+# Duel-judge profile — score two JS candidates with production multiview logic.
+# No vLLM coder needed. Uses OpenRouter for S1–S4 judge + local renderer + DINO.
+#
+# Usage:
+#   export CONFIG_FILE=$TRAINING/pipeline/configuration.duel-judge.yaml
+#   export PYTHONPATH=$SHINY_GUIDE/pipeline_service
+#   python scripts/duel_score_candidates.py ...
+
+api:
+  host: "127.0.0.1"
+  port: 10006
+  debug: false
+
+pipeline:
+  refinement_enabled: false
+
+benchmark: false
+warmup: false
+
+llm_clients:
+  openrouter:
+    enabled: true
+    base_url: "https://openrouter.ai/api/v1"
+    api_key_env: "OPENROUTER_API_KEY"
+  coder-instance:
+    enabled: false
+
+actors:
+  judge:
+    client: "openrouter"
+    model: "google/gemini-2.5-pro-preview"
+    workers: 2
+    queue_size: 4
+    max_tokens: 8192
+    temperature: 0.0
+    seed: 42
+  checker:
+    workers: 1
+    queue_size: 2
+  renderer:
+    workers: 2
+    queue_size: 4
+
+js_checker:
+  execution_timeout_ms: 5000
+  node_binary: "node"
+
+renderer:
+  sidecar_host: "127.0.0.1"
+  sidecar_port: 8013
+  startup_timeout_s: 120.0
+  request_timeout_s: 120.0
+  node_binary: "node"
+  img_size: 518
+  grid_gap: 5
+  sidecar_count: 2
+  static_port_base: 13100
+  pool_size: 1
+  judge_multiview: true
+  render_timeout_ms: 90000
+  protocol_timeout_ms: 90000
+
+embedder:
+  enabled: true
+  model_id: "facebook/dinov3-vits16-pretrain-lvd1689m"
+  revision: "main"
+  device: "cpu"
+  batch_size: 4

@@ -27,10 +27,8 @@ VLLM_VENV="$PIPELINE_DIR/.vllm-env"
 VLLM_BIN="${VLLM_BIN:-$VLLM_VENV/bin/vllm}"
 PIPE_VENV="$PIPELINE_DIR/.venv"
 
-if [[ -z "${OPENROUTER_API_KEY:-}" ]]; then
-  echo "ERROR: Set OPENROUTER_API_KEY in $TRAINING_ROOT/.env"
-  exit 1
-fi
+require_shiny_guide
+require_openrouter_if_needed
 
 for req in "$PIPE_VENV/bin/python" "$VLLM_BIN" "$BASE_CONFIG"; do
   if [[ ! -e "$req" ]]; then

@@ -22,6 +22,7 @@ Machine profiles — pick one matching your GPU box:
   smoke          1× GPU smoke test (100 prompts, DPO, fast sanity)
   h100x2-dpo     2× H100 80GB — DPO bf16 LoRA (recommended minimum)
   h200x2-dpo     2× H200 141GB — DPO bf16 LoRA (recommended default)
+  h200x4-dpo     4× H200 — DPO data prep (TP=4, max_num_seqs=96)
   h100x4-grpo    4× H100 80GB — GRPO bf16 LoRA + rollouts
   h200x2-grpo    2× H200 — GRPO bf16 LoRA (tight; num_generations=2)
   h200x8-fullft  8× H200 — full fine-tune SFT (use_lora: false, 8 GPU)
@@ -54,6 +55,12 @@ apply_pipeline_gpus() {
   cp "$BASE_CFG" "$LOCAL_CFG"
   sed -i "s|gpu_ids: \"[^\"]*\"|gpu_ids: \"${gpu_ids}\"|" "$LOCAL_CFG"
   sed -i "s|tensor_parallel_size: [0-9]*|tensor_parallel_size: ${tp}|" "$LOCAL_CFG"
+  upsert_env CONFIG_FILE "$LOCAL_CFG" "$ENV_FILE"
+}
+
+apply_pipeline_template() {
+  local template="$1"
+  cp "$template" "$LOCAL_CFG"
   upsert_env CONFIG_FILE "$LOCAL_CFG" "$ENV_FILE"
 }
 
@@ -99,6 +106,21 @@ case "$PROFILE" in
     TRAIN_METHOD="DPO bf16 LoRA"
     DATA_NOTE="TRAIN_N=6000 recommended for 2× H200; aim ≥2500 DPO pairs"
     GPU_NOTE="2× H200: comfortable DPO; pipeline tp=2 on same box"
+    ;;
+  h200x4-dpo)
+    upsert_env MACHINE_PROFILE h200x4-dpo "$ENV_FILE"
+    upsert_env TRAIN dpo "$ENV_FILE"
+    upsert_env TRAIN_N 5000 "$ENV_FILE"
+    upsert_env VAL_N 300 "$ENV_FILE"
+    upsert_env DUEL_N 200 "$ENV_FILE"
+    upsert_env DPO_SAMPLES 4 "$ENV_FILE"
+    upsert_env CONFIG configs/dpo_shiny_27b.yaml "$ENV_FILE"
+    upsert_env ALIGN dpo "$ENV_FILE"
+    upsert_env NUM_PROCESSES 2 "$ENV_FILE"
+    apply_pipeline_template "$TRAINING_ROOT/pipeline/configuration.h200x4-dpo.yaml"
+    TRAIN_METHOD="DPO bf16 LoRA"
+    DATA_NOTE="TRAIN_N=5000, DPO_SAMPLES=4 → aim ≥2000 pairs; pipeline TP=4"
+    GPU_NOTE="4× H200 data prep (vLLM TP=4); stop pipeline before DPO train"
     ;;
   h100x4-grpo)
     upsert_env MACHINE_PROFILE h100x4-grpo "$ENV_FILE"
@@ -177,7 +199,7 @@ Updated:
   ${LOCAL_CFG:-pipeline/configuration.local.yaml (if pipeline profile)}
 
 Next on a new machine:
-  1. Edit ${ENV_FILE} — set OPENROUTER_API_KEY (data gen only) + HF_TOKEN
+  1. Edit ${ENV_FILE} — set HF_TOKEN (OPENROUTER only for duel-scored / critic paths)
   2. ./run/00_bootstrap_assets.sh
   3. INSTALL_SYSTEM=1 ./run/00_install_all.sh
   4. source .env && ./run/run_all.sh

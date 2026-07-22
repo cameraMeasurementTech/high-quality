@@ -46,8 +46,7 @@ case "$TEACHER_MODE" in
     for d in \
       "$PIPELINE_DIR/runs/eval/baseline" \
       "$PIPELINE_DIR/runs/eval/merged" \
-      "$WORKSPACE_ROOT/local-eval/runs/duel/shiny-guide" \
-      "$WORKSPACE_ROOT/local-eval/runs/pool"
+      "$TRAINING_ROOT/data/raw_js/teacher"
     do
       [[ -d "$d" ]] && RUN_DIRS+=("$d")
     done
