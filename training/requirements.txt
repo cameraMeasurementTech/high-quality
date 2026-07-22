@@ -1,13 +1,12 @@
 # Training pipeline deps for the image->Three.js coder VLM (SFT + DPO + GRPO).
 # Pin to known-good ranges; bump deliberately and re-test the audit.
 #
-# Install on the GPU training box:
-#   python -m venv .venv && source .venv/bin/activate
+# Install on the GPU training box (fresh machine):
+#   See SHINY_GUIDE_TRAINING.md Phase 0–2 for full steps.
+#   python3 -m venv .venv && source .venv/bin/activate
 #   pip install -U pip
+#   pip install torch --index-url https://download.pytorch.org/whl/cu124
 #   pip install -r requirements.txt
-#
-# NOTE: vllm + torch are heavy and CUDA-specific. If pip resolves a CPU torch,
-# install the matching CUDA wheel first (see COOKBOOK.md step 1).
 
 # Core training stack
 torch>=2.4.0

@@ -1,5 +1,8 @@
 # Training Cookbook: Beat the King (SFT → DPO → GRPO)
 
+> **Fresh GPU machine?** Use the step-by-step install + dataset + train guide:
+> [`SHINY_GUIDE_TRAINING.md`](SHINY_GUIDE_TRAINING.md) (Phases 0–7).
+
 End-to-end runbook to improve the **coder VLM** that emits validator-safe
 `generate(THREE)` modules for 404-GEN Competition 2, then ship open weights in
 Docker so you can beat the current leader (~5% duel margin on 128 prompts).

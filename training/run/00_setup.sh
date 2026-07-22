@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 # Step 0 — machine setup for the training cookbook.
+#
+# On a fresh GPU box, install CUDA torch BEFORE requirements.txt:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+#   pip install -r requirements.txt
+#
+# Full walkthrough: SHINY_GUIDE_TRAINING.md (Phase 0–7)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
