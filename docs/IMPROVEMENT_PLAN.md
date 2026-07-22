@@ -22,22 +22,42 @@ OpenRouter frontier models are used only for CPU R&D; the shipped Docker miner m
 
 ## 1. Changes already applied in this branch
 
-### 1a. Turn on dormant quality levers (CPU profile)
+### 1a. Turn on dormant quality levers
 
-`local-eval/configuration.my-agent.cpu-openrouter.yaml`:
+CPU profile (`local-eval/configuration.my-agent.cpu-openrouter.yaml`):
 
-- `refinement_enabled: true` — enables critic -> repair. This is the **single biggest lever** and is OFF in the shipped `configuration.yaml`.
-- `event_bus.score_threshold: 0.6` — keeps refinement working on near-misses instead of stopping at 0.55.
-- `ensemble_size: 3` on CPU (cost bound); keep 40 on GPU.
+- `refinement_enabled: true`
+- `event_bus.score_threshold: 0.55`, `max_iter: 3`
+- `coder.ensemble_size: 3` with `workers: 1` (best-of-3 sequentially on weak boxes)
 - Planner fully configured and one flag (`use_planner: true`) away from an A/B.
 
-Recommended for the shipped GPU `configuration.yaml`: set `refinement_enabled: true` and evaluate `use_planner: true`. These are the two highest-ROI switches and cost nothing to flip.
+Shipped GPU `configuration.yaml`:
 
-### 1b. Prompt improvements
+- `refinement_enabled: true` (was false — biggest dormant lever)
+- `max_iter: 3`
 
-- `modules/scene_coder/prompts.py`: added a **Multi-view & duel awareness** section — build real 3D depth (side/back views are judged), enforce grounding (lowest point near `y=-0.5`, centered), silhouette-first priority.
-- `modules/critic/prompts.py`: added **score calibration across repair iterations** — use full 0.01 resolution, move the score when a repair fixes/regresses an issue, anchor score to remaining-issue count. Fixes the observed failure where `score_history` was a flat `[0.45, 0.45, 0.45]`, which gave refinement no signal.
-- `modules/scene_planner/prompts.py`: added a **Quality bar** — numeric proportions per part, a PBR material per part, mandatory `count_hint`, explicit front/+Z orientation.
+### 1b. Prompt improvements (duel-driven, after 5–5 vs shiny-guide)
+
+Loss cluster from `local-eval/runs/duel/duel_detailed.md` (10 prompts): broken
+geometry, missing landmarks (handle/spout/brim/hole/fold/binding), floating
+parts, collapsed 3D depth. Applied:
+
+- `modules/scene_coder/prompts.py`: **Duel-winning construction rules** +
+  landmark inventory + Lathe-for-vessels + thin-sheet folds + structural
+  coherence repair playbook (simplify broken meshes before adding detail).
+- `modules/critic/prompts.py`: structural high-severity list for all classes;
+  score capped ≤0.45 while structural issues remain; color called out for
+  close duels.
+- Earlier: multi-view/duel awareness, critic score calibration, planner quality bar.
+
+### 1c. Structured image analysis → detailed 3D build
+
+- Planner OSD schema adds `primitive`, `attach_to`, `size_frac`, `color_hex`,
+  `material` per part; planner prompt requires landmark checklist + build order.
+- Coder system prompt: **Structured image → 3D build protocol** (analyze →
+  shared dims → body → landmarks → trim).
+- Image-only + OSD user templates force that structure in emitted JS.
+- CPU profile: `use_planner: true` so generation runs analyze(OSD) → code.
 
 ---
 
@@ -89,7 +109,18 @@ Target: my-agent win-rate > 50% vs shiny-guide on a representative prompt set, t
 
 ---
 
-## 4. Backlog (higher effort, not yet applied)
+## 4. Offline model training (GRPO)
+
+To improve the image→Three.js coder itself (not just prompts/pipeline knobs), see:
+
+- Strategy: [`docs/TRAINING_GRPO_STRATEGY.md`](../../docs/TRAINING_GRPO_STRATEGY.md)
+- **Runnable cookbook:** [`training/COOKBOOK.md`](../training/COOKBOOK.md) (`./run/00_setup.sh` → … → `./run/04_merge_and_eval.sh`)
+
+Summary: SFT warm-start on validator-filtered `(image, js)` pairs from `prompts.txt`, then GRPO with rewards = validate → render → S1/DINO/S4 (+ within-group duels), judge with GLM-4.6V-Flash; ship merged open weights in Docker.
+
+---
+
+## 5. Backlog (higher effort, not yet applied)
 
 | Idea | Rationale |
 |------|-----------|

@@ -1,0 +1,32 @@
+# DPO on pre-trained shiny-guide AstroWolf (skip SFT — king weights already specialized).
+# Fresh LoRA on base checkpoint; no sft_adapter_path.
+# Pairs: best vs worst JS from K pipeline samples per validator prompt.
+
+model_name_or_path: "Tooony133/Qwen-3.6-27B-AstroWolf"
+# sft_adapter_path: null   # omit — base model is already SFT'd in production
+dataset_path: "data/hf/dpo_shiny/dataset"
+output_dir: "data/checkpoints/dpo_shiny_27b"
+
+use_lora: true
+load_in_4bit: true
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+
+num_train_epochs: 1
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 16
+learning_rate: 3.0e-7
+warmup_ratio: 0.03
+lr_scheduler_type: cosine
+beta: 0.08
+max_completion_length: 16384
+gradient_checkpointing: true
+
+logging_steps: 5
+save_steps: 50
+save_total_limit: 3
+report_to: none
+dataloader_num_workers: 2
+
+# max_samples: 128

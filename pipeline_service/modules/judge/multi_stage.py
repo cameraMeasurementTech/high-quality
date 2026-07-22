@@ -531,7 +531,14 @@ def _slim_s1(s1: dict, choice: str) -> dict:
         "n_total": s1["n_total"],
         "n_consistent": s1["n_consistent"],
         "angles": [
-            {"label": a["label"], "pen_a": a["pen_a"], "pen_b": a["pen_b"]}
+            {
+                "label": a["label"],
+                "pen_a": a["pen_a"],
+                "pen_b": a["pen_b"],
+                # Keep short VLM issue text so duel logs explain *why* a penalty.
+                "issues_ab": (a.get("ab") or {}).get("issues", ""),
+                "issues_ba": (a.get("ba") or {}).get("issues", ""),
+            }
             for a in s1["angles"]
         ],
     }
@@ -672,9 +679,15 @@ async def _s1_run(
                 "theta": _theta,
                 "phi": _phi,
                 "weight": weight,
+                "ab": {
+                    **_strip_issues(ab),
+                    "issues": "" if ab.issues == JSON_FAILED_MARKER else ab.issues,
+                },
+                "ba": {
+                    **_strip_issues(ba),
+                    "issues": "" if ba.issues == JSON_FAILED_MARKER else ba.issues,
+                },
                 "label": label,
-                "ab": _strip_issues(ab),
-                "ba": _strip_issues(ba),
                 "pen_a": (pen_a_ab + pen_a_ba) / 2,
                 "pen_b": (pen_b_ab + pen_b_ba) / 2,
                 "diff_ab": diff_ab,

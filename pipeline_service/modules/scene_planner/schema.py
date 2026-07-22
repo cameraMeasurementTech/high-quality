@@ -9,9 +9,9 @@ class OSDPart(BaseModel):
     name: str = Field(
         ...,
         description=(
-            "Short stable identifier — 'seat', 'front-left leg', 'lampshade'. "
-            "Used by the Coder as a node id hint and by the Critic/Patcher as "
-            "`target_node_id` for iterative refinement."
+            "Short stable identifier — 'seat', 'front_left_leg', 'lampshade'. "
+            "Used by the Coder as a JS `const` name and by the Critic/Patcher as "
+            "`target_node_id` for iterative refinement. Prefer snake_case."
         ),
     )
     narrative: str = Field(
@@ -36,9 +36,43 @@ class OSDPart(BaseModel):
     motif_role: str | None = Field(
         default=None,
         description=(
-            "Optional role hint — 'support', 'body', 'enclosure', "
-            "'decoration'. Helps the Coder group related nodes into the "
-            "right sub-group (legs_group, body_group, ...)."
+            "Role hint — 'support', 'body', 'enclosure', 'landmark', "
+            "'decoration'. Helps the Coder group related nodes and prioritize "
+            "landmarks (handle/spout/brim/hole) over trim."
+        ),
+    )
+    # Structured build fields (optional for backward compatibility; planner
+    # should fill them so the Coder can map image → Three.js without guessing).
+    primitive: str | None = Field(
+        default=None,
+        description=(
+            "Preferred Three.js primitive family: box, cylinder, sphere, cone, "
+            "torus, lathe, tube, extrude, capsule, instanced."
+        ),
+    )
+    attach_to: str | None = Field(
+        default=None,
+        description=(
+            "Parent part `name` this attaches to, or 'root' for the main group. "
+            "Coder must parent.add(child) — never leave parts floating."
+        ),
+    )
+    size_frac: str | None = Field(
+        default=None,
+        description=(
+            "Relative size vs whole object, e.g. '~0.35H', '~0.6W', '~0.2D'."
+        ),
+    )
+    color_hex: str | None = Field(
+        default=None,
+        description="Dominant color as #rrggbb when confident; else null.",
+    )
+    material: str | None = Field(
+        default=None,
+        description=(
+            "PBR family phrase: polished metal, brushed metal, glossy plastic, "
+            "matte plastic, wood, ceramic, leather, fabric, clear glass, "
+            "frosted glass, rubber, generic."
         ),
     )
 

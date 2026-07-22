@@ -517,7 +517,7 @@ enter `DOWNLOADING` and fetch your URLs.
 Prove generate → validate → R2 upload with a past round (e.g. **24**) before competing:
 
 ```bash
-cd /home/high-quality
+cd /home/404-gen-subnet/my-agent
 bash scripts/fetch_round.sh 24
 # API must be ready on :10006
 bash scripts/smoke_round.sh 24 --smoke          # 2 prompts
@@ -533,7 +533,8 @@ Full details: [`LOCAL_SMOKE.md`](LOCAL_SMOKE.md).
 | Doc | Use |
 |-----|-----|
 | [`LOCAL_SMOKE.md`](LOCAL_SMOKE.md) | Round-24 local generate / validate / R2 smoke |
-| [`../../image-three.js-localeval/docs/MINER_VALIDATOR_GUIDE.md`](../../image-three.js-localeval/docs/MINER_VALIDATOR_GUIDE.md) | Full subnet / API / output specs |
+| [`../../docs/MINER_VALIDATOR_GUIDE.md`](../../docs/MINER_VALIDATOR_GUIDE.md) | Full subnet / API / output specs |
 | [`PIPELINE_WORKFLOW.md`](PIPELINE_WORKFLOW.md) | Internal pipeline stages |
-| `image-three.js-localeval/miner-reference/AGENTS.md` | LLM-facing output constraints |
-| `image-three.js-localeval/local-eval/run-generate-cdn.sh` | OpenRouter CDN prototype (**not** live-safe) |
+| [`../miner-reference/AGENTS.md`](../miner-reference/AGENTS.md) | LLM-facing output constraints |
+| [`../miner-reference/api_specification.md`](../miner-reference/api_specification.md) | Verification batch API contract |
+| [`../../local-eval/run-generate-cdn.sh`](../../local-eval/run-generate-cdn.sh) | OpenRouter CDN prototype (**not** live-safe) |

@@ -52,6 +52,14 @@ Prefer a specific score justified by the issue list over the band midpoint.
 2. Describe the RENDER in one sentence: what the coder produced.
 3. Compare: list at most 5 MOST IMPACTFUL visible mismatches, ordered by
    severity (structural > proportional > material > color > decoration).
+   Across ALL object classes, treat these as structural (high severity):
+   - Distorted / broken / self-intersecting / unreadable geometry
+   - Missing distinctive landmarks visible in the reference (handle, spout,
+     lid/knob, brim, crown pinch, hole/eyelet, fold, spiral binding, clip,
+     strap, wheels, legs, toppings)
+   - Disconnected or floating parts (lid, icing, fruit, rivets, hangers)
+   - Flat billboard where the reference has real 3D depth (A-frame stand,
+     folded tag, thick vessel)
    For vehicles, structural means object class, silhouette, part count,
    attachment, and orientation: wheels/rotors/wings/forks/fuselage/body
    come before paint, shine, logos, or small trim.
@@ -61,6 +69,9 @@ Prefer a specific score justified by the issue list over the band midpoint.
    For seating furniture, structural means seat/back/arm/leg/frame count,
    cushion segmentation, rolled-arm shape, tufting, slats, and support rails
    before small color or trim differences.
+   When silhouette/landmarks already match, a large hue error (e.g. mustard
+   vs bright yellow, gray vs white paper) is medium-high — it decides close
+   duels — and MUST appear in the issue list with a concrete hex target.
 4. Identify 2–5 aspects that ALREADY MATCH well — these go into
    `matching_aspects`. The repair stage reads this list as a preserve-list
    and will tell the coder NOT to modify those parts; without it the coder
@@ -147,8 +158,11 @@ regenerating the whole module.
 1. Do NOT emit more than 5 issues per report. Pick the MOST IMPACTFUL.
 2. Every issue MUST have a concrete, measurable description per the
    examples above.
-3. Set `stop: true` only when score ≥ 0.80 AND no high-severity issues.
-4. Return ONLY JSON matching EXACTLY this shape (no prose, no markdown
+3. Cap the score at ≤ 0.45 whenever ANY high-severity structural issue
+   remains (broken geometry, missing landmark, floating major part, or
+   collapsed 3D depth). Do not score "good" while those are open.
+4. Set `stop: true` only when score ≥ 0.80 AND no high-severity issues.
+5. Return ONLY JSON matching EXACTLY this shape (no prose, no markdown
    fences, no $defs):
 
 {

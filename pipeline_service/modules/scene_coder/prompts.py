@@ -129,16 +129,40 @@ material — pick exact PBR params, don't improvise):
   emissive / LED              MeshStandardMaterial  emissive=color emissiveIntensity 1.0
   generic / unsure            MeshStandardMaterial  metalness 0.0 roughness 0.7
 
+Structured image → 3D build protocol (follow this order in code):
+
+Phase A — Analyze the reference (mentally; do not print analysis):
+  A1. Object class + overall silhouette (taller/wider/cubic; front face).
+  A2. Landmark inventory: every distinctive feature (handle, spout, lid,
+      brim, hole, fold, binding, clip, wheels, legs, toppings, …).
+  A3. Part tree: root body → attached landmarks → trim/decoration.
+  A4. Shared dimensions first: `bodyH`, `bodyW`, `bodyD` (or radius) as
+      numeric consts; derive child sizes as fractions of those.
+  A5. Materials: one MeshStandard/PhysicalMaterial per distinct surface;
+      sample dominant hex colors from the image.
+
+Phase B — Emit JS in this structure (readable, critic-friendly):
+  1. `fitToUnitCube` helper
+  2. materials block (`const bodyMat = …`)
+  3. shared dimension consts
+  4. root `const group = new THREE.Group()`
+  5. body / primary mesh(es), `group.add(…)`
+  6. each landmark as `const <snake_name> = new THREE.Mesh(…)` parented to
+     body or group with a real contact offset
+  7. trim / decoration last
+  8. `fitToUnitCube(group); return group;`
+
 Modeling strategy:
-- Translate the reference image into a clear part hierarchy.
+- Translate the reference image into a clear part hierarchy (Phase A→B).
 - Use box/cylinder/sphere/cone/torus for simple components.
 - Use lathe for rotationally symmetric vessels and silhouettes.
 - Use tube for handles, rods, pipes, cables, curved frames.
-- Use extrude for flat custom silhouettes, panel-like bodies, and bladed
-  weapons (thin depth + large bevel → lenticular cross-section).
+- Use extrude for flat custom silhouettes, panel-like bodies, folded sheets,
+  and bladed weapons (thin depth + large bevel → lenticular cross-section).
 - Prefer simple composition first; only use custom BufferGeometry or DataTexture if clearly justified.
 - Keep material choices conservative and compatible with the fixed render setup.
 - When the object is ambiguous, choose the most plausible clean low-poly reconstruction.
+- Detail means COMPLETE landmarks + correct proportions, not noisy geometry.
 
 Seating furniture / upholstery handbook:
 - For chairs, sofas, couches, loveseats, armchairs, benches, and chaise
@@ -245,6 +269,39 @@ Multi-view and duel awareness (how your output is scored):
 - Silhouette first: the single highest-impact factor is a correct silhouette
   and part layout in the front view. Get object class, part count, and
   proportions right before spending effort on fine trim, logos, or micro-detail.
+
+Duel-winning construction rules (learned from pairwise VLM losses):
+- Coherent beats broken: a simple, attached, recognizable shape ALWAYS beats
+  a more detailed mesh that is distorted, self-intersecting, detached, or
+  unreadable. If a complex Extrude/Boolean attempt looks wrong, fall back to
+  Lathe + primitives that stay attached.
+- Landmark inventory BEFORE coding: list every distinctive feature visible in
+  the reference (handle, spout, lid/knob, brim, crown pinch, hole/eyelet,
+  fold/crease, spiral binding, clip mechanism, wheels, legs, strap, tag hole,
+  icing/topping). EVERY landmark must become a mesh that is parented to the
+  body — omitting a landmark is the #1 reason judges pick the opponent.
+- Attachment is mandatory: every part must share a contact surface or short
+  neck with the body. No floating lids, icing blobs, fruit, rivets, hangers,
+  or decorations in empty space. Prefer `parent.add(child)` with local
+  offsets over world-space free floats.
+- Prefer LatheGeometry for vessels / pots / bottles / cups: one clean
+  SplineCurve profile (Vector2 points) beats stacked broken extrudes. Add
+  spout as a short tapered cylinder attached to the rim; handle as a
+  CatmullRomCurve3 TubeGeometry that starts and ends ON the body surface.
+- Thin sheet / tag / paper / folded card: use ExtrudeGeometry with tiny
+  depth (0.01–0.04), include the hole as a Shape hole, and model the fold
+  as two angled panels — never a solid block or a bucket-like shell.
+- Hats / soft goods: model the brim as a real Torus/Lathe disk (never omit
+  it) and match crown silhouette (pinch, dent, dome) before fabric texture.
+- Desktop stands / A-frames / calendars: keep the true 3D dihedral (two
+  panels at an angle) so side views still read as a stand; do not flatten
+  into a single plane. Spiral bindings and front images are landmarks.
+- Color fidelity: when the silhouette is close, wrong hue loses the duel.
+  Sample the dominant reference color carefully (bright yellow ≠ mustard;
+  white paper ≠ gray metal). Cap metalness ≤ 0.6 so colors stay visible.
+- Side-view budget: after building, mentally rotate — if the side silhouette
+  collapses to a line or becomes a different object class, add depth / fix
+  proportions before returning.
 """
     + "\n\n---\n\n"
     + THREEJS_OUTPUT_SPEC_REFERENCE
@@ -252,51 +309,67 @@ Multi-view and duel awareness (how your output is scored):
     + THREEJS_PRIMITIVE_REFERENCE
 )
 
-CODER_USER_TEMPLATE_OSD = """Object Structural Description (OSD):
+CODER_USER_TEMPLATE_OSD = """Object Structural Description (OSD) — structured analysis of the reference:
 {osd_json}
 
-Generate the full JavaScript module now.
+Implement the FULL JavaScript module from this OSD. Follow the build order in
+`scene_brief` → Build order (body first, then landmarks, then decoration).
 
-Reminders before you write:
-- For each entry in `parts[]`, create a `const <name> = new THREE.Mesh(...)`
-  whose variable matches `parts[i].name` (lowercase, underscores). The
-  visual critic will refer to parts by that name in later repair rounds.
-- Use the material normalization quick-reference from your system prompt
-  — don't improvise PBR values.
-- If this is seating furniture, use the seating furniture handbook: build
-  distinct cushions, back modules, arms, legs/frame, seams/piping, and any
-  tufted buttons or slats before minor decorative details.
-- If the object has painted/printed floral or ornamental texture, use the
-  surface decoration handbook: motifs must be flat or shallow, parented to
-  the object, and placed just above the surface normal, not floating around it.
-- If this is a vehicle, use the vehicle modeling playbook: set shared
-  dimensions first, keep front +Z / Y-up / width X, attach all major parts,
-  and prioritize correct wheel/rotor/wing count and orientation before trim.
-- Call your `fitToUnitCube` helper with `0.95 / maxDim` so the object
-  fills ~95% of the frame (not lost in background).
+Reminders:
+- For each `parts[]` entry, create `const <name> = …` using that exact
+  snake_case `name`. Parent it to `attach_to` (`root` → group, else the
+  named parent mesh/group). Use `primitive`, `size_frac`, `color_hex`, and
+  `material` as the primary build specs; use `narrative` for placement detail.
+- Prefer coherent Lathe/primitives over broken Extrudes.
+- Use the material normalization quick-reference — don't improvise PBR.
+  Prefer `color_hex` from the OSD when present.
+- Seating / surface-decoration / vehicle handbooks apply when relevant.
+- Call `fitToUnitCube` with `0.95 / maxDim` before return.
 
 Return ONLY the JS module source.
 """
 
 
-CODER_USER_TEMPLATE_IMAGE_ONLY = """Reference image is attached above. Decompose it into part meshes and generate the full JavaScript module now.
+CODER_USER_TEMPLATE_IMAGE_ONLY = """Reference image is attached above.
 
-Reminders before you write:
-- Pick a clear part hierarchy from the image. Name each `const` after its
-  part (lowercase, underscores) so the critic can target it later.
-- Use the material normalization quick-reference from your system prompt
-  — don't improvise PBR values.
-- If this is seating furniture, use the seating furniture handbook: build
-  distinct cushions, back modules, arms, legs/frame, seams/piping, and any
-  tufted buttons or slats before minor decorative details.
-- If the object has painted/printed floral or ornamental texture, use the
-  surface decoration handbook: motifs must be flat or shallow, parented to
-  the object, and placed just above the surface normal, not floating around it.
-- If this is a vehicle, use the vehicle modeling playbook: set shared
-  dimensions first, keep front +Z / Y-up / width X, attach all major parts,
-  and prioritize correct wheel/rotor/wing count and orientation before trim.
-- Call your `fitToUnitCube` helper with `0.95 / maxDim` so the object
-  fills ~95% of the frame (not lost in background).
+Analyze it with the structured protocol below, then emit the FULL JavaScript
+module. Do NOT print the analysis — only return JS — but your code MUST
+reflect every step (named consts, attached landmarks, shared dimensions).
+
+## Structured image analysis (internal)
+
+1. Object class + silhouette (taller/wider/cubic; which face is front → +Z).
+2. Landmark inventory — list every distinctive feature visible:
+   handle / spout / lid / knob / brim / crown / hole / fold / binding /
+   clip / wheels / legs / strap / toppings / windows / … .
+3. Part tree — root body → each landmark attached to a parent → trim last.
+4. Shared dimensions — choose numeric consts (`bodyH`, `bodyR`, …) and
+   express child sizes as fractions of them.
+5. Materials — one material per distinct surface; sample hex from the image.
+
+## Code structure to emit
+
+```
+export default function generate(THREE) {{
+  // fitToUnitCube helper
+  // materials
+  // shared dimension consts
+  // const group = new THREE.Group()
+  // body mesh(es) → group.add
+  // each landmark as const <snake_name> = … parented with contact offset
+  // trim/decoration
+  // fitToUnitCube(group); return group;
+}}
+```
+
+## Hard requirements
+
+- Every landmark from step 2 becomes an ATTACHED mesh (no floating parts).
+- Prefer coherent Lathe/primitive assemblies over broken complex Extrudes.
+- Name each `const` after its part (snake_case) for critic targeting.
+- Match dominant reference hues; metalness ≤ 0.6.
+- Apply seating / surface-decoration / vehicle handbooks when relevant.
+- `fitToUnitCube` must use `0.95 / maxDim`.
 
 Return ONLY the JS module source.
 """
@@ -372,6 +445,17 @@ Per-kind playbook:
 - `wrong_position`     → move the mesh (or its parent group) along the
   axis the description names.
 - `wrong_orientation`  → add or adjust `mesh.rotation.<axis>`.
+
+Structural coherence repair priority (all object classes):
+- If the critic reports distorted, broken, detached, or unreadable geometry,
+  SIMPLIFY first: replace the broken region with Lathe/primitives that attach
+  cleanly. Do not add more decorative complexity on top of a broken mesh.
+- Missing landmarks (handle, spout, lid/knob, brim, hole, fold, spiral
+  binding, clip, topping) are high priority: ADD the missing mesh attached to
+  the body. Prefer a simple attached cylinder/tube/torus over an elaborate
+  free-floating Extrude.
+- Floating lids, toppings, fruit, rivets, or hangers must be re-parented onto
+  a contact surface with a tiny normal offset — never left in empty space.
 
 Vehicle repair priority:
 - For cars, bikes, scooters, motorcycles, aircraft, and drones, fix object
@@ -480,6 +564,17 @@ Per-kind playbook:
 - `wrong_position`     → move the mesh (or its parent group) along the
   axis the description names.
 - `wrong_orientation`  → add or adjust `mesh.rotation.<axis>`.
+
+Structural coherence repair priority (all object classes):
+- If the critic reports distorted, broken, detached, or unreadable geometry,
+  SIMPLIFY first: replace the broken region with Lathe/primitives that attach
+  cleanly. Do not add more decorative complexity on top of a broken mesh.
+- Missing landmarks (handle, spout, lid/knob, brim, hole, fold, spiral
+  binding, clip, topping) are high priority: ADD the missing mesh attached to
+  the body. Prefer a simple attached cylinder/tube/torus over an elaborate
+  free-floating Extrude.
+- Floating lids, toppings, fruit, rivets, or hangers must be re-parented onto
+  a contact surface with a tiny normal offset — never left in empty space.
 
 Vehicle repair priority:
 - For cars, bikes, scooters, motorcycles, aircraft, and drones, fix object

@@ -1,0 +1,7 @@
+.venv/
+data/
+__pycache__/
+*.pyc
+hf_cache/
+wandb/
+.accelerate/

@@ -5,6 +5,8 @@ This document describes how `my-agent` turns a single reference image (the compe
 It is a fork of the current subnet leader (`shiny-guide`). The competition is **404-GEN Subnet 17, Competition 2: Procedural Image-to-3D**. Miners submit `{stem}.js` files; validators render them and run pairwise VLM duels to rank miners.
 
 > To run this pipeline **live** on the subnet (build/run the Docker, reveal on-chain, generate a round, upload to your CDN, pass the audit), see [`GO_LIVE.md`](GO_LIVE.md).
+>
+> How validators score `.js` files (S1–S4 duels) and where prompt/eval images come from: [`../../docs/VALIDATOR_SCORING_AND_DATASET.md`](../../docs/VALIDATOR_SCORING_AND_DATASET.md).
 
 ---
 

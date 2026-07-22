@@ -151,6 +151,8 @@ class JudgeAgent(BaseAgent):
             reason = str(detail.get("issues", "")) or f"decided by {decided_by or 'multi-stage'}"
             confidence = _confidence_from_decided_by(decided_by, winner)
 
+        # Keep stage diagnostics + the VLM "explain" issues string so local-eval
+        # (and any caller) can write detailed duel rationale logs.
         verdict = JudgeVerdict(
             winner=side,
             reason=reason,
@@ -158,7 +160,18 @@ class JudgeAgent(BaseAgent):
             decided_by=decided_by,
             detail={
                 k: detail[k]
-                for k in ("s1_slim", "s2_slim", "s3_slim", "s4_slim", "decided_by")
+                for k in (
+                    "issues",
+                    "decided_by",
+                    "s1_slim",
+                    "s2_slim",
+                    "s3_slim",
+                    "s4_slim",
+                    "s1",
+                    "s2",
+                    "s3",
+                    "s4",
+                )
                 if k in detail
             },
         )
