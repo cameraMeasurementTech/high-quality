@@ -85,6 +85,14 @@ def load_model_and_processor(cfg: dict):
         )
         model = get_peft_model(model, lora)
         model.print_trainable_parameters()
+    elif not cfg.get("use_lora", True):
+        for p in model.parameters():
+            p.requires_grad = True
+        model.print_trainable_parameters()
+
+    if cfg.get("use_lora", True) and not cfg.get("load_in_4bit"):
+        if hasattr(model, "enable_input_require_grads"):
+            model.enable_input_require_grads()
 
     return model, processor
 

@@ -9,6 +9,7 @@ cd "$TRAINING_ROOT"
 # shellcheck disable=SC1091
 source .venv/bin/activate
 
+# CONFIG may be set by MACHINE_PROFILE in .env
 CONFIG="${CONFIG:-configs/dpo_8b.yaml}"
 
 echo "==> DPO with $CONFIG"

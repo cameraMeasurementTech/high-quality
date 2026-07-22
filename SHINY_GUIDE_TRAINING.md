@@ -16,6 +16,8 @@ Strategy background: [`docs/TRAINING_DPO_STRATEGY.md`](../../docs/TRAINING_DPO_S
 
 Complete walkthrough from a **blank Ubuntu GPU box** to a trained LoRA checkpoint.
 
+**Step 0 on every new machine:** [`MACHINE_PROFILES.md`](MACHINE_PROFILES.md) + `./run/00_configure_profile.sh`
+
 Replace `/home/404-gen-subnet` with your clone path if different.
 
 ### Timeline overview
@@ -27,21 +29,75 @@ Replace `/home/404-gen-subnet` with your clone path if different.
 | 2 | Python training env (CUDA torch) | 20–60 min |
 | 3 | Start shiny-guide (data generation) | 1–3 h first boot (model download) |
 | 4 | Prepare dataset (DPO or GRPO) | 4–48 h (depends on `TRAIN_N`, pipeline speed) |
-| 5 | Run DPO or GRPO training | 6–48 h (27B QLoRA) |
+| 5 | Run DPO or GRPO training | 6–48 h (27B bf16 LoRA) |
 | 6 | Merge LoRA + deploy | 1–2 h |
 
 ---
 
-### Phase 0 — Hardware and OS
+### Phase 0 — Pick machine profile (do this first)
 
-**Minimum for 27B DPO/GRPO (QLoRA):**
+On a **new GPU box**, choose settings that match your hardware **before** installing packages.
+
+```bash
+cd $TRAINING   # or: cd training/ in standalone layout
+cp .env.template .env
+
+# List profiles
+./run/00_configure_profile.sh
+
+# Apply one (examples)
+./run/00_configure_profile.sh h200x2-dpo     # 2× H200 — DPO bf16 LoRA (recommended)
+./run/00_configure_profile.sh h100x2-dpo     # 2× H100 80GB — DPO
+./run/00_configure_profile.sh h100x4-grpo   # 4× H100 — GRPO
+./run/00_configure_profile.sh smoke         # 1 GPU quick sanity
+./run/00_configure_profile.sh train-only      # dataset already built; no pipeline
+
+# Edit keys (always required for data generation):
+#   OPENROUTER_API_KEY  — pipeline critic/judge only (NOT training)
+#   HF_TOKEN            — AstroWolf + embedder download
+nano .env
+```
+
+Full matrix: [`MACHINE_PROFILES.md`](MACHINE_PROFILES.md)
+
+| Your box | Profile | Method | `TRAIN_N` (default) |
+|----------|---------|--------|---------------------|
+| 2× H200 | `h200x2-dpo` | DPO bf16 LoRA | 6000 |
+| 2× H100 80GB | `h100x2-dpo` | DPO bf16 LoRA | 5000 |
+| 4× H100 | `h100x4-grpo` | GRPO bf16 LoRA | 5000 |
+| 2× H200 (GRPO) | `h200x2-grpo` | GRPO (tight) | 4000 |
+| 8× H200 | `h200x8-fullft` | Full SFT | 10000 |
+| 1 GPU test | `smoke` | DPO smoke | 100 |
+
+**Single-box rule (2× GPU):** run **pipeline data gen** and **training** in sequence — not both at full GPU load:
+
+```bash
+# Phase A — data (needs OPENROUTER)
+./pipeline/start-native-bg.sh && ./pipeline/wait-ready.sh
+source .env && ./run/01_prepare_shiny_align.sh
+./pipeline/stop-native.sh
+
+# Phase B — train (OPENROUTER not needed)
+CONFIG=configs/dpo_shiny_27b.yaml ./run/03_dpo.sh
+```
+
+Profile sets `pipeline/configuration.local.yaml` (`gpu_ids`, `tensor_parallel_size`) automatically.
+
+---
+
+### Phase 0b — Hardware and OS
+
+**Defaults after profile `h200x2-dpo` / `h100x2-dpo` (bf16 LoRA, not 4-bit):**
 
 | Resource | Recommendation |
 |----------|----------------|
-| GPU | 2× H100 80GB (train) **or** 4× A100 80GB |
+| GPU (train) | **2× H200** or **2× H100 80GB** (DPO); **4× H100** (GRPO) |
+| GPU (pipeline) | 1–2× same box (`configuration.local.yaml` from profile) |
 | CPU RAM | ≥ 128 GB |
 | Disk | ≥ 2 TB SSD (HF cache + datasets + checkpoints) |
 | OS | Ubuntu 22.04 / 24.04 |
+
+**Full fine-tune 27B (`h200x8-fullft`):** **8× H200** (or 8× H100 80GB + ZeRO-3) — not feasible on 2× H200.
 
 **For dataset generation (shiny-guide Docker on same or second box):**
 
@@ -285,7 +341,9 @@ export HF_HOME=$TRAINING/data/hf_cache
 
 #### One-command prep (recommended)
 
-**Smaller first run (smoke / iterate):**
+Use **`TRAIN_N` from your profile** (`.env` after `00_configure_profile.sh`):
+
+**Smaller first run (smoke profile or manual):**
 
 ```bash
 ALIGN=dpo TRAIN_N=500 VAL_N=50 DUEL_N=50 DPO_SAMPLES=4 \
@@ -293,14 +351,21 @@ PIPELINE_URL=http://127.0.0.1:10006 \
 ./run/01_prepare_shiny_align.sh
 ```
 
-**Production-sized run:**
+**Production (h200x2-dpo profile defaults):**
 
 ```bash
-ALIGN=dpo TRAIN_N=5000 VAL_N=300 DUEL_N=200 DPO_SAMPLES=4 \
-PIPELINE_URL=http://127.0.0.1:10006 \
+source .env   # TRAIN_N=6000, DPO_SAMPLES=4 from profile
+ALIGN=dpo PIPELINE_URL=http://127.0.0.1:10006 \
 REWARD_MODE=cheap MIN_MARGIN=0.15 \
 ./run/01_prepare_shiny_align.sh
 ```
+
+| Profile | Target DPO pairs | Notes |
+|---------|------------------|-------|
+| smoke | ≥50 | sanity only |
+| h100x2-dpo | ≥2000 | `TRAIN_N=5000` |
+| h200x2-dpo | ≥2500 | `TRAIN_N=6000` |
+| h200x8-fullft | 10k SFT rows | `PREP_SFT=1`, not DPO pairs |
 
 For **GRPO** (prompt-only — no candidate collection):
 
@@ -357,21 +422,32 @@ python scripts/prepare_splits.py \
 
 ### Phase 5 — Run training (skip SFT)
 
-AstroWolf is already specialized. **Do not run** `./run/02_sft.sh`.
+AstroWolf is already specialized. **Do not run** `./run/02_sft.sh` unless profile is **`h200x8-fullft`**.
 
-#### DPO training
+Use **`CONFIG` from your profile** (`.env` after `00_configure_profile.sh`):
 
-Dry-run (64 samples) — uncomment in yaml first:
+| Profile | Command |
+|---------|---------|
+| h200x2-dpo, h100x2-dpo, smoke | `CONFIG=configs/dpo_shiny_27b.yaml ./run/03_dpo.sh` |
+| h100x4-grpo, h200x2-grpo | `CONFIG=configs/grpo_shiny_27b.yaml ./run/03_grpo.sh` |
+| h200x8-fullft | Edit `sft_shiny_27b.yaml`: `use_lora: false`; then `NUM_PROCESSES=8 ./run/02_sft.sh` |
+
+#### DPO training (bf16 LoRA — default profiles)
+
+Dry-run — uncomment in yaml first:
 
 ```bash
 # edit configs/dpo_shiny_27b.yaml → max_samples: 64
+source .env
 CONFIG=configs/dpo_shiny_27b.yaml ./run/03_dpo.sh
 ```
 
-Full run:
+Full run (2× H200 / 2× H100):
 
 ```bash
+source .env
 CONFIG=configs/dpo_shiny_27b.yaml NUM_PROCESSES=1 ./run/03_dpo.sh
+# or: CONFIG=$CONFIG ./run/03_dpo.sh   # if set by profile in .env
 ```
 
 Checkpoint: `data/checkpoints/dpo_shiny_27b/final`
@@ -578,8 +654,8 @@ REWARD_MODE=s1 MIN_MARGIN=0.20 ALIGN=dpo ./run/01_prepare_shiny_align.sh
 | `validate.js` fails | `cd $REPO/miner-reference/validator && npm install` |
 | shiny-guide `:10006` connection refused | `docker compose up -d`; wait for model download |
 | DPO `n_pairs: 0` | Check pipeline logs; lower `MIN_MARGIN`; increase `DPO_SAMPLES` |
-| GRPO OOM | Lower `num_generations` to 2; enable `load_in_4bit`; use more GPUs |
-| DPO OOM on 27B | Keep `load_in_4bit: true`; batch=1; increase `gradient_accumulation_steps` |
+| GRPO OOM | Lower `num_generations` to 2; use more GPUs |
+| DPO OOM on 27B | batch=1; increase `gradient_accumulation_steps`; 2× GPU; shorten `max_completion_length` |
 | HF 401 / gated model | `huggingface-cli login`; accept model license on HF website |
 | Train/serve prompt drift | Always `PROMPTS_ROOT=shiny-guide` for pack + train |
 

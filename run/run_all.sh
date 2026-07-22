@@ -20,8 +20,13 @@ cd "$TRAINING_ROOT"
 
 if [[ ! -f .env ]]; then
   cp .env.template .env
-  echo "Created .env from template — set OPENROUTER_API_KEY and HF_TOKEN, then re-run."
+  echo "Created .env — run ./run/00_configure_profile.sh <profile> then set API keys."
+  echo "  Example: ./run/00_configure_profile.sh h200x2-dpo"
   exit 1
+fi
+
+if [[ -z "${MACHINE_PROFILE:-}" ]]; then
+  echo "TIP: Run ./run/00_configure_profile.sh h200x2-dpo to match your GPU box (see MACHINE_PROFILES.md)"
 fi
 
 # shellcheck disable=SC1091
@@ -40,7 +45,7 @@ ALIGN="${ALIGN:-$TRAIN}"
 
 echo "=============================================="
 echo "  shiny-guide standalone training — run_all"
-echo "  TRAIN=$TRAIN  ALIGN=$ALIGN  TRAIN_N=${TRAIN_N:-5000}"
+echo "  profile=${MACHINE_PROFILE:-<unset>}  TRAIN=$TRAIN  ALIGN=$ALIGN  TRAIN_N=${TRAIN_N:-5000}"
 echo "=============================================="
 
 if [[ "${SKIP_BOOTSTRAP:-0}" != "1" ]]; then

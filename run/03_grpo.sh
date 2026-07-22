@@ -10,6 +10,7 @@ cd "$TRAINING_ROOT"
 # shellcheck disable=SC1091
 source .venv/bin/activate
 
+# CONFIG may be set by MACHINE_PROFILE in .env
 CONFIG="${CONFIG:-configs/grpo_8b.yaml}"
 
 # Optional overrides (also readable from yaml)

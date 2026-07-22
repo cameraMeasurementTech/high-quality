@@ -1,13 +1,14 @@
 # DPO on pre-trained shiny-guide AstroWolf (skip SFT — king weights already specialized).
-# Override HF id with local weights: export MODEL_PATH=/path/to/AstroWolf
+# bf16 LoRA (NOT 4-bit QLoRA). Fits 2× H200 / 2× H100 80GB with batch=1.
+# Override HF id: export MODEL_PATH=/path/to/AstroWolf
 
 model_name_or_path: "Tooony133/Qwen-3.6-27B-AstroWolf"
-# sft_adapter_path: null   # omit — base model is already SFT'd in production
 dataset_path: "data/hf/dpo_shiny/dataset"
 output_dir: "data/checkpoints/dpo_shiny_27b"
 
 use_lora: true
-load_in_4bit: true
+load_in_4bit: false
+# Full fine-tune (all weights, needs much more VRAM): use_lora: false
 lora_r: 16
 lora_alpha: 32
 lora_dropout: 0.05
@@ -21,6 +22,7 @@ lr_scheduler_type: cosine
 beta: 0.08
 max_completion_length: 16384
 gradient_checkpointing: true
+attn_implementation: sdpa
 
 logging_steps: 5
 save_steps: 50

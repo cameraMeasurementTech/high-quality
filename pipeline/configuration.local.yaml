@@ -1,0 +1,127 @@
+# Native GPU profile for shiny-guide (NO Docker, NO full monorepo).
+# Local vLLM serves AstroWolf for the coder; critic/judge use OpenRouter.
+#
+# Use with:
+#   source ../.env
+#   ./setup-native.sh && ./run-native.sh
+#
+# Local model (after download):
+#   export MODEL_PATH=/path/to/Qwen-3.6-27B-AstroWolf
+#   ./run-native.sh
+#
+# GPU layout:
+#   1× GPU: gpu_ids "0", tensor_parallel_size 1
+#   2× GPU: gpu_ids "0,1", tensor_parallel_size 2
+
+api:
+  host: "0.0.0.0"
+  port: 10006
+  debug: true
+
+pipeline:
+  batch_time_budget: 14400
+  prompt_timeout: 900.0
+  use_planner: false
+  render_from_object: true
+  refinement_enabled: false
+
+benchmark: false
+warmup: true
+
+llm_clients:
+  openrouter:
+    enabled: true
+    base_url: "https://openrouter.ai/api/v1"
+    api_key_env: "OPENROUTER_API_KEY"
+  coder-instance:
+    enabled: true
+    base_url: "http://localhost:8001/v1"
+    api_key: "local"
+    vllm:
+      model: "Tooony133/Qwen-3.6-27B-AstroWolf"
+      gpu_ids: "0,1"
+      tensor_parallel_size: 2
+      gpu_memory_utilization: 0.92
+      max_model_len: 32768
+      max_num_seqs: 32
+      vllm_bin: "/opt/vllm-env/bin/vllm"
+
+actors:
+  planner:
+    client: "coder-instance"
+    model: "Tooony133/Qwen-3.6-27B-AstroWolf"
+    workers: 8
+    queue_size: 16
+    max_tokens: 8192
+    temperature: 0.6
+    multimodal: true
+  coder:
+    client: "coder-instance"
+    model: "Tooony133/Qwen-3.6-27B-AstroWolf"
+    workers: 8
+    queue_size: 16
+    max_tokens: 24576
+    temperature: 0.6
+    top_p: 0.95
+    top_k: 20
+    seed: 42
+    multimodal: true
+    ensemble_size: 1
+    ensemble_temperature: 0.65
+  patcher:
+    workers: 4
+    queue_size: 8
+  critic:
+    client: "openrouter"
+    model: "google/gemini-2.5-pro-preview"
+    workers: 2
+    queue_size: 8
+    max_tokens: 6144
+    temperature: 0.3
+    seed: 42
+    ensemble_size: 1
+  judge:
+    client: "openrouter"
+    model: "google/gemini-2.5-pro-preview"
+    workers: 2
+    queue_size: 8
+    max_tokens: 8192
+    temperature: 0.0
+    seed: 42
+  checker:
+    workers: 4
+    queue_size: 8
+  renderer:
+    workers: 4
+    queue_size: 8
+
+event_bus:
+  max_iter: 2
+  task_deadline_s: 3600
+  score_threshold: 0.55
+
+js_checker:
+  execution_timeout_ms: 5000
+  node_binary: "node"
+
+renderer:
+  sidecar_host: "127.0.0.1"
+  sidecar_port: 8003
+  startup_timeout_s: 120.0
+  request_timeout_s: 120.0
+  node_binary: "node"
+  img_size: 518
+  grid_gap: 5
+  sidecar_count: 2
+  static_port_base: 13000
+  pool_size: 1
+  judge_multiview: true
+  render_timeout_ms: 90000
+  protocol_timeout_ms: 90000
+
+embedder:
+  enabled: true
+  model_id: "facebook/dinov3-vits16-pretrain-lvd1689m"
+  revision: "main"
+  device: "cpu"
+  batch_size: 4

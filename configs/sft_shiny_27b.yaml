@@ -6,7 +6,7 @@ dataset_path: "data/hf/sft_shiny/dataset"
 output_dir: "data/checkpoints/sft_shiny_27b"
 
 use_lora: true
-load_in_4bit: true
+load_in_4bit: false
 lora_r: 16
 lora_alpha: 32
 lora_dropout: 0.05

@@ -2,22 +2,45 @@
 
 Run the full loop from a **single folder**. No monorepo, no Docker, no `my-agent` / `local-eval`.
 
-## One command
+## New machine — start here
 
 ```bash
 cd training
 cp .env.template .env
-# Edit: OPENROUTER_API_KEY, HF_TOKEN
 
+# 1. Match config to your GPU box
+./run/00_configure_profile.sh              # list options
+./run/00_configure_profile.sh h200x2-dpo     # example: 2× H200 DPO
+
+# 2. API keys (edit .env)
+#    OPENROUTER_API_KEY — pipeline data gen only (critic/judge)
+#    HF_TOKEN           — model download + training
+
+# 3. Full automated run
 chmod +x run/*.sh pipeline/*.sh
 ./run/run_all.sh
 ```
 
-Smoke test (small dataset, fast sanity check):
+**Profile guide:** [`MACHINE_PROFILES.md`](MACHINE_PROFILES.md)
+
+| Your hardware | Profile |
+|---------------|---------|
+| 2× H200 | `h200x2-dpo` ⭐ |
+| 2× H100 80GB | `h100x2-dpo` |
+| 4× H100 GRPO | `h100x4-grpo` |
+| 8× H200 full FT | `h200x8-fullft` |
+| 1 GPU test | `smoke` |
+| Dataset ready | `train-only` |
+
+---
+
+## One command
 
 ```bash
-SMOKE=1 ./run/run_all.sh
+./run/run_all.sh
 ```
+
+Smoke: `SMOKE=1 ./run/run_all.sh` (or apply `smoke` profile first)
 
 ---
 
@@ -25,56 +48,37 @@ SMOKE=1 ./run/run_all.sh
 
 | Step | Script | Action |
 |------|--------|--------|
-| 1 | `00_bootstrap_assets.sh` | Clone **shiny-guide**, download **prompts.txt**, download **AstroWolf** locally |
-| 2 | `00_install_all.sh` | Validator npm, training venv + CUDA torch, pipeline venv + vLLM |
-| 3 | `pipeline/start-native-bg.sh` | Start king pipeline on `:10006` |
-| 4 | `01_prepare_shiny_align.sh` | Splits, images, DPO candidates, pack DPO + GRPO datasets |
-| 5 | `03_dpo.sh` / `03_grpo.sh` | QLoRA training |
+| 0 | `00_configure_profile.sh` | **You run this first** — sets `.env` + pipeline GPUs |
+| 1 | `00_bootstrap_assets.sh` | Clone shiny-guide, prompts.txt, AstroWolf |
+| 2 | `00_install_all.sh` | Validator npm, training venv, pipeline venv + vLLM |
+| 3 | `pipeline/start-native-bg.sh` | King pipeline on `:10006` |
+| 4 | `01_prepare_shiny_align.sh` | Datasets (sizes from profile / `.env`) |
+| 5 | `03_dpo.sh` / `03_grpo.sh` | bf16 LoRA training (`CONFIG` from profile) |
 
 Skip flags: `SKIP_BOOTSTRAP=1`, `SKIP_INSTALL=1`, `SKIP_PIPELINE=1`, `SKIP_PREP=1`, `SKIP_TRAIN=1`
-
-Train mode: `TRAIN=dpo` (default), `TRAIN=grpo`, `TRAIN=both`, `TRAIN=skip`
-
----
-
-## Workspace layout (auto-created)
-
-```
-workspace/                          # WORKSPACE_ROOT (parent or monorepo root)
-├── shiny-guide/                    # cloned from GitHub
-├── prompts.txt                     # ~99k validator URLs (or data/prompts.txt)
-├── models/
-│   └── Qwen-3.6-27B-AstroWolf/     # local coder weights
-└── training/                       # this folder
-    ├── .env
-    ├── .venv
-    ├── pipeline/                   # native GPU runner
-    ├── third_party/                # bundled validate.js
-    └── data/                       # splits, images, hf datasets, checkpoints
-```
-
-Inside the monorepo (`404-gen-subnet/my-agent/training`), paths auto-detect sibling `shiny-guide/` and repo `prompts.txt`.
 
 ---
 
 ## Step-by-step (manual control)
 
-### 0 — Configure
+### 0 — Configure for your machine
 
 ```bash
 cp .env.template .env
+./run/00_configure_profile.sh h200x2-dpo
+# edit .env: OPENROUTER_API_KEY, HF_TOKEN
 ```
 
-Required keys: `OPENROUTER_API_KEY`, `HF_TOKEN` (for AstroWolf + DINOv3).
+Profile writes to `.env`:
 
-Optional bootstrap overrides in `.env`:
+| Variable | Example (h200x2-dpo) |
+|----------|----------------------|
+| `TRAIN_N` | 6000 |
+| `TRAIN` | dpo |
+| `CONFIG` | configs/dpo_shiny_27b.yaml |
+| `CONFIG_FILE` | pipeline/configuration.local.yaml |
 
-| Variable | Default |
-|----------|---------|
-| `SHINY_GUIDE_REPO` | `https://github.com/mokabetrade/shiny-guide.git` |
-| `PROMPTS_URL` | raw URL to `prompts.txt` |
-| `CODER_MODEL_ID` | `Tooony133/Qwen-3.6-27B-AstroWolf` |
-| `MODEL_DIR` | `$WORKSPACE/models/Qwen-3.6-27B-AstroWolf` |
+And creates `pipeline/configuration.local.yaml` with `gpu_ids: "0,1"`, `tensor_parallel_size: 2`.
 
 ### 1 — Bootstrap assets
 
@@ -82,84 +86,52 @@ Optional bootstrap overrides in `.env`:
 ./run/00_bootstrap_assets.sh
 ```
 
-Clones shiny-guide, fetches prompts, downloads model, writes paths to `.env`.
-
 ### 2 — Install packages
 
 ```bash
-INSTALL_SYSTEM=1 ./run/00_install_all.sh   # + apt Chromium libs on Ubuntu
+INSTALL_SYSTEM=1 ./run/00_install_all.sh   # Ubuntu: Chromium libs
 ```
 
-Or on a machine that already has Node 20+ and GPU drivers:
-
-```bash
-./run/00_install_all.sh
-```
-
-### 3 — Start pipeline (Terminal A)
+### 3 — Data generation (needs OPENROUTER)
 
 ```bash
 source .env
-./pipeline/start-native-bg.sh
-./pipeline/wait-ready.sh
-# curl -s http://127.0.0.1:10006/health
+./pipeline/start-native-bg.sh && ./pipeline/wait-ready.sh
+source .venv/bin/activate
+./run/01_prepare_shiny_align.sh    # uses TRAIN_N from .env
+./pipeline/stop-native.sh         # free GPUs before training
 ```
 
-Stop: `./pipeline/stop-native.sh`
-
-### 4 — Prepare datasets
+### 4 — Train (OPENROUTER not needed)
 
 ```bash
 source .venv/bin/activate
 source .env
-
-ALIGN=dpo TRAIN_N=5000 VAL_N=300 DUEL_N=200 DPO_SAMPLES=4 \
-  ./run/01_prepare_shiny_align.sh
+./run/03_dpo.sh                   # uses CONFIG from .env
 ```
 
-| ALIGN | Output |
-|-------|--------|
-| `dpo` | `data/hf/dpo_shiny/dataset` |
-| `grpo` | `data/hf/grpo_shiny/dataset` |
-| `both` | both |
-
-### 5 — Train
+### 5 — Merge + eval
 
 ```bash
-CONFIG=configs/dpo_shiny_27b.yaml ./run/03_dpo.sh
-# or
-CONFIG=configs/grpo_shiny_27b.yaml ./run/03_grpo.sh
-```
-
-Uses `MODEL_PATH` from `.env` when set (local AstroWolf).
-
-### 6 — Merge, deploy, beat the king
-
-```bash
-ADAPTER=data/checkpoints/dpo_shiny_27b/final \
-  MERGED=data/checkpoints/merged_shiny_coder \
-  ./run/04_merge_and_eval.sh
-
+./run/04_merge_and_eval.sh
 export MODEL_PATH=$PWD/data/checkpoints/merged_shiny_coder
-./pipeline/stop-native.sh
-./pipeline/start-native-bg.sh && ./pipeline/wait-ready.sh
-
+./pipeline/stop-native.sh && ./pipeline/start-native-bg.sh && ./pipeline/wait-ready.sh
 ./pipeline/run-eval.sh data/splits/duel.txt --limit 100 --name merged
 ```
 
-Compare with baseline eval (pipeline on original AstroWolf). Target: **>55–60%** win rate on held-out `duel.txt`.
-
-Optional: DPO → GRPO stack — set `sft_adapter_path: data/checkpoints/dpo_shiny_27b/final` in `grpo_shiny_27b.yaml`.
-
 ---
 
-## GPU requirements (27B QLoRA)
+## Capacity quick reference
 
-| Stage | Minimum | Recommended |
-|-------|---------|-------------|
-| Pipeline (vLLM) | 1× 80 GB | 2× 80 GB |
-| DPO | 1× 80 GB | 2× H100 |
-| GRPO | 2× 80 GB | 4× H100 |
+See [`MACHINE_PROFILES.md`](MACHINE_PROFILES.md) for the full matrix.
+
+| Method | Min GPUs | Recommended | Dataset |
+|--------|----------|-------------|---------|
+| DPO bf16 LoRA | 2× 80 GB | 2× H200 | 5k–6k prompts → 2k+ pairs |
+| GRPO bf16 LoRA | 2× 80 GB (tight) | 4× H100 | 4k–5k prompts |
+| Full SFT 27B | 8× H100 + ZeRO-3 | 8× H200 | 8k–12k validated JS |
+
+Default yaml: `load_in_4bit: false`, `use_lora: true` (bf16 LoRA).
 
 ---
 
@@ -167,16 +139,9 @@ Optional: DPO → GRPO stack — set `sft_adapter_path: data/checkpoints/dpo_shi
 
 | Issue | Fix |
 |-------|-----|
-| `prompts.txt` download fails | Copy manually to `data/prompts.txt`, set `PROMPTS_POOL` |
-| Model download 401 | Set `HF_TOKEN`, accept model license on HuggingFace |
-| Pipeline not ready | `tail -f pipeline/runs/pipeline-server.log` |
-| Chromium fails | `INSTALL_SYSTEM=1 ./run/00_install_all.sh` |
-| OOM training | Lower `max_completion_length`; GRPO: `num_generations: 2` |
+| Wrong GPU layout | Re-run `./run/00_configure_profile.sh <profile>` |
+| OOM training | See profile notes in `MACHINE_PROFILES.md`; lower `max_completion_length` |
+| OOM same box | Stop pipeline before `./run/03_dpo.sh` |
+| No OPENROUTER for train-only | Use `train-only` profile |
 
-See also [`SHINY_GUIDE_TRAINING.md`](SHINY_GUIDE_TRAINING.md) for detailed phases.
-
----
-
-## Monorepo
-
-Still works at `404-gen-subnet/my-agent/training`. Bootstrap skips clone/download when assets already exist.
+See also [`SHINY_GUIDE_TRAINING.md`](SHINY_GUIDE_TRAINING.md).

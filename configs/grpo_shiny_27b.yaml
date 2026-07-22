@@ -1,13 +1,13 @@
 # GRPO on pre-trained shiny-guide AstroWolf (skip SFT).
+# bf16 LoRA (NOT 4-bit QLoRA). Plan on 2× H200 or 4× H100 for rollouts + policy.
 # Override HF id: export MODEL_PATH=/path/to/AstroWolf
 
 model_name_or_path: "Tooony133/Qwen-3.6-27B-AstroWolf"
-# sft_adapter_path: null   # omit — start from production weights
 dataset_path: "data/hf/grpo_shiny/dataset"
 output_dir: "data/checkpoints/grpo_shiny_27b"
 
 use_lora: true
-load_in_4bit: true
+load_in_4bit: false
 lora_r: 16
 lora_alpha: 32
 lora_dropout: 0.05
@@ -22,6 +22,7 @@ temperature: 0.7
 beta: 0.03
 use_vllm: true
 gradient_checkpointing: true
+attn_implementation: sdpa
 
 reward_mode: cheap   # cheap | render | s1 — start cheap, then s1 + GLM judge
 w_s1: 0.45
