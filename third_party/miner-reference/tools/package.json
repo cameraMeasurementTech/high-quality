@@ -1,0 +1,6 @@
+{
+  "name": "@404-subnet/validate-cli",
+  "private": true,
+  "type": "module",
+  "description": "Makes tools/validate.js load as ESM under Node 20+"
+}

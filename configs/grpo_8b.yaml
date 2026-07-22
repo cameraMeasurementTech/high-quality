@@ -1,0 +1,36 @@
+# Phase-2 GRPO after SFT. Start with reward_mode=cheap (validate+format),
+# then set reward_mode=s1 + JUDGE_* env for front-match signal.
+
+model_name_or_path: "Qwen/Qwen2.5-VL-7B-Instruct"
+sft_adapter_path: "data/checkpoints/sft_8b/final"
+dataset_path: "data/hf/grpo_train/dataset"
+output_dir: "data/checkpoints/grpo_8b"
+
+use_lora: true
+load_in_4bit: true
+lora_r: 32
+lora_alpha: 64
+
+num_train_epochs: 1
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 4
+learning_rate: 1.0e-6
+num_generations: 4
+max_completion_length: 12288
+temperature: 0.8
+beta: 0.04
+use_vllm: false
+gradient_checkpointing: true
+
+reward_mode: cheap   # cheap | render | s1
+w_s1: 0.45
+w_fmt: 0.05
+# judge_base_url: "http://127.0.0.1:8002/v1"
+# judge_model: "zai-org/GLM-4.6V-Flash"
+
+logging_steps: 5
+save_steps: 50
+save_total_limit: 3
+report_to: none
+
+# max_samples: 128

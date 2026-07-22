@@ -1,0 +1,30 @@
+# SFT on shiny-guide's production coder (Tooony133 AstroWolf fork).
+# Prompts: PROMPTS_ROOT=shiny-guide (default in coder_prompts.py)
+
+model_name_or_path: "Tooony133/Qwen-3.6-27B-AstroWolf"
+dataset_path: "data/hf/sft_shiny/dataset"
+output_dir: "data/checkpoints/sft_shiny_27b"
+
+use_lora: true
+load_in_4bit: true
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+
+num_train_epochs: 1
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 16
+learning_rate: 8.0e-6
+warmup_ratio: 0.03
+lr_scheduler_type: cosine
+max_seq_length: 16384
+gradient_checkpointing: true
+attn_implementation: sdpa
+
+logging_steps: 5
+save_steps: 100
+save_total_limit: 3
+report_to: none
+dataloader_num_workers: 2
+
+# max_samples: 64

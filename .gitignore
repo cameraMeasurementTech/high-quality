@@ -1,0 +1,11 @@
+.venv/
+data/
+__pycache__/
+*.pyc
+hf_cache/
+wandb/
+.accelerate/
+pipeline/.venv/
+pipeline/.vllm-env/
+pipeline/runs/
+third_party/**/node_modules/
