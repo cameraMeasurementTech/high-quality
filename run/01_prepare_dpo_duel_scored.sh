@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # DPO dataset with production multiview duel scoring (S1–S4 + DINO + AB/BA judge).
 #
-# Diversity for the 2 JS codes (same coder model):
-#   SAME image + SAME coder prompts + SAME temperature (pipeline yaml, ~0.6)
-#   DIFFERENT seeds only (sample_0 seed=42…, sample_1 seed=1042…)
-#   → mirrors production multigen (seed+k at fixed ensemble_temperature)
+# Diversity for the 2 JS codes (same coder model + same prompts/image):
+#   Default: DIFFERENT seeds (sample_0 seed=42…, sample_1 seed=1042…)
+#   Optional: DIFFERENT temperatures via DPO_TEMPERATURES=0.5,0.7
+#             (sample_0 @ 0.5, sample_1 @ 0.7). Keep temps ≤ ~0.7.
+#             Use SEED_STRIDE=0 if you want temperature-only diversity.
 #
 # Flow:
 #   1. splits + images
@@ -16,7 +17,8 @@
 #   ./run/00_configure_profile.sh h200x4-dpo-duel
 #   Phase A (GPUs 0–3 = vLLM TP=4):
 #     ./pipeline/start-native-bg.sh && ./pipeline/wait-ready.sh
-#     SKIP_DUEL_SCORE=1 SKIP_PACK=1 ./run/01_prepare_dpo_duel_scored.sh
+#     SKIP_DUEL_SCORE=1 SKIP_PACK=1 DPO_TEMPERATURES=0.5,0.7 \
+#       ./run/01_prepare_dpo_duel_scored.sh
 #     ./pipeline/stop-native.sh
 #   Phase B (OpenRouter + Chromium; DINO on cuda:0):
 #     SKIP_COLLECT=1 ./run/01_prepare_dpo_duel_scored.sh
@@ -25,6 +27,8 @@
 #
 # Env:
 #   TRAIN_N VAL_N DUEL_N SEED DPO_SAMPLES=2
+#   DPO_TEMPERATURES=0.5,0.7   (optional; empty = seed-only)
+#   SEED_STRIDE=1000           (0 = same seed when using temps)
 #   BATCH_SIZE=96              (match max_num_seqs; Phase A is JS-only / skip_render)
 #   SIDECAR_COUNT=16           (Chromium render farm for Phase B scoring)
 #   DUEL_CONCURRENCY=8         (parallel stems while scoring; A∥B render per stem)
@@ -51,6 +55,8 @@ DUEL_LIMIT="${DUEL_LIMIT:-0}"
 BATCH_SIZE="${BATCH_SIZE:-96}"
 SIDECAR_COUNT="${SIDECAR_COUNT:-16}"
 DUEL_CONCURRENCY="${DUEL_CONCURRENCY:-8}"
+DPO_TEMPERATURES="${DPO_TEMPERATURES:-}"
+SEED_STRIDE="${SEED_STRIDE:-1000}"
 SCRIPTS="$TRAINING_ROOT/scripts"
 
 export SHINY_GUIDE_ROOT
@@ -75,16 +81,24 @@ if [[ ! -d "$TRAINING_ROOT/data/images" ]] || [[ -z "$(ls -A "$TRAINING_ROOT/dat
     --workers "${DL_WORKERS:-32}"
 fi
 
-echo "==> [2/4] Collect $DPO_SAMPLES JS/stem (diversity=seed, batch=$BATCH_SIZE) via $PIPELINE_URL"
+echo "==> [2/4] Collect $DPO_SAMPLES JS/stem (batch=$BATCH_SIZE) via $PIPELINE_URL"
 if [[ "${SKIP_COLLECT:-0}" != "1" ]]; then
-  echo "    Same prompt/temp; different seeds (sample_0 vs sample_1)."
+  if [[ -n "$DPO_TEMPERATURES" ]]; then
+    echo "    Diversity: temperatures=$DPO_TEMPERATURES (seed_stride=$SEED_STRIDE)"
+  else
+    echo "    Diversity: seed-only (sample_0 vs sample_1); set DPO_TEMPERATURES=0.5,0.7 for temps"
+  fi
   echo "    Pipeline should use skip_render=true (JS only; render in step 3)."
   echo "    Pipeline must be running: ./pipeline/start-native-bg.sh"
+  TEMP_ARGS=()
+  [[ -n "$DPO_TEMPERATURES" ]] && TEMP_ARGS=(--temperatures "$DPO_TEMPERATURES")
   python "$SCRIPTS/collect_candidates.py" --from-pipeline \
     --list "$TRAINING_ROOT/data/splits/train.txt" \
     --base-url "$PIPELINE_URL" \
     --samples "$DPO_SAMPLES" \
     --batch-size "$BATCH_SIZE" \
+    --seed-stride "$SEED_STRIDE" \
+    "${TEMP_ARGS[@]}" \
     --out "$CAND_DIR"
 else
   echo "    SKIP_COLLECT=1"

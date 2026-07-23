@@ -184,14 +184,13 @@ You generate **2 JS** per prompt (same image/prompts/temperature, **different se
 
 Pipeline config uses `skip_render: true` here: **JS only**. Multiview render happens in Phase B.
 
+**Seed-only diversity (default):** same temperature (~0.6), different seeds.
+
 ```bash
 source .env && source .venv/bin/activate
 
 ./pipeline/start-native-bg.sh
 ./pipeline/wait-ready.sh
-
-# Confirm log mentions: skip_render=true — Chromium renderer not started
-# Optional: tail -f pipeline/runs/pipeline-server.log
 
 SKIP_DUEL_SCORE=1 SKIP_PACK=1 \
   TRAIN_N=5000 DPO_SAMPLES=2 BATCH_SIZE=96 \
@@ -200,6 +199,23 @@ SKIP_DUEL_SCORE=1 SKIP_PACK=1 \
 ./pipeline/stop-native.sh    # free GPUs before scoring / training
 ```
 
+**Temperature diversity** (`sample_0` @ 0.5, `sample_1` @ 0.7):
+
+```bash
+SKIP_DUEL_SCORE=1 SKIP_PACK=1 \
+  TRAIN_N=5000 DPO_SAMPLES=2 BATCH_SIZE=96 \
+  DPO_TEMPERATURES=0.5,0.7 \
+  SEED_STRIDE=0 \
+  ./run/01_prepare_dpo_duel_scored.sh
+```
+
+| Setting | Effect |
+|---------|--------|
+| `DPO_TEMPERATURES=0.5,0.7` | `sample_0` temp 0.5, `sample_1` temp 0.7 |
+| `SEED_STRIDE=0` | same seed → **only** temperature differs |
+| `SEED_STRIDE=1000` (default) | different seed **and** temperature |
+
+Keep temps ≤ ~0.7; higher values increase invalid JS.
 **Outputs:**
 
 ```text

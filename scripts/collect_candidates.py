@@ -5,26 +5,27 @@ Writes:
   {out}/{stem}/sample_{i}.js
   {out}/{stem}/sample_{i}.meta.json
 
-Diversity strategy (pipeline mode — recommended for duel-scored DPO):
-  Same image + same coder system/user prompts + same temperature (from
-  pipeline yaml, typically 0.6).  Only the RNG *seed* changes per sample:
+Diversity strategy (pipeline mode):
+  Same image + same coder system/user prompts. Vary per sample via:
 
-    sample_i seed = base_seed + sample_i * seed_stride + batch_i
+    --temperatures 0.5,0.7     different temperature per sample_i
+    seed (always)              sample_i seed = base_seed + sample_i * seed_stride + batch_i
+                               set --seed-stride 0 to keep seed fixed across samples
 
-  This matches production multigen (ensemble_size>1 uses seed+k at fixed
-  ensemble_temperature). Prefer seeds over temperature sweeps: high temp
-  increases invalid JS and weakens pairwise preference quality.
+  Default without --temperatures: seed-only at pipeline yaml temperature (~0.6).
+  Prefer temps ≤ ~0.7 — high temp increases invalid JS.
 
 Modes:
-  --from-pipeline   POST /generate K times per stem (different seeds)
+  --from-pipeline   POST /generate K times per stem
   --from-openai     Sample K completions (can vary temperature)
   --from-dir        Copy existing flat *.js dirs into per-stem folders
 
 Usage:
-  # Duel DPO: 2 candidates, large batches on 4× H200
+  # Temp diversity (2 JS): sample_0 @ 0.5, sample_1 @ 0.7
   python collect_candidates.py --from-pipeline \\
     --list data/splits/train.txt --base-url http://127.0.0.1:10006 \\
-    --samples 2 --batch-size 48 --out data/candidates/shiny_k2
+    --samples 2 --batch-size 96 --temperatures 0.5,0.7 \\
+    --out data/candidates/shiny_k2
 """
 from __future__ import annotations
 
@@ -51,6 +52,12 @@ def sample_seed(base_seed: int, sample_i: int, seed_stride: int, batch_i: int) -
     return base_seed + sample_i * seed_stride + batch_i
 
 
+def sample_temperature(temperatures: list[float] | None, sample_i: int) -> float | None:
+    if not temperatures:
+        return None
+    return float(temperatures[sample_i % len(temperatures)])
+
+
 def collect_pipeline_multi(
     pairs: list[tuple[str, str]],
     base_url: str,
@@ -61,16 +68,16 @@ def collect_pipeline_multi(
     batch_size: int = 16,
     base_seed: int = 42,
     seed_stride: int = 1000,
+    temperatures: list[float] | None = None,
 ) -> tuple[int, int]:
-    """Run K batch generations with different seeds for diversity.
-
-    Same prompt/image/temperature each time — only seed changes (production-style).
+    """Run K batch generations with seed and/or temperature diversity.
 
     Batches are interleaved across samples (for each chunk of stems: sample_0 then
     sample_1) so pairs complete sooner and resumes waste less work.
     """
     ok = fail = 0
-    # Stems still needing any sample.
+    temps = list(temperatures or [])
+    diversity = "temperature+seed" if temps else "seed"
     pending_all = list(pairs)
     for batch_i in tqdm(
         range(0, len(pending_all), batch_size),
@@ -89,16 +96,21 @@ def collect_pipeline_multi(
                 continue
             prompts = [{"stem": stem, "image_url": url} for stem, url in pending]
             seed = sample_seed(base_seed, sample_i, seed_stride, batch_i)
+            temp = sample_temperature(temps, sample_i)
             try:
                 js_map = submit_and_wait(
                     base_url,
                     prompts,
                     seed=seed,
+                    temperature=temp,
                     timeout=timeout,
                 )
             except Exception as exc:  # noqa: BLE001
                 fail += len(pending)
-                print(f"batch fail sample={sample_i}: {exc}", file=sys.stderr)
+                print(
+                    f"batch fail sample={sample_i} temp={temp}: {exc}",
+                    file=sys.stderr,
+                )
                 continue
 
             for stem, url in pending:
@@ -114,10 +126,15 @@ def collect_pipeline_multi(
                     "sample_index": sample_i,
                     "url": url,
                     "seed": seed,
-                    "diversity": "seed",
+                    "temperature": temp,
+                    "diversity": diversity,
                     "note": (
-                        "Same prompt/image/temperature as other samples; "
-                        "only RNG seed differs (production multigen style)."
+                        "Same prompt/image as other samples; "
+                        + (
+                            "temperature (and seed) may differ."
+                            if temps
+                            else "only RNG seed differs (production multigen style)."
+                        )
                     ),
                 }
                 (dest.with_suffix(".meta.json")).write_text(
@@ -224,9 +241,17 @@ def main() -> None:
         "--seed-stride",
         type=int,
         default=1000,
-        help="seed spacing between sample indices (sample_i * stride)",
+        help="seed spacing between sample indices (sample_i * stride); 0 = same seed",
     )
-    ap.add_argument("--temperatures", type=str, default="0.5,0.7,0.9,1.0")
+    ap.add_argument(
+        "--temperatures",
+        type=str,
+        default=os.environ.get("DPO_TEMPERATURES", ""),
+        help=(
+            "comma temps for pipeline/openai sample_i "
+            "(e.g. 0.5,0.7). Empty = pipeline yaml temp + seed-only diversity"
+        ),
+    )
     ap.add_argument("--timeout", type=float, default=900.0)
     ap.add_argument("--max-tokens", type=int, default=24576)
     ap.add_argument("--skip-existing", action="store_true", default=True)
@@ -246,6 +271,8 @@ def main() -> None:
         raise SystemExit("--list required for pipeline/openai modes")
     pairs = load_pairs(args.list)
 
+    temps = [float(x.strip()) for x in (args.temperatures or "").split(",") if x.strip()]
+
     if args.from_pipeline:
         ok, fail = collect_pipeline_multi(
             pairs,
@@ -257,6 +284,7 @@ def main() -> None:
             batch_size=max(1, args.batch_size),
             base_seed=args.base_seed,
             seed_stride=args.seed_stride,
+            temperatures=temps or None,
         )
         print(
             json.dumps(
@@ -266,7 +294,8 @@ def main() -> None:
                     "fail": fail,
                     "samples": args.samples,
                     "batch_size": args.batch_size,
-                    "diversity": "seed",
+                    "temperatures": temps or None,
+                    "diversity": "temperature+seed" if temps else "seed",
                     "out": str(args.out),
                 },
                 indent=2,
@@ -277,7 +306,8 @@ def main() -> None:
         return
 
     api_key = os.environ.get(args.api_key_env, "") or os.environ.get("OPENAI_API_KEY", "local")
-    temps = [float(x.strip()) for x in args.temperatures.split(",") if x.strip()]
+    if not temps:
+        temps = [0.5, 0.7, 0.9, 1.0]
     ok, fail = collect_openai_multi(
         pairs,
         args.images,
@@ -297,6 +327,7 @@ def main() -> None:
                 "ok": ok,
                 "fail": fail,
                 "samples": args.samples,
+                "temperatures": temps,
                 "out": str(args.out),
             },
             indent=2,

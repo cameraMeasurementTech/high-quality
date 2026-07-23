@@ -296,6 +296,85 @@ class VllmServeConfig(BaseModel):""",
         else:
             print("  [warn] orchestrator success-flags: pattern not found", file=sys.stderr)
 
+    # --- per-batch temperature override for DPO_TEMPERATURES ---
+    req = ps / "schemas" / "requests.py"
+    rtext = req.read_text(encoding="utf-8")
+    if "temperature: float | None = None" in rtext:
+        print("  [ok] GenerateRequest.temperature already patched")
+    else:
+        old_r = "class GenerateRequest(BaseModel):\n    prompts: list[PromptItem]\n    seed: int = 42\n"
+        new_r = (
+            "class GenerateRequest(BaseModel):\n"
+            "    prompts: list[PromptItem]\n"
+            "    seed: int = 42\n"
+            "    # Optional per-batch coder temperature. When set, overrides actors.coder.temperature\n"
+            "    # for this batch only (used for DPO multi-sample diversity).\n"
+            "    temperature: float | None = None\n"
+        )
+        if old_r in rtext:
+            req.write_text(rtext.replace(old_r, new_r, 1), encoding="utf-8")
+            print("  [patch] GenerateRequest.temperature")
+        else:
+            print("  [warn] requests.py: pattern not found", file=sys.stderr)
+
+    task_py = ps / "pipeline" / "task.py"
+    ttext = task_py.read_text(encoding="utf-8")
+    if "temperature: float | None = None" in ttext and "Optional per-batch coder" in ttext:
+        print("  [ok] PipelineTask.temperature already patched")
+    else:
+        old_t = "    stem: str\n    image_url: str\n    seed: int = 42\n"
+        new_t = (
+            "    stem: str\n"
+            "    image_url: str\n"
+            "    seed: int = 42\n"
+            "    # Optional per-batch coder temperature override (from /generate).\n"
+            "    temperature: float | None = None\n"
+        )
+        if old_t in ttext:
+            task_py.write_text(ttext.replace(old_t, new_t, 1), encoding="utf-8")
+            print("  [patch] PipelineTask.temperature")
+        else:
+            print("  [warn] task.py: pattern not found", file=sys.stderr)
+
+    serve = ps / "serve.py"
+    stext = serve.read_text(encoding="utf-8")
+    if "temperature=request.temperature" in stext:
+        print("  [ok] serve.py temperature already patched")
+    else:
+        old_s = (
+            "        tasks = [\n"
+            "            PipelineTask(stem=p.stem, image_url=p.image_url, seed=request.seed)\n"
+            "            for p in request.prompts\n"
+            "        ]\n"
+        )
+        new_s = (
+            "        tasks = [\n"
+            "            PipelineTask(\n"
+            "                stem=p.stem,\n"
+            "                image_url=p.image_url,\n"
+            "                seed=request.seed,\n"
+            "                temperature=request.temperature,\n"
+            "            )\n"
+            "            for p in request.prompts\n"
+            "        ]\n"
+        )
+        if old_s in stext:
+            serve.write_text(stext.replace(old_s, new_s, 1), encoding="utf-8")
+            print("  [patch] serve.py temperature")
+        else:
+            print("  [warn] serve.py: pattern not found", file=sys.stderr)
+
+    genp = ps / "pipeline" / "generation_pipeline.py"
+    g2 = genp.read_text(encoding="utf-8")
+    if "batch_temp = tasks[0].temperature" in g2:
+        print("  [ok] run_batch temperature already patched")
+    else:
+        print(
+            "  [warn] generation_pipeline.run_batch temperature override missing — "
+            "copy from monorepo shiny-guide or re-bootstrap from a patched tree",
+            file=sys.stderr,
+        )
+
     print("==> Done")
     return 0
 

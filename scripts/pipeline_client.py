@@ -27,6 +27,7 @@ def submit_and_wait(
     prompts: list[dict[str, str]],
     *,
     seed: int = 42,
+    temperature: float | None = None,
     timeout: float = 900.0,
 ) -> dict[str, str]:
     """Submit batch, poll until complete, return stem -> js_code."""
@@ -36,6 +37,8 @@ def submit_and_wait(
             raise RuntimeError(f"pipeline not ready: {base}")
 
         payload: dict[str, Any] = {"prompts": prompts, "seed": seed}
+        if temperature is not None:
+            payload["temperature"] = float(temperature)
         r = client.post("/generate", json=payload)
         r.raise_for_status()
         accepted = r.json().get("accepted", len(prompts))
