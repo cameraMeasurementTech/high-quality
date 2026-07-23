@@ -175,11 +175,25 @@ def validator_npm_root() -> Path:
 
 
 def prompts_pool() -> Path:
+    """Resolve the ~99k image URL pool for standalone training/.
+
+    Priority:
+      1. PROMPTS_POOL env (absolute or relative to training/)
+      2. training/data/prompts.txt  (bootstrap default)
+      3. training/prompts.txt
+      4. workspace_root/prompts.txt (legacy monorepo)
+    """
     env = os.environ.get("PROMPTS_POOL", "").strip()
     if env:
-        p = Path(env).resolve()
+        p = Path(env)
+        if not p.is_absolute():
+            p = training_root() / p
+        p = p.resolve()
         if not p.is_file():
-            raise FileNotFoundError(f"PROMPTS_POOL not found: {p}")
+            raise FileNotFoundError(
+                f"PROMPTS_POOL not found: {p}\n"
+                "Run ./run/00_bootstrap_assets.sh"
+            )
         return p
 
     for candidate in (
@@ -192,7 +206,7 @@ def prompts_pool() -> Path:
 
     raise FileNotFoundError(
         "prompts.txt not found. Run ./run/00_bootstrap_assets.sh or set PROMPTS_POOL=\n"
-        f"  expected: {default_data_root() / 'prompts.txt'}"
+        f"  expected: {default_data_root() / 'prompts.txt'} (~99k https URLs)"
     )
 
 

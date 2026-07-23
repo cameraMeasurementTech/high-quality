@@ -63,7 +63,12 @@ def write_stem_url(path: Path, pairs: list[tuple[str, str]]) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="Prepare non-overlapping train/val/duel splits")
-    ap.add_argument("--pool", type=Path, default=prompts_pool())
+    ap.add_argument(
+        "--pool",
+        type=Path,
+        default=None,
+        help="prompts.txt (default: PROMPTS_POOL or training/data/prompts.txt)",
+    )
     ap.add_argument("--train", type=int, default=10000)
     ap.add_argument("--val", type=int, default=500)
     ap.add_argument("--duel", type=int, default=200)
@@ -75,10 +80,19 @@ def main() -> None:
         default=[],
         help="stem/url lists to exclude (e.g. recent live round prompts)",
     )
-    ap.add_argument("--out-dir", type=Path, default=default_data_root() / "splits")
+    ap.add_argument("--out-dir", type=Path, default=None)
     args = ap.parse_args()
 
-    urls = load_urls(args.pool)
+    pool = Path(args.pool).resolve() if args.pool else prompts_pool()
+    out = Path(args.out_dir).resolve() if args.out_dir else (default_data_root() / "splits")
+
+    if not pool.is_file():
+        raise SystemExit(
+            f"prompts pool not found: {pool}\n"
+            "Run ./run/00_bootstrap_assets.sh (downloads ~99k URLs to data/prompts.txt)"
+        )
+
+    urls = load_urls(pool)
     exclude = load_exclude_stems(args.exclude)
     candidates = [(url_to_stem(u), u) for u in urls if url_to_stem(u) not in exclude]
     need = args.train + args.val + args.duel
@@ -92,19 +106,20 @@ def main() -> None:
     val = candidates[args.duel : args.duel + args.val]
     train = candidates[args.duel + args.val : args.duel + args.val + args.train]
 
-    out = args.out_dir
     write_stem_url(out / "train.txt", train)
     write_stem_url(out / "val.txt", val)
     write_stem_url(out / "duel.txt", duel)
 
     meta = {
         "seed": args.seed,
-        "pool": str(args.pool),
+        "pool": str(pool),
+        "pool_urls": len(urls),
         "exclude_files": [str(p) for p in args.exclude],
         "exclude_stems": len(exclude),
         "counts": {"train": len(train), "val": len(val), "duel": len(duel)},
         "repo": str(repo_root()),
     }
+    out.mkdir(parents=True, exist_ok=True)
     (out / "manifest.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(meta, indent=2))
     print(f"Wrote splits -> {out}", file=sys.stderr)

@@ -46,10 +46,24 @@ if [[ -d vendor/shiny-guide/pipeline_service ]]; then
 else
   warn "vendor/shiny-guide missing — run ./run/00_bootstrap_assets.sh"
 fi
+# Bootstrap artifacts (created on machine)
 if [[ -f data/prompts.txt ]]; then
-  pass "data/prompts.txt present"
+  lines=$(wc -l < data/prompts.txt | tr -d ' ')
+  if [[ "$lines" -gt 50000 ]]; then
+    pass "data/prompts.txt present ($lines lines, ~99k pool)"
+  elif [[ "$lines" -gt 1000 ]]; then
+    warn "data/prompts.txt has only $lines lines (expected ~99k) — FORCE_PROMPTS_DOWNLOAD=1 ./run/00_bootstrap_assets.sh"
+  else
+    bad "data/prompts.txt too small ($lines lines)"
+  fi
+  # Format: one https URL per line (or stem\\turl)
+  if head -5 data/prompts.txt | grep -qE 'https?://'; then
+    pass "prompts.txt starts with http(s) URLs"
+  else
+    bad "prompts.txt does not look like URL list"
+  fi
 else
-  warn "data/prompts.txt missing — run bootstrap"
+  warn "data/prompts.txt missing — run ./run/00_bootstrap_assets.sh"
 fi
 if [[ -f data/models/Qwen-3.6-27B-AstroWolf/config.json ]] || [[ -n "${MODEL_PATH:-}" && -f "${MODEL_PATH}/config.json" ]]; then
   pass "coder model weights present"

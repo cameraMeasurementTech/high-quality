@@ -21,25 +21,71 @@ export PYTHONPATH="$TRAINING_ROOT/scripts${PYTHONPATH:+:$PYTHONPATH}"
 export HF_HOME="${HF_HOME:-$TRAINING_ROOT/data/hf_cache}"
 export MODEL_PATH="${MODEL_PATH:-${CODER_MODEL_PATH:-$TRAINING_ROOT/data/models/Qwen-3.6-27B-AstroWolf}}"
 
-if [[ -z "${PROMPTS_POOL:-}" ]]; then
-  if [[ -f "$TRAINING_ROOT/data/prompts.txt" ]]; then
-    export PROMPTS_POOL="$TRAINING_ROOT/data/prompts.txt"
-  elif [[ -f "$WORKSPACE_ROOT/prompts.txt" ]]; then
-    export PROMPTS_POOL="$WORKSPACE_ROOT/prompts.txt"
+# Resolve a path relative to TRAINING_ROOT (does not require the file to exist).
+_abs_under_training() {
+  local p="${1:-}"
+  [[ -z "$p" ]] && return 1
+  if [[ "$p" != /* ]]; then
+    p="$TRAINING_ROOT/${p#./}"
   fi
-fi
+  # Normalize .. components without requiring the file.
+  local dir base
+  dir="$(dirname "$p")"
+  base="$(basename "$p")"
+  if [[ -d "$dir" ]]; then
+    echo "$(cd "$dir" && pwd)/$base"
+  else
+    echo "$p"
+  fi
+}
 
+# Find prompts.txt for standalone layout. Soft: may leave PROMPTS_POOL empty.
 resolve_prompts_pool() {
+  local candidates=()
+  local c
+
   if [[ -n "${PROMPTS_POOL:-}" ]]; then
-    echo "$PROMPTS_POOL"
-    return
+    candidates+=("$(_abs_under_training "$PROMPTS_POOL")")
   fi
-  echo "ERROR: prompts.txt not found. Run ./run/00_bootstrap_assets.sh" >&2
-  echo "  expected: $TRAINING_ROOT/data/prompts.txt" >&2
-  exit 1
+  candidates+=(
+    "$TRAINING_ROOT/data/prompts.txt"
+    "$WORKSPACE_ROOT/prompts.txt"
+    "$TRAINING_ROOT/prompts.txt"
+  )
+
+  for c in "${candidates[@]}"; do
+    if [[ -f "$c" ]]; then
+      echo "$c"
+      return 0
+    fi
+  done
+  echo ""
+  return 0
 }
 
 export PROMPTS_POOL="$(resolve_prompts_pool)"
+
+# Hard check for dataset-prep scripts (after bootstrap).
+require_prompts_pool() {
+  if [[ -z "${PROMPTS_POOL:-}" ]] || [[ ! -f "$PROMPTS_POOL" ]]; then
+    echo "ERROR: prompts.txt not found." >&2
+    echo "  Run: ./run/00_bootstrap_assets.sh" >&2
+    echo "  expected: $TRAINING_ROOT/data/prompts.txt (~99k image URLs)" >&2
+    exit 1
+  fi
+  local lines
+  lines="$(wc -l < "$PROMPTS_POOL" | tr -d ' ')"
+  if [[ "$lines" -lt 1000 ]]; then
+    echo "ERROR: prompts pool too small ($lines lines) at $PROMPTS_POOL" >&2
+    echo "  Re-download: FORCE_PROMPTS_DOWNLOAD=1 ./run/00_bootstrap_assets.sh" >&2
+    exit 1
+  fi
+  if [[ "$lines" -lt 50000 ]]; then
+    echo "WARNING: prompts pool has $lines lines (expected ~99k). Continuing." >&2
+  fi
+  export PROMPTS_POOL
+  echo "==> prompts pool: $PROMPTS_POOL ($lines lines)"
+}
 
 # Legacy aliases (some docs still mention REPO)
 export REPO="$WORKSPACE_ROOT"

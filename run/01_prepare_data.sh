@@ -25,6 +25,7 @@ TEACHER_MODEL="${TEACHER_MODEL:-google/gemini-2.5-pro-preview}"
 SCRIPTS="$TRAINING_ROOT/scripts"
 
 echo "==> [1/6] Prepare splits (train=$TRAIN_N val=$VAL_N duel=$DUEL_N seed=$SEED)"
+require_prompts_pool
 python "$SCRIPTS/prepare_splits.py" \
   --pool "$PROMPTS_POOL" \
   --train "$TRAIN_N" --val "$VAL_N" --duel "$DUEL_N" \

@@ -66,6 +66,7 @@ export PYTHONPATH="$SHINY_GUIDE_ROOT/pipeline_service:$TRAINING_ROOT/scripts${PY
 : "${OPENROUTER_API_KEY:?Set OPENROUTER_API_KEY for multiview judge scoring}"
 
 echo "==> [1/4] Splits + images (TRAIN_N=$TRAIN_N)"
+require_prompts_pool
 if [[ ! -f "$TRAINING_ROOT/data/splits/train.txt" ]]; then
   python "$SCRIPTS/prepare_splits.py" \
     --pool "$PROMPTS_POOL" \

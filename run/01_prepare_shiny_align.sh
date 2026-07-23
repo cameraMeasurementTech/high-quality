@@ -19,6 +19,7 @@ PREP_SFT="${PREP_SFT:-0}"
 SCRIPTS="$TRAINING_ROOT/scripts"
 
 echo "==> Alignment prep (ALIGN=$ALIGN, PROMPTS_POOL=$PROMPTS_POOL)"
+require_prompts_pool
 
 python "$SCRIPTS/prepare_splits.py" \
   --pool "$PROMPTS_POOL" \

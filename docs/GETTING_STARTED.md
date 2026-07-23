@@ -131,8 +131,23 @@ CODER_MODEL_ID=Tooony133/Qwen-3.6-27B-AstroWolf
 Bootstrap also fetches:
 
 - `vendor/shiny-guide/` — generation pipeline
-- `data/prompts.txt` — prompt/image pool
+- `data/prompts.txt` — **~99k image URLs** (one `https://…png` per line)
 - coder prompt snapshot under `vendor/pipeline_prompts/`
+
+How the prompt pool is used:
+
+```text
+data/prompts.txt
+    → prepare_splits.py  →  data/splits/{train,val,duel}.txt   (stem\\turl)
+    → download_images.py →  data/images/{stem}.png
+    → collect / duel score / pack DPO
+```
+
+Re-download prompts only:
+
+```bash
+FORCE_PROMPTS_DOWNLOAD=1 ./run/00_bootstrap_assets.sh
+```
 
 First model download often takes **1–3 hours**.
 
