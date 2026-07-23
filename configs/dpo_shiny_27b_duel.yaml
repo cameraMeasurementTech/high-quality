@@ -1,6 +1,6 @@
-# configs/dpo_shiny_27b_duel.yaml
 # DPO on pairs ranked by production multiview duel (S1–S4 + DINO + OpenRouter judge).
 # Dataset: data/hf/dpo_shiny_duel/dataset (from ./run/01_prepare_dpo_duel_scored.sh)
+# 4× H200: NUM_PROCESSES=4 (effective batch ≈ 16 with grad_accum=4)
 
 model_name_or_path: "Tooony133/Qwen-3.6-27B-AstroWolf"
 dataset_path: "data/hf/dpo_shiny_duel/dataset"
@@ -14,7 +14,7 @@ lora_dropout: 0.05
 
 num_train_epochs: 1
 per_device_train_batch_size: 1
-gradient_accumulation_steps: 16
+gradient_accumulation_steps: 4
 learning_rate: 3.0e-7
 warmup_ratio: 0.03
 lr_scheduler_type: cosine
@@ -27,4 +27,6 @@ logging_steps: 5
 save_steps: 50
 save_total_limit: 3
 report_to: none
-dataloader_num_workers: 2
+dataloader_num_workers: 4
+
+# max_samples: 128

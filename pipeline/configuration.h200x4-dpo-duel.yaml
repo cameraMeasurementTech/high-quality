@@ -1,0 +1,88 @@
+# 4× H200 — duel-scored DPO data prep (27B AstroWolf, TP=4).
+# Generate 2 JS/stem with seed diversity; score with validator S1–S4 later.
+# Applied by: ./run/00_configure_profile.sh h200x4-dpo-duel
+#
+# Diversity (2 samples): same image + same coder prompts + same temperature;
+# different batch seeds via collect_candidates.py (sample_0 seed≈42, sample_1≈1042).
+# Production multigen uses the same idea (seed + k). Temperature is fixed here.
+
+api:
+  host: "0.0.0.0"
+  port: 10006
+  debug: true
+
+pipeline:
+  batch_time_budget: 14400
+  prompt_timeout: 900.0
+  use_planner: false
+  render_from_object: true
+  refinement_enabled: false
+
+benchmark: false
+warmup: true
+
+llm_clients:
+  openrouter:
+    enabled: false
+    base_url: "https://openrouter.ai/api/v1"
+    api_key_env: "OPENROUTER_API_KEY"
+  coder-instance:
+    enabled: true
+    base_url: "http://localhost:8001/v1"
+    api_key: "local"
+    vllm:
+      model: "Tooony133/Qwen-3.6-27B-AstroWolf"
+      gpu_ids: "0,1,2,3"
+      tensor_parallel_size: 4
+      gpu_memory_utilization: 0.90
+      max_model_len: 65536
+      max_num_seqs: 96
+      vllm_bin: "/opt/vllm-env/bin/vllm"
+
+actors:
+  coder:
+    client: "coder-instance"
+    model: "Tooony133/Qwen-3.6-27B-AstroWolf"
+    workers: 96
+    queue_size: 128
+    max_tokens: 24576
+    temperature: 0.7
+    top_p: 0.95
+    top_k: 20
+    seed: 42
+    multimodal: true
+    ensemble_size: 1
+    ensemble_temperature: 0.7
+  checker:
+    workers: 16
+    queue_size: 32
+  renderer:
+    workers: 16
+    queue_size: 32
+
+event_bus:
+  max_iter: 2
+  task_deadline_s: 3600
+  score_threshold: 0.55
+
+js_checker:
+  execution_timeout_ms: 5000
+  node_binary: "node"
+
+renderer:
+  sidecar_host: "127.0.0.1"
+  sidecar_port: 8003
+  startup_timeout_s: 120.0
+  request_timeout_s: 120.0
+  node_binary: "node"
+  img_size: 518
+  grid_gap: 5
+  sidecar_count: 4
+  static_port_base: 13000
+  pool_size: 2
+  judge_multiview: false
+  render_timeout_ms: 90000
+  protocol_timeout_ms: 90000
+
+embedder:
+  enabled: false

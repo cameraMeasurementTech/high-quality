@@ -20,13 +20,31 @@ cp .env.template .env
 | **smoke** | 1× any | DPO LoRA | 100 prompts | 1 (`tp=1`) | same box, sequential |
 | **h100x2-dpo** | 2× H100 80GB | DPO bf16 LoRA | 5k → ~2k pairs | 2 (`tp=2`) | 2 (stop pipeline first) |
 | **h200x2-dpo-duel** ⭐ | 2× H200 | DPO duel-scored | 3k × 2 JS | 2 (`tp=2`) | 2 (sequential phases) |
-| **h200x4-dpo** | 4× H200 | DPO bf16 LoRA prep | 5k → ~2k pairs | 4 (`tp=4`) | 2 (stop pipeline first) |
+| **h200x4-dpo** | 4× H200 | DPO cheap | 5k → ~2k pairs | 4 (`tp=4`) | 2 (stop pipeline first) |
+| **h200x4-dpo-duel** ⭐ | 4× H200 | DPO duel-scored | 5k × 2 JS + S1–S4 | 4 (`tp=4`) | 4 (sequential phases) |
 | **h100x4-grpo** | 4× H100 80GB | GRPO bf16 LoRA | 5k prompts | 2 (`tp=2`) | 4 |
 | **h200x2-grpo** | 2× H200 | GRPO bf16 LoRA | 4k prompts | 2 (`tp=2`) | 2 (tight; `num_generations: 2`) |
 | **h200x8-fullft** | 8× H200 | Full SFT | 10k validated JS | 4 (`tp=4`) | 8 + ZeRO-3 |
 | **train-only** | 2× H200/H100 | DPO LoRA | pre-built | skip | 2 |
 
-⭐ Default recommendation for beating the king on a single renter box: **`h200x2-dpo`**.
+⭐ For subnet-aligned DPO on 4× H200: **`h200x4-dpo-duel`** (2 JS + validator duel scoring).  
+⭐ Cheap/fast pairs on 2× H200: **`h200x2-dpo`**.
+
+## 4× H200 duel-scored workflow
+
+```text
+Phase A — generate (all 4 GPUs, vLLM TP=4)
+  DPO_SAMPLES=2, BATCH_SIZE=48
+  diversity = different seeds, same prompt/temperature
+
+Phase B — score (stop vLLM; OpenRouter + Chromium + DINO)
+  SIDECAR_COUNT=8, DUEL_CONCURRENCY=4
+
+Phase C — train
+  CONFIG=configs/dpo_shiny_27b_duel.yaml NUM_PROCESSES=4
+```
+
+See [`docs/DPO_DUEL_SCORING.md`](docs/DPO_DUEL_SCORING.md).
 
 ---
 

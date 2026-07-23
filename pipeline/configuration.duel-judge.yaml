@@ -1,9 +1,12 @@
-# Duel-judge profile — score two JS candidates with production multiview logic.
-# No vLLM coder needed. Uses OpenRouter for S1–S4 judge + local renderer + DINO.
+# Duel-judge profile — score sample_0 vs sample_1 with production multiview logic.
+# Same stack as subnet validators: validate → multiview render → DINO → S1–S4 AB/BA.
 #
-# Usage:
+# No vLLM coder. OpenRouter for judge. Chromium sidecars for renders.
+# Tuned for 4× H200 boxes (more sidecars; embedder on cuda:0 after coder vLLM stopped).
+#
+# Usage (after stop-native.sh):
 #   export CONFIG_FILE=$TRAINING/pipeline/configuration.duel-judge.yaml
-#   export PYTHONPATH=$SHINY_GUIDE/pipeline_service
+#   export PYTHONPATH=$SHINY_GUIDE_ROOT/pipeline_service:$PYTHONPATH
 #   python scripts/duel_score_candidates.py ...
 
 api:
@@ -29,17 +32,17 @@ actors:
   judge:
     client: "openrouter"
     model: "google/gemini-2.5-pro-preview"
-    workers: 2
-    queue_size: 4
+    workers: 8
+    queue_size: 16
     max_tokens: 8192
     temperature: 0.0
     seed: 42
   checker:
-    workers: 1
-    queue_size: 2
+    workers: 8
+    queue_size: 16
   renderer:
-    workers: 2
-    queue_size: 4
+    workers: 16
+    queue_size: 32
 
 js_checker:
   execution_timeout_ms: 5000
@@ -53,9 +56,9 @@ renderer:
   node_binary: "node"
   img_size: 518
   grid_gap: 5
-  sidecar_count: 2
+  sidecar_count: 8
   static_port_base: 13100
-  pool_size: 1
+  pool_size: 2
   judge_multiview: true
   render_timeout_ms: 90000
   protocol_timeout_ms: 90000
@@ -64,5 +67,5 @@ embedder:
   enabled: true
   model_id: "facebook/dinov3-vits16-pretrain-lvd1689m"
   revision: "main"
-  device: "cpu"
-  batch_size: 4
+  device: "cuda:0"
+  batch_size: 16

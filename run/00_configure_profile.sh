@@ -22,7 +22,8 @@ Machine profiles — pick one matching your GPU box:
   smoke          1× GPU smoke test (100 prompts, DPO, fast sanity)
   h100x2-dpo     2× H100 80GB — DPO bf16 LoRA (recommended minimum)
   h200x2-dpo     2× H200 141GB — DPO bf16 LoRA (recommended default)
-  h200x4-dpo     4× H200 — DPO data prep (TP=4, max_num_seqs=96)
+  h200x4-dpo     4× H200 — cheap DPO data prep (TP=4, max_num_seqs=96)
+  h200x4-dpo-duel 4× H200 — duel-scored DPO (2 JS + S1–S4 judge) ⭐
   h100x4-grpo    4× H100 80GB — GRPO bf16 LoRA + rollouts
   h200x2-grpo    2× H200 — GRPO bf16 LoRA (tight; num_generations=2)
   h200x8-fullft  8× H200 — full fine-tune SFT (use_lora: false, 8 GPU)
@@ -118,9 +119,28 @@ case "$PROFILE" in
     upsert_env ALIGN dpo "$ENV_FILE"
     upsert_env NUM_PROCESSES 2 "$ENV_FILE"
     apply_pipeline_template "$TRAINING_ROOT/pipeline/configuration.h200x4-dpo.yaml"
-    TRAIN_METHOD="DPO bf16 LoRA"
+    TRAIN_METHOD="DPO bf16 LoRA (cheap validate.js pairs)"
     DATA_NOTE="TRAIN_N=5000, DPO_SAMPLES=4 → aim ≥2000 pairs; pipeline TP=4"
     GPU_NOTE="4× H200 data prep (vLLM TP=4); stop pipeline before DPO train"
+    ;;
+  h200x4-dpo-duel)
+    upsert_env MACHINE_PROFILE h200x4-dpo-duel "$ENV_FILE"
+    upsert_env TRAIN dpo "$ENV_FILE"
+    upsert_env TRAIN_N 5000 "$ENV_FILE"
+    upsert_env VAL_N 300 "$ENV_FILE"
+    upsert_env DUEL_N 200 "$ENV_FILE"
+    upsert_env DPO_SAMPLES 2 "$ENV_FILE"
+    upsert_env BATCH_SIZE 48 "$ENV_FILE"
+    upsert_env SIDECAR_COUNT 8 "$ENV_FILE"
+    upsert_env DUEL_CONCURRENCY 4 "$ENV_FILE"
+    upsert_env CONFIG configs/dpo_shiny_27b_duel.yaml "$ENV_FILE"
+    upsert_env ALIGN dpo "$ENV_FILE"
+    upsert_env NUM_PROCESSES 4 "$ENV_FILE"
+    upsert_env JUDGE_CONFIG "$TRAINING_ROOT/pipeline/configuration.duel-judge.yaml" "$ENV_FILE"
+    apply_pipeline_template "$TRAINING_ROOT/pipeline/configuration.h200x4-dpo.yaml"
+    TRAIN_METHOD="DPO bf16 LoRA on duel-scored pairs (S1–S4)"
+    DATA_NOTE="TRAIN_N=5000 × 2 JS (seed diversity) → duel score → aim ≥3500–4500 pairs"
+    GPU_NOTE="Phase A: TP=4 generate; stop vLLM; Phase B: Chromium+OpenRouter; Phase C: train ×4"
     ;;
   h100x4-grpo)
     upsert_env MACHINE_PROFILE h100x4-grpo "$ENV_FILE"

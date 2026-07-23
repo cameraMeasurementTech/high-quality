@@ -5,16 +5,26 @@ Writes:
   {out}/{stem}/sample_{i}.js
   {out}/{stem}/sample_{i}.meta.json
 
+Diversity strategy (pipeline mode — recommended for duel-scored DPO):
+  Same image + same coder system/user prompts + same temperature (from
+  pipeline yaml, typically 0.6).  Only the RNG *seed* changes per sample:
+
+    sample_i seed = base_seed + sample_i * seed_stride + batch_i
+
+  This matches production multigen (ensemble_size>1 uses seed+k at fixed
+  ensemble_temperature). Prefer seeds over temperature sweeps: high temp
+  increases invalid JS and weakens pairwise preference quality.
+
 Modes:
-  --from-pipeline   POST /generate K times per stem (same pipeline, optional temp hint)
-  --from-openai     Sample K completions from an OpenAI-compatible VLM
-  --from-dir        Copy existing flat *.js dirs into per-stem candidate folders
+  --from-pipeline   POST /generate K times per stem (different seeds)
+  --from-openai     Sample K completions (can vary temperature)
+  --from-dir        Copy existing flat *.js dirs into per-stem folders
 
 Usage:
-  python collect_candidates.py --from-openai \\
-    --list ../data/splits/train.txt --images ../data/images \\
-    --samples 4 --temperatures 0.5,0.7,0.9,1.0 \\
-    --out ../data/candidates/openai_k4
+  # Duel DPO: 2 candidates, large batches on 4× H200
+  python collect_candidates.py --from-pipeline \\
+    --list data/splits/train.txt --base-url http://127.0.0.1:10006 \\
+    --samples 2 --batch-size 48 --out data/candidates/shiny_k2
 """
 from __future__ import annotations
 
@@ -22,13 +32,11 @@ import argparse
 import json
 import os
 import sys
-import time
 from pathlib import Path
 
-import httpx
 from tqdm import tqdm
 
-from collect_teacher_js import collect_from_openai, load_pairs, strip_fences, write_js
+from collect_teacher_js import collect_from_openai, load_pairs, strip_fences
 from paths import default_data_root
 from pipeline_client import submit_and_wait
 
@@ -39,6 +47,10 @@ def _stem_dir(out: Path, stem: str) -> Path:
     return d
 
 
+def sample_seed(base_seed: int, sample_i: int, seed_stride: int, batch_i: int) -> int:
+    return base_seed + sample_i * seed_stride + batch_i
+
+
 def collect_pipeline_multi(
     pairs: list[tuple[str, str]],
     base_url: str,
@@ -47,8 +59,13 @@ def collect_pipeline_multi(
     timeout: float,
     skip_existing: bool,
     batch_size: int = 16,
+    base_seed: int = 42,
+    seed_stride: int = 1000,
 ) -> tuple[int, int]:
-    """Run K batch generations with different seeds for diversity."""
+    """Run K batch generations with different seeds for diversity.
+
+    Same prompt/image/temperature each time — only seed changes (production-style).
+    """
     ok = fail = 0
     for sample_i in range(samples):
         pending: list[tuple[str, str]] = []
@@ -65,11 +82,12 @@ def collect_pipeline_multi(
         ):
             chunk = pending[batch_i : batch_i + batch_size]
             prompts = [{"stem": stem, "image_url": url} for stem, url in chunk]
+            seed = sample_seed(base_seed, sample_i, seed_stride, batch_i)
             try:
                 js_map = submit_and_wait(
                     base_url,
                     prompts,
-                    seed=42 + sample_i * 1000 + batch_i,
+                    seed=seed,
                     timeout=timeout,
                 )
             except Exception as exc:  # noqa: BLE001
@@ -89,7 +107,12 @@ def collect_pipeline_multi(
                     "source": "pipeline",
                     "sample_index": sample_i,
                     "url": url,
-                    "seed": 42 + sample_i * 1000 + batch_i,
+                    "seed": seed,
+                    "diversity": "seed",
+                    "note": (
+                        "Same prompt/image/temperature as other samples; "
+                        "only RNG seed differs (production multigen style)."
+                    ),
                 }
                 (dest.with_suffix(".meta.json")).write_text(
                     json.dumps(meta, indent=2) + "\n", encoding="utf-8"
@@ -116,7 +139,6 @@ def collect_openai_multi(
         temp = temps[i % len(temps)]
         tmp = out_dir / f"_flat_sample_{i}"
         tmp.mkdir(parents=True, exist_ok=True)
-        # Reuse teacher collector, then reorganize into per-stem folders.
         sub_ok, sub_fail = collect_from_openai(
             pairs,
             images_dir,
@@ -137,8 +159,16 @@ def collect_openai_multi(
             if skip_existing and dest.is_file() and dest.stat().st_size > 0:
                 continue
             dest.write_text(js_path.read_text(encoding="utf-8"), encoding="utf-8")
-            meta = {"source": "openai", "model": model, "sample_index": i, "temperature": temp}
-            (dest.with_suffix(".meta.json")).write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+            meta = {
+                "source": "openai",
+                "model": model,
+                "sample_index": i,
+                "temperature": temp,
+                "diversity": "temperature",
+            }
+            (dest.with_suffix(".meta.json")).write_text(
+                json.dumps(meta, indent=2) + "\n", encoding="utf-8"
+            )
         for p in tmp.glob("*"):
             p.unlink(missing_ok=True)
         tmp.rmdir()
@@ -155,7 +185,9 @@ def collect_from_flat_dir(src_dir: Path, out_dir: Path) -> int:
         dest = _stem_dir(out_dir, stem) / "sample_0.js"
         dest.write_text(js.read_text(encoding="utf-8"), encoding="utf-8")
         meta = {"source": str(js), "sample_index": 0}
-        (dest.with_suffix(".meta.json")).write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+        (dest.with_suffix(".meta.json")).write_text(
+            json.dumps(meta, indent=2) + "\n", encoding="utf-8"
+        )
         n += 1
     return n
 
@@ -174,7 +206,20 @@ def main() -> None:
     ap.add_argument("--model", type=str, default="google/gemini-2.5-pro-preview")
     ap.add_argument("--api-key-env", type=str, default="OPENROUTER_API_KEY")
     ap.add_argument("--out", type=Path, required=True)
-    ap.add_argument("--samples", type=int, default=4)
+    ap.add_argument("--samples", type=int, default=2, help="candidates per stem (2 for duel DPO)")
+    ap.add_argument(
+        "--batch-size",
+        type=int,
+        default=int(os.environ.get("BATCH_SIZE", "16")),
+        help="stems per /generate call (raise to 48–64 on 4× H200)",
+    )
+    ap.add_argument("--base-seed", type=int, default=42)
+    ap.add_argument(
+        "--seed-stride",
+        type=int,
+        default=1000,
+        help="seed spacing between sample indices (sample_i * stride)",
+    )
     ap.add_argument("--temperatures", type=str, default="0.5,0.7,0.9,1.0")
     ap.add_argument("--timeout", type=float, default=900.0)
     ap.add_argument("--max-tokens", type=int, default=24576)
@@ -203,8 +248,24 @@ def main() -> None:
             args.samples,
             args.timeout,
             args.skip_existing,
+            batch_size=max(1, args.batch_size),
+            base_seed=args.base_seed,
+            seed_stride=args.seed_stride,
         )
-        print(json.dumps({"mode": "pipeline", "ok": ok, "fail": fail, "out": str(args.out)}, indent=2))
+        print(
+            json.dumps(
+                {
+                    "mode": "pipeline",
+                    "ok": ok,
+                    "fail": fail,
+                    "samples": args.samples,
+                    "batch_size": args.batch_size,
+                    "diversity": "seed",
+                    "out": str(args.out),
+                },
+                indent=2,
+            )
+        )
         if fail and ok == 0:
             sys.exit(1)
         return
@@ -225,7 +286,13 @@ def main() -> None:
     )
     print(
         json.dumps(
-            {"mode": "openai", "ok": ok, "fail": fail, "samples": args.samples, "out": str(args.out)},
+            {
+                "mode": "openai",
+                "ok": ok,
+                "fail": fail,
+                "samples": args.samples,
+                "out": str(args.out),
+            },
             indent=2,
         )
     )

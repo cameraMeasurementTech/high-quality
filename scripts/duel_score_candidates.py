@@ -233,38 +233,47 @@ async def run(args) -> int:
                 print(f"warn embed {stem[:12]}: {exc}", file=sys.stderr)
         return s
 
-    print(f"Scoring {len(stem_dirs)} stems | judge={settings.actors.judge.model} | max_stage={args.max_stage}")
+    concurrency = max(1, int(args.concurrency))
+    print(
+        f"Scoring {len(stem_dirs)} stems | judge={settings.actors.judge.model} | "
+        f"max_stage={args.max_stage} | sidecar={args.sidecar_count} | concurrency={concurrency}"
+    )
     await renderer.startup()
 
     records: list[dict] = []
     skipped = {"no_pair": 0, "no_img": 0, "both_invalid": 0, "draw": 0}
+    lock = asyncio.Lock()
+    sem = asyncio.Semaphore(concurrency)
 
-    try:
-        for stem_dir in tqdm(stem_dirs, desc="duel-score"):
-            stem = stem_dir.name
-            pair = find_candidate_pair(stem_dir)
-            if pair is None:
+    async def score_stem(stem_dir: Path) -> None:
+        stem = stem_dir.name
+        pair = find_candidate_pair(stem_dir)
+        if pair is None:
+            async with lock:
                 skipped["no_pair"] += 1
-                continue
-            js_a_path, js_b_path = pair
-            img_path = images_dir / f"{stem}.png"
-            if not img_path.is_file():
+            return
+        js_a_path, js_b_path = pair
+        img_path = images_dir / f"{stem}.png"
+        if not img_path.is_file():
+            async with lock:
                 skipped["no_img"] += 1
-                continue
+            return
 
-            js_a = js_a_path.read_text(encoding="utf-8")
-            js_b = js_b_path.read_text(encoding="utf-8")
+        js_a = js_a_path.read_text(encoding="utf-8")
+        js_b = js_b_path.read_text(encoding="utf-8")
 
-            if args.require_validate:
-                ok_a = validate_js(js_a, val_cfg)
-                ok_b = validate_js(js_b, val_cfg)
-                if not ok_a and not ok_b:
+        if args.require_validate:
+            ok_a = validate_js(js_a, val_cfg)
+            ok_b = validate_js(js_b, val_cfg)
+            if not ok_a and not ok_b:
+                async with lock:
                     skipped["both_invalid"] += 1
-                    continue
+                return
 
-            ref_bytes = img_path.read_bytes()
-            ref_mime = mime_for(img_path)
+        ref_bytes = img_path.read_bytes()
+        ref_mime = mime_for(img_path)
 
+        async with sem:
             ref_vec = None
             if embedder is not None:
                 try:
@@ -278,10 +287,12 @@ async def run(args) -> int:
             rec = await duel_one(
                 judge, stem, ref_bytes, ref_mime, side_a, side_b, args.max_stage
             )
-            rec["candidate_a"] = str(js_a_path.resolve())
-            rec["candidate_b"] = str(js_b_path.resolve())
-            rec["reference_image"] = str(img_path.resolve())
 
+        rec["candidate_a"] = str(js_a_path.resolve())
+        rec["candidate_b"] = str(js_b_path.resolve())
+        rec["reference_image"] = str(img_path.resolve())
+
+        async with lock:
             if rec["winner"] == "A":
                 rec["chosen_file"] = rec["candidate_a"]
                 rec["rejected_file"] = rec["candidate_b"]
@@ -290,8 +301,12 @@ async def run(args) -> int:
                 rec["rejected_file"] = rec["candidate_a"]
             else:
                 skipped["draw"] += 1
-
             records.append(rec)
+
+    try:
+        tasks = [asyncio.create_task(score_stem(d)) for d in stem_dirs]
+        for fut in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="duel-score"):
+            await fut
     finally:
         await renderer.shutdown()
         await client.close()
@@ -324,7 +339,18 @@ def main() -> None:
     ap.add_argument("--max-stage", type=int, default=4)
     ap.add_argument("--sidecar-port", type=int, default=8013)
     ap.add_argument("--static-port-base", type=int, default=13100)
-    ap.add_argument("--sidecar-count", type=int, default=2)
+    ap.add_argument(
+        "--sidecar-count",
+        type=int,
+        default=int(os.environ.get("SIDECAR_COUNT", "8")),
+        help="Chromium render processes (8 recommended on 4× H200 boxes)",
+    )
+    ap.add_argument(
+        "--concurrency",
+        type=int,
+        default=int(os.environ.get("DUEL_CONCURRENCY", "4")),
+        help="parallel stems during scoring (raise carefully vs OpenRouter rate limits)",
+    )
     ap.add_argument("--no-embedder", action="store_true")
     ap.add_argument("--require-validate", action="store_true", default=True)
     ap.add_argument("--no-require-validate", action="store_false", dest="require_validate")
