@@ -56,13 +56,13 @@ apply_pipeline_gpus() {
   cp "$BASE_CFG" "$LOCAL_CFG"
   sed -i "s|gpu_ids: \"[^\"]*\"|gpu_ids: \"${gpu_ids}\"|" "$LOCAL_CFG"
   sed -i "s|tensor_parallel_size: [0-9]*|tensor_parallel_size: ${tp}|" "$LOCAL_CFG"
-  upsert_env CONFIG_FILE "$LOCAL_CFG" "$ENV_FILE"
+  upsert_env CONFIG_FILE "pipeline/configuration.local.yaml" "$ENV_FILE"
 }
 
 apply_pipeline_template() {
   local template="$1"
   cp "$template" "$LOCAL_CFG"
-  upsert_env CONFIG_FILE "$LOCAL_CFG" "$ENV_FILE"
+  upsert_env CONFIG_FILE "pipeline/configuration.local.yaml" "$ENV_FILE"
 }
 
 case "$PROFILE" in
@@ -137,7 +137,7 @@ case "$PROFILE" in
     upsert_env ALIGN dpo "$ENV_FILE"
     upsert_env NUM_PROCESSES 4 "$ENV_FILE"
     upsert_env JUDGE_CONFIG "$TRAINING_ROOT/pipeline/configuration.duel-judge.yaml" "$ENV_FILE"
-    apply_pipeline_template "$TRAINING_ROOT/pipeline/configuration.h200x4-dpo.yaml"
+    apply_pipeline_template "$TRAINING_ROOT/pipeline/configuration.h200x4-dpo-duel.yaml"
     TRAIN_METHOD="DPO bf16 LoRA on duel-scored pairs (S1–S4)"
     DATA_NOTE="TRAIN_N=5000 × 2 JS (seed diversity) → duel score → aim ≥3500–4500 pairs"
     GPU_NOTE="Phase A: TP=4 generate; stop vLLM; Phase B: Chromium+OpenRouter; Phase C: train ×4"

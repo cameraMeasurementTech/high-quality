@@ -1,19 +1,21 @@
 # Training Cookbook: Beat the King (SFT → DPO → GRPO)
 
-> **All-in-one from `training/`:** [`STANDALONE.md`](STANDALONE.md) — `./run/run_all.sh`
+> **Standalone (copy only `training/`):** use [`STANDALONE.md`](STANDALONE.md) and
+> [`docs/DPO_DUEL_SCORING.md`](docs/DPO_DUEL_SCORING.md).  
+> This COOKBOOK still mentions monorepo paths (`local-eval/`, `/home/404-gen-subnet/…`)
+> for historical context — **do not follow those paths** on a fresh GPU box.
 
-> **Fresh GPU machine (detailed phases)?** [`SHINY_GUIDE_TRAINING.md`](SHINY_GUIDE_TRAINING.md) (Phases 0–7).
+> **All-in-one:** `./run/00_configure_profile.sh h200x4-dpo-duel` then `INSTALL_SYSTEM=1 ./run/run_all.sh`
 
 End-to-end runbook to improve the **coder VLM** that emits validator-safe
-`generate(THREE)` modules for 404-GEN Competition 2, then ship open weights in
-Docker so you can beat the current leader (~5% duel margin on 128 prompts).
+`generate(THREE)` modules for 404-GEN Competition 2.
 
-Companion docs:
+Companion docs (standalone):
 
-- Platform scoring: [`docs/VALIDATOR_SCORING_AND_DATASET.md`](../../docs/VALIDATOR_SCORING_AND_DATASET.md)
-- Strategy deep-dive (GRPO): [`docs/TRAINING_GRPO_STRATEGY.md`](../../docs/TRAINING_GRPO_STRATEGY.md)
-- Strategy deep-dive (DPO): [`docs/TRAINING_DPO_STRATEGY.md`](../../docs/TRAINING_DPO_STRATEGY.md)
-- Local duels: [`local-eval/README.md`](../../local-eval/README.md)
+- [`STANDALONE.md`](STANDALONE.md)
+- [`docs/DPO_DUEL_SCORING.md`](docs/DPO_DUEL_SCORING.md)
+- [`docs/CODER_MODEL.md`](docs/CODER_MODEL.md)
+- [`MACHINE_PROFILES.md`](MACHINE_PROFILES.md)
 
 ---
 

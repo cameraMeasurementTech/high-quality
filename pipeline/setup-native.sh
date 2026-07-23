@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # One-time setup: shiny-guide native GPU pipeline + bundled validator + training venv.
-# Standalone — only needs sibling shiny-guide/ + this training/ tree.
+# Standalone — uses training/vendor/shiny-guide (from 00_bootstrap_assets.sh).
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

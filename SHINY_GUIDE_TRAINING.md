@@ -1,14 +1,13 @@
 # Shiny-guide training guide
 
-> **All-in-one from `training/` only:** [`STANDALONE.md`](STANDALONE.md) — `./run/run_all.sh`
+> **Standalone:** prefer [`STANDALONE.md`](STANDALONE.md) + [`docs/DPO_DUEL_SCORING.md`](docs/DPO_DUEL_SCORING.md).  
+> Sections below that mention `local-eval/` or `/home/404-gen-subnet` are **legacy monorepo** notes.
 
-Train the **404-GEN king coder** (`shiny-guide`) on **validator prompts** using **DPO** or **GRPO**.
+Train the **404-GEN king coder** on validator prompts using **DPO** or **GRPO**.
 
 - Base model: `Tooony133/Qwen-3.6-27B-AstroWolf` (already SFT-specialized — **skip SFT**)
-- Prompts: `shiny-guide/pipeline_service/modules/scene_coder/prompts.py`
-- Scripts: `my-agent/training/` (set `PROMPTS_ROOT=shiny-guide`, default)
-
-Strategy background: [`docs/TRAINING_DPO_STRATEGY.md`](../../docs/TRAINING_DPO_STRATEGY.md)
+- Prompts: vendored via `./run/00_bootstrap_assets.sh` → `vendor/pipeline_prompts/` + `vendor/shiny-guide/`
+- Scripts: this `training/` tree only
 
 ---
 
@@ -16,9 +15,7 @@ Strategy background: [`docs/TRAINING_DPO_STRATEGY.md`](../../docs/TRAINING_DPO_S
 
 Complete walkthrough from a **blank Ubuntu GPU box** to a trained LoRA checkpoint.
 
-**Step 0 on every new machine:** [`MACHINE_PROFILES.md`](MACHINE_PROFILES.md) + `./run/00_configure_profile.sh`
-
-Replace `/home/404-gen-subnet` with your clone path if different.
+**Step 0 on every new machine:** [`MACHINE_PROFILES.md`](MACHINE_PROFILES.md) + `./run/00_configure_profile.sh h200x4-dpo-duel`
 
 ### Timeline overview
 

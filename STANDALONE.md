@@ -16,6 +16,14 @@ training/
 └── scripts/                     ← Python tooling
 ```
 
+## Standalone self-check
+
+```bash
+./run/00_verify_standalone.sh
+```
+
+Expect PASS on bundled `validate.js` + configs. WARN for missing `vendor/` / model until bootstrap.
+
 ## Quick start — 4× H200 duel-scored DPO (recommended)
 
 Generate **2 JS** per prompt (same prompts, **different seeds**), score with **validator-like S1–S4**, then DPO:

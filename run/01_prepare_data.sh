@@ -18,7 +18,7 @@ TRAIN_N="${TRAIN_N:-10000}"
 VAL_N="${VAL_N:-500}"
 DUEL_N="${DUEL_N:-200}"
 SEED="${SEED:-7}"
-TEACHER_MODE="${TEACHER_MODE:-runs}"
+TEACHER_MODE="${TEACHER_MODE:-pipeline}"
 PIPELINE_URL="${PIPELINE_URL:-http://127.0.0.1:10006}"
 TEACHER_MODEL="${TEACHER_MODEL:-google/gemini-2.5-pro-preview}"
 
@@ -51,7 +51,7 @@ case "$TEACHER_MODE" in
       [[ -d "$d" ]] && RUN_DIRS+=("$d")
     done
     if [[ ${#RUN_DIRS[@]} -eq 0 ]]; then
-      echo "No eval run dirs found. Set TEACHER_MODE=pipeline or openai." >&2
+      echo "No eval run dirs found. Set TEACHER_MODE=pipeline (default) or openai." >&2
       exit 1
     fi
     python "$SCRIPTS/collect_teacher_js.py" --from-runs --run-dirs "${RUN_DIRS[@]}" --out "$RAW"

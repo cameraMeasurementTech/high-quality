@@ -19,8 +19,8 @@ cp .env.template .env
 |---------|------|--------|-----------------|---------------|---------------|
 | **smoke** | 1× any | DPO LoRA | 100 prompts | 1 (`tp=1`) | same box, sequential |
 | **h100x2-dpo** | 2× H100 80GB | DPO bf16 LoRA | 5k → ~2k pairs | 2 (`tp=2`) | 2 (stop pipeline first) |
-| **h200x2-dpo-duel** ⭐ | 2× H200 | DPO duel-scored | 3k × 2 JS | 2 (`tp=2`) | 2 (sequential phases) |
-| **h200x4-dpo** | 4× H200 | DPO cheap | 5k → ~2k pairs | 4 (`tp=4`) | 2 (stop pipeline first) |
+| **h200x2-dpo** | 2× H200 | DPO cheap | 6k → ~2.5k pairs | 2 (`tp=2`) | 2 (stop pipeline first) |
+| **h200x4-dpo** | 4× H200 | DPO cheap | 5k → ~2k pairs | 4 (`tp=4`) | 2–4 (stop pipeline first) |
 | **h200x4-dpo-duel** ⭐ | 4× H200 | DPO duel-scored | 5k × 2 JS + S1–S4 | 4 (`tp=4`) | 4 (sequential phases) |
 | **h100x4-grpo** | 4× H100 80GB | GRPO bf16 LoRA | 5k prompts | 2 (`tp=2`) | 4 |
 | **h200x2-grpo** | 2× H200 | GRPO bf16 LoRA | 4k prompts | 2 (`tp=2`) | 2 (tight; `num_generations: 2`) |

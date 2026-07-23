@@ -2,16 +2,19 @@
 # One command: bootstrap → install → pipeline → dataset prep → train.
 #
 # Usage:
-#   cp .env.template .env    # set OPENROUTER_API_KEY + HF_TOKEN
-#   ./run/run_all.sh
+#   cp .env.template .env
+#   ./run/00_configure_profile.sh h200x4-dpo-duel   # or h200x4-dpo / h200x2-dpo
+#   # set HF_TOKEN (+ OPENROUTER_API_KEY for duel profiles)
+#   INSTALL_SYSTEM=1 ./run/run_all.sh
+#
+# Duel profiles (MACHINE_PROFILE=*dpo-duel* or CONFIG=*dpo_shiny_27b_duel*):
+#   Phase A generate → stop pipeline → Phase B score+pack → Phase C train
 #
 # Env knobs:
-#   TRAIN=dpo|grpo|both|skip     (default: dpo)
-#   ALIGN=dpo|grpo|both          (default: matches TRAIN)
-#   TRAIN_N=500 VAL_N=50 DUEL_N=50 DPO_SAMPLES=4
+#   TRAIN=dpo|grpo|both|skip
 #   SKIP_BOOTSTRAP=1 SKIP_INSTALL=1 SKIP_PIPELINE=1 SKIP_PREP=1 SKIP_TRAIN=1
-#   INSTALL_SYSTEM=1             apt install Chromium deps
-#   SMOKE=1                      TRAIN_N=100, small smoke run
+#   INSTALL_SYSTEM=1
+#   SMOKE=1
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -21,12 +24,12 @@ cd "$TRAINING_ROOT"
 if [[ ! -f .env ]]; then
   cp .env.template .env
   echo "Created .env — run ./run/00_configure_profile.sh <profile> then set API keys."
-  echo "  Example: ./run/00_configure_profile.sh h200x2-dpo"
+  echo "  Example: ./run/00_configure_profile.sh h200x4-dpo-duel"
   exit 1
 fi
 
 if [[ -z "${MACHINE_PROFILE:-}" ]]; then
-  echo "TIP: Run ./run/00_configure_profile.sh h200x2-dpo to match your GPU box (see MACHINE_PROFILES.md)"
+  echo "TIP: Run ./run/00_configure_profile.sh h200x4-dpo-duel (see MACHINE_PROFILES.md)"
 fi
 
 # shellcheck disable=SC1091
@@ -37,15 +40,25 @@ if [[ "${SMOKE:-0}" == "1" ]]; then
   export VAL_N="${VAL_N:-20}"
   export DUEL_N="${DUEL_N:-20}"
   export DPO_SAMPLES="${DPO_SAMPLES:-2}"
+  export DUEL_LIMIT="${DUEL_LIMIT:-50}"
 fi
 
 TRAIN="${TRAIN:-dpo}"
 ALIGN="${ALIGN:-$TRAIN}"
 [[ "$ALIGN" == "skip" ]] && ALIGN="dpo"
 
+is_duel_profile=0
+case "${MACHINE_PROFILE:-}" in
+  *dpo-duel*) is_duel_profile=1 ;;
+esac
+case "${CONFIG:-}" in
+  *dpo_shiny_27b_duel*) is_duel_profile=1 ;;
+esac
+
 echo "=============================================="
-echo "  shiny-guide standalone training — run_all"
+echo "  standalone training — run_all"
 echo "  profile=${MACHINE_PROFILE:-<unset>}  TRAIN=$TRAIN  ALIGN=$ALIGN  TRAIN_N=${TRAIN_N:-5000}"
+echo "  duel_scored=${is_duel_profile}"
 echo "=============================================="
 
 if [[ "${SKIP_BOOTSTRAP:-0}" != "1" ]]; then
@@ -61,16 +74,43 @@ source "$SCRIPT_DIR/env.sh"
 # shellcheck disable=SC1091
 source .venv/bin/activate
 
-if [[ "${SKIP_PIPELINE:-0}" != "1" ]]; then
-  "$PIPELINE_DIR/start-native-bg.sh"
-  "$PIPELINE_DIR/wait-ready.sh"
-fi
-
 if [[ "${SKIP_PREP:-0}" != "1" ]]; then
-  echo "==> Prepare DPO/GRPO datasets"
-  TRAIN_N="${TRAIN_N:-5000}" VAL_N="${VAL_N:-300}" DUEL_N="${DUEL_N:-200}" \
-    DPO_SAMPLES="${DPO_SAMPLES:-4}" ALIGN="$ALIGN" \
-    "$SCRIPT_DIR/01_prepare_shiny_align.sh"
+  if [[ "$is_duel_profile" == "1" ]]; then
+    : "${OPENROUTER_API_KEY:?Set OPENROUTER_API_KEY in .env for duel-scored DPO}"
+
+    if [[ "${SKIP_PIPELINE:-0}" != "1" ]]; then
+      "$PIPELINE_DIR/start-native-bg.sh"
+      "$PIPELINE_DIR/wait-ready.sh"
+    fi
+
+    echo "==> [duel] Phase A — collect 2 JS/stem (seed diversity)"
+    SKIP_DUEL_SCORE=1 SKIP_PACK=1 \
+      TRAIN_N="${TRAIN_N:-5000}" VAL_N="${VAL_N:-300}" DUEL_N="${DUEL_N:-200}" \
+      DPO_SAMPLES="${DPO_SAMPLES:-2}" BATCH_SIZE="${BATCH_SIZE:-48}" \
+      "$SCRIPT_DIR/01_prepare_dpo_duel_scored.sh"
+
+    echo "==> [duel] Stopping pipeline before scoring / training"
+    "$PIPELINE_DIR/stop-native.sh" || true
+
+    echo "==> [duel] Phase B — multiview S1–S4 score + pack"
+    SKIP_COLLECT=1 \
+      SIDECAR_COUNT="${SIDECAR_COUNT:-8}" DUEL_CONCURRENCY="${DUEL_CONCURRENCY:-4}" \
+      DUEL_LIMIT="${DUEL_LIMIT:-0}" \
+      "$SCRIPT_DIR/01_prepare_dpo_duel_scored.sh"
+  else
+    if [[ "${SKIP_PIPELINE:-0}" != "1" ]]; then
+      "$PIPELINE_DIR/start-native-bg.sh"
+      "$PIPELINE_DIR/wait-ready.sh"
+    fi
+
+    echo "==> Prepare cheap DPO/GRPO datasets"
+    TRAIN_N="${TRAIN_N:-5000}" VAL_N="${VAL_N:-300}" DUEL_N="${DUEL_N:-200}" \
+      DPO_SAMPLES="${DPO_SAMPLES:-4}" ALIGN="$ALIGN" \
+      "$SCRIPT_DIR/01_prepare_shiny_align.sh"
+
+    echo "==> Stopping pipeline before training"
+    "$PIPELINE_DIR/stop-native.sh" || true
+  fi
 fi
 
 if [[ "${SKIP_TRAIN:-0}" == "1" ]]; then
@@ -100,6 +140,5 @@ esac
 
 echo ""
 echo "==> run_all complete"
-echo "    Merge:  ADAPTER=data/checkpoints/dpo_shiny_27b/final ./run/04_merge_and_eval.sh"
-echo "    Deploy: ./run/05_deploy_merged.sh"
+echo "    Merge:  ADAPTER=data/checkpoints/dpo_shiny_27b_duel/final ./run/04_merge_and_eval.sh"
 echo "    Eval:   ./pipeline/run-eval.sh data/splits/duel.txt --limit 50 --name merged"
