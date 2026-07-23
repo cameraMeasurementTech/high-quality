@@ -69,20 +69,21 @@ actors:
     workers: 4
     queue_size: 8
   critic:
-    client: "openrouter"
-    model: "google/gemini-2.5-pro-preview"
-    workers: 2
-    queue_size: 8
-    max_tokens: 6144
-    temperature: 0.3
+    # refinement_enabled=false — stub to local coder so config loads without OpenRouter
+    client: "coder-instance"
+    model: "Tooony133/Qwen-3.6-27B-AstroWolf"
+    workers: 1
+    queue_size: 4
+    max_tokens: 1024
+    temperature: 0.0
     seed: 42
     ensemble_size: 1
   judge:
-    client: "openrouter"
-    model: "google/gemini-2.5-pro-preview"
-    workers: 2
-    queue_size: 8
-    max_tokens: 8192
+    client: "coder-instance"
+    model: "Tooony133/Qwen-3.6-27B-AstroWolf"
+    workers: 1
+    queue_size: 4
+    max_tokens: 1024
     temperature: 0.0
     seed: 42
   checker:

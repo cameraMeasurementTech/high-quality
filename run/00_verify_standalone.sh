@@ -79,6 +79,14 @@ print("  INFO  vendor expected at", vendor_shiny_guide_root())
 print("  INFO  data root", default_data_root())
 PY
 
+if [[ -f scripts/check_prep_regressions.py ]]; then
+  if python3 scripts/check_prep_regressions.py; then
+    pass "prep regression checks"
+  else
+    bad "prep regression checks failed"
+  fi
+fi
+
 echo ""
 if [[ "$fail" -eq 0 ]]; then
   echo "==> Standalone gate: OK (bootstrap warnings above are expected on a fresh copy)"

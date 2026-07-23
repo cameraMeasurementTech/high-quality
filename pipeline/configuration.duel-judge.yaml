@@ -16,6 +16,8 @@ api:
 
 pipeline:
   refinement_enabled: false
+  use_planner: false
+  skip_render: true  # scoring script renders itself; unused by GenerationPipeline here
 
 benchmark: false
 warmup: false
@@ -27,22 +29,34 @@ llm_clients:
     api_key_env: "OPENROUTER_API_KEY"
   coder-instance:
     enabled: false
+    base_url: "http://localhost:8001/v1"
+    api_key: "local"
 
 actors:
+  # SettingsConf always validates coder+critic clients even when unused for scoring.
+  coder:
+    client: "openrouter"
+    model: "google/gemini-2.5-pro-preview"
+    workers: 1
+    multimodal: true
+  critic:
+    client: "openrouter"
+    model: "google/gemini-2.5-pro-preview"
+    workers: 1
   judge:
     client: "openrouter"
     model: "google/gemini-2.5-pro-preview"
-    workers: 8
-    queue_size: 16
+    workers: 16
+    queue_size: 32
     max_tokens: 8192
     temperature: 0.0
     seed: 42
   checker:
-    workers: 8
-    queue_size: 16
-  renderer:
     workers: 16
     queue_size: 32
+  renderer:
+    workers: 32
+    queue_size: 64
 
 js_checker:
   execution_timeout_ms: 5000
@@ -56,7 +70,7 @@ renderer:
   node_binary: "node"
   img_size: 518
   grid_gap: 5
-  sidecar_count: 8
+  sidecar_count: 16
   static_port_base: 13100
   pool_size: 2
   judge_multiview: true
@@ -68,4 +82,4 @@ embedder:
   model_id: "facebook/dinov3-vits16-pretrain-lvd1689m"
   revision: "main"
   device: "cuda:0"
-  batch_size: 16
+  batch_size: 32

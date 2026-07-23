@@ -25,9 +25,9 @@
 #
 # Env:
 #   TRAIN_N VAL_N DUEL_N SEED DPO_SAMPLES=2
-#   BATCH_SIZE=48              (stems per /generate; raise on 4× H200)
-#   SIDECAR_COUNT=8            (Chromium render farm for scoring)
-#   DUEL_CONCURRENCY=4         (parallel stems while scoring)
+#   BATCH_SIZE=96              (match max_num_seqs; Phase A is JS-only / skip_render)
+#   SIDECAR_COUNT=16           (Chromium render farm for Phase B scoring)
+#   DUEL_CONCURRENCY=8         (parallel stems while scoring; A∥B render per stem)
 #   PIPELINE_URL JUDGE_CONFIG
 #   SKIP_COLLECT=1 SKIP_DUEL_SCORE=1 SKIP_PACK=1
 set -euo pipefail
@@ -48,9 +48,9 @@ CAND_DIR="${CAND_DIR:-$TRAINING_ROOT/data/candidates/shiny_k${DPO_SAMPLES}}"
 DUEL_JSON="${DUEL_JSON:-$TRAINING_ROOT/data/duel_scores/candidate_duels.json}"
 JUDGE_CONFIG="${JUDGE_CONFIG:-$PIPELINE_DIR/configuration.duel-judge.yaml}"
 DUEL_LIMIT="${DUEL_LIMIT:-0}"
-BATCH_SIZE="${BATCH_SIZE:-48}"
-SIDECAR_COUNT="${SIDECAR_COUNT:-8}"
-DUEL_CONCURRENCY="${DUEL_CONCURRENCY:-4}"
+BATCH_SIZE="${BATCH_SIZE:-96}"
+SIDECAR_COUNT="${SIDECAR_COUNT:-16}"
+DUEL_CONCURRENCY="${DUEL_CONCURRENCY:-8}"
 SCRIPTS="$TRAINING_ROOT/scripts"
 
 export SHINY_GUIDE_ROOT
@@ -72,12 +72,13 @@ if [[ ! -d "$TRAINING_ROOT/data/images" ]] || [[ -z "$(ls -A "$TRAINING_ROOT/dat
   python "$SCRIPTS/download_images.py" \
     --list "$TRAINING_ROOT/data/splits/train_val.txt" \
     --out "$TRAINING_ROOT/data/images" \
-    --workers "${DL_WORKERS:-16}"
+    --workers "${DL_WORKERS:-32}"
 fi
 
 echo "==> [2/4] Collect $DPO_SAMPLES JS/stem (diversity=seed, batch=$BATCH_SIZE) via $PIPELINE_URL"
 if [[ "${SKIP_COLLECT:-0}" != "1" ]]; then
   echo "    Same prompt/temp; different seeds (sample_0 vs sample_1)."
+  echo "    Pipeline should use skip_render=true (JS only; render in step 3)."
   echo "    Pipeline must be running: ./pipeline/start-native-bg.sh"
   python "$SCRIPTS/collect_candidates.py" --from-pipeline \
     --list "$TRAINING_ROOT/data/splits/train.txt" \

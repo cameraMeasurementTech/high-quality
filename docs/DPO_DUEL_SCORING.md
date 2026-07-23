@@ -48,11 +48,13 @@ For **duel-scored DPO** aimed at subnet win-rate, keep temperature fixed and var
 
 | Phase | GPUs | What |
 |-------|------|------|
-| **A — Generate 2 JS/stem** | **0–3 TP=4** vLLM AstroWolf | `max_num_seqs=96`, `BATCH_SIZE=48` |
-| **B — Duel score** | Stop vLLM; DINO on `cuda:0`; Chromium on CPU | OpenRouter judge |
+| **A — Generate 2 JS/stem** | **0–3 TP=4** vLLM AstroWolf | `skip_render=true`, `max_num_seqs=96`, `BATCH_SIZE=96` |
+| **B — Duel score** | Stop vLLM; DINO on `cuda:0`; Chromium×16 | OpenRouter judge; A∥B render per stem |
 | **C — DPO train** | **4 processes** LoRA | `NUM_PROCESSES=4` |
 
 Do **not** run Phase A and C at the same time on one box.
+
+**Phase A does not render.** Multiview Chromium runs only in Phase B.
 
 Profile:
 
@@ -60,7 +62,7 @@ Profile:
 ./run/00_configure_profile.sh h200x4-dpo-duel
 ```
 
-Sets: `DPO_SAMPLES=2`, `BATCH_SIZE=48`, `SIDECAR_COUNT=8`, `DUEL_CONCURRENCY=4`, `CONFIG=configs/dpo_shiny_27b_duel.yaml`, pipeline TP=4.
+Sets: `DPO_SAMPLES=2`, `BATCH_SIZE=96`, `SIDECAR_COUNT=16`, `DUEL_CONCURRENCY=8`, `CONFIG=configs/dpo_shiny_27b_duel.yaml`, pipeline TP=4 + `skip_render`.
 
 ---
 
@@ -69,25 +71,27 @@ Sets: `DPO_SAMPLES=2`, `BATCH_SIZE=48`, `SIDECAR_COUNT=8`, `DUEL_CONCURRENCY=4`,
 ```bash
 cd training
 cp .env.template .env
-# HF_TOKEN=...   OPENROUTER_API_KEY=...   (both required for this path)
+# in .env
+#   HF_TOKEN=...  OPENROUTER_API_KEY=...
 
+# Full guide: docs/GETTING_STARTED.md
 ./run/00_configure_profile.sh h200x4-dpo-duel
 ./run/00_bootstrap_assets.sh
 INSTALL_SYSTEM=1 ./run/00_install_all.sh
 source .env && source .venv/bin/activate
 
-# --- Phase A: generate 2 JS per prompt (all 4 GPUs) ---
+# --- Phase A: generate 2 JS per prompt (all 4 GPUs, no Chromium) ---
 ./pipeline/start-native-bg.sh && ./pipeline/wait-ready.sh
 
 SKIP_DUEL_SCORE=1 SKIP_PACK=1 \
-  TRAIN_N=5000 DPO_SAMPLES=2 BATCH_SIZE=48 \
+  TRAIN_N=5000 DPO_SAMPLES=2 BATCH_SIZE=96 \
   ./run/01_prepare_dpo_duel_scored.sh
 
 ./pipeline/stop-native.sh   # free GPUs before scoring / training
 
-# --- Phase B: validator-like duel score ---
+# --- Phase B: validator-like duel score (render here) ---
 SKIP_COLLECT=1 \
-  SIDECAR_COUNT=8 DUEL_CONCURRENCY=4 \
+  SIDECAR_COUNT=16 DUEL_CONCURRENCY=8 \
   ./run/01_prepare_dpo_duel_scored.sh
 
 # Optional smoke first: DUEL_LIMIT=100

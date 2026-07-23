@@ -130,9 +130,10 @@ case "$PROFILE" in
     upsert_env VAL_N 300 "$ENV_FILE"
     upsert_env DUEL_N 200 "$ENV_FILE"
     upsert_env DPO_SAMPLES 2 "$ENV_FILE"
-    upsert_env BATCH_SIZE 48 "$ENV_FILE"
-    upsert_env SIDECAR_COUNT 8 "$ENV_FILE"
-    upsert_env DUEL_CONCURRENCY 4 "$ENV_FILE"
+    upsert_env BATCH_SIZE 96 "$ENV_FILE"
+    upsert_env SIDECAR_COUNT 16 "$ENV_FILE"
+    upsert_env DUEL_CONCURRENCY 8 "$ENV_FILE"
+    upsert_env DL_WORKERS 32 "$ENV_FILE"
     upsert_env CONFIG configs/dpo_shiny_27b_duel.yaml "$ENV_FILE"
     upsert_env ALIGN dpo "$ENV_FILE"
     upsert_env NUM_PROCESSES 4 "$ENV_FILE"
@@ -140,7 +141,7 @@ case "$PROFILE" in
     apply_pipeline_template "$TRAINING_ROOT/pipeline/configuration.h200x4-dpo-duel.yaml"
     TRAIN_METHOD="DPO bf16 LoRA on duel-scored pairs (S1–S4)"
     DATA_NOTE="TRAIN_N=5000 × 2 JS (seed diversity) → duel score → aim ≥3500–4500 pairs"
-    GPU_NOTE="Phase A: TP=4 generate; stop vLLM; Phase B: Chromium+OpenRouter; Phase C: train ×4"
+    GPU_NOTE="Phase A: TP=4 skip_render JS collect BATCH=96; stop vLLM; Phase B: sidecars×16; Phase C: train ×4"
     ;;
   h100x4-grpo)
     upsert_env MACHINE_PROFILE h100x4-grpo "$ENV_FILE"

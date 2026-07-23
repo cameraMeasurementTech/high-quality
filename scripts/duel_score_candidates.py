@@ -281,8 +281,10 @@ async def run(args) -> int:
                 except Exception as exc:  # noqa: BLE001
                     print(f"warn ref embed {stem[:12]}: {exc}", file=sys.stderr)
 
-            side_a = await build_side(ref_vec, stem, js_a)
-            side_b = await build_side(ref_vec, stem, js_b)
+            side_a, side_b = await asyncio.gather(
+                build_side(ref_vec, stem, js_a),
+                build_side(ref_vec, stem, js_b),
+            )
 
             rec = await duel_one(
                 judge, stem, ref_bytes, ref_mime, side_a, side_b, args.max_stage
@@ -342,13 +344,13 @@ def main() -> None:
     ap.add_argument(
         "--sidecar-count",
         type=int,
-        default=int(os.environ.get("SIDECAR_COUNT", "8")),
-        help="Chromium render processes (8 recommended on 4× H200 boxes)",
+        default=int(os.environ.get("SIDECAR_COUNT", "16")),
+        help="Chromium render processes (16 recommended on 4× H200 boxes)",
     )
     ap.add_argument(
         "--concurrency",
         type=int,
-        default=int(os.environ.get("DUEL_CONCURRENCY", "4")),
+        default=int(os.environ.get("DUEL_CONCURRENCY", "8")),
         help="parallel stems during scoring (raise carefully vs OpenRouter rate limits)",
     )
     ap.add_argument("--no-embedder", action="store_true")

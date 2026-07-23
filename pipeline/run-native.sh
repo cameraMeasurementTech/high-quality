@@ -30,6 +30,9 @@ PIPE_VENV="$PIPELINE_DIR/.venv"
 require_shiny_guide
 require_openrouter_if_needed
 
+echo "==> Applying throughput overlays (skip_render + prepare concurrency)"
+python3 "$PIPELINE_DIR/apply_throughput_overlays.py" "$SHINY_GUIDE_ROOT"
+
 for req in "$PIPE_VENV/bin/python" "$VLLM_BIN" "$BASE_CONFIG"; do
   if [[ ! -e "$req" ]]; then
     echo "ERROR: Missing $req — run $PIPELINE_DIR/setup-native.sh"

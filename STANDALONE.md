@@ -26,6 +26,8 @@ Expect PASS on bundled `validate.js` + configs. WARN for missing `vendor/` / mod
 
 ## Quick start — 4× H200 duel-scored DPO (recommended)
 
+**Full numbered guide:** [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)
+
 Generate **2 JS** per prompt (same prompts, **different seeds**), score with **validator-like S1–S4**, then DPO:
 
 ```bash

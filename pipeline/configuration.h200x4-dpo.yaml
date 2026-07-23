@@ -12,6 +12,8 @@ pipeline:
   use_planner: false
   render_from_object: true
   refinement_enabled: false
+  # JS-only collect; cheap validate.js scoring does not need generate-time render.
+  skip_render: true
 
 benchmark: false
 warmup: true
@@ -35,6 +37,9 @@ llm_clients:
       vllm_bin: "/opt/vllm-env/bin/vllm"
 
 actors:
+  planner:
+    workers: 96
+    queue_size: 128
   coder:
     client: "coder-instance"
     model: "Tooony133/Qwen-3.6-27B-AstroWolf"
@@ -49,11 +54,17 @@ actors:
     ensemble_size: 1
     ensemble_temperature: 0.65
   checker:
-    workers: 16
-    queue_size: 32
+    workers: 96
+    queue_size: 128
+  # Unused when refinement_enabled=false, but SettingsConf still validates critic.client.
+  critic:
+    client: "coder-instance"
+    model: "Tooony133/Qwen-3.6-27B-AstroWolf"
+    workers: 1
+    queue_size: 4
   renderer:
-    workers: 16
-    queue_size: 32
+    workers: 1
+    queue_size: 4
 
 event_bus:
   max_iter: 2
@@ -72,9 +83,9 @@ renderer:
   node_binary: "node"
   img_size: 518
   grid_gap: 5
-  sidecar_count: 4
+  sidecar_count: 1
   static_port_base: 13000
-  pool_size: 2
+  pool_size: 1
   judge_multiview: false
   render_timeout_ms: 90000
   protocol_timeout_ms: 90000

@@ -65,23 +65,29 @@ def collect_pipeline_multi(
     """Run K batch generations with different seeds for diversity.
 
     Same prompt/image/temperature each time — only seed changes (production-style).
+
+    Batches are interleaved across samples (for each chunk of stems: sample_0 then
+    sample_1) so pairs complete sooner and resumes waste less work.
     """
     ok = fail = 0
-    for sample_i in range(samples):
-        pending: list[tuple[str, str]] = []
-        for stem, url in pairs:
-            dest = _stem_dir(out_dir, stem) / f"sample_{sample_i}.js"
-            if skip_existing and dest.is_file() and dest.stat().st_size > 0:
-                ok += 1
+    # Stems still needing any sample.
+    pending_all = list(pairs)
+    for batch_i in tqdm(
+        range(0, len(pending_all), batch_size),
+        desc="pipeline-batches",
+    ):
+        chunk_pairs = pending_all[batch_i : batch_i + batch_size]
+        for sample_i in range(samples):
+            pending: list[tuple[str, str]] = []
+            for stem, url in chunk_pairs:
+                dest = _stem_dir(out_dir, stem) / f"sample_{sample_i}.js"
+                if skip_existing and dest.is_file() and dest.stat().st_size > 0:
+                    ok += 1
+                    continue
+                pending.append((stem, url))
+            if not pending:
                 continue
-            pending.append((stem, url))
-
-        for batch_i in tqdm(
-            range(0, len(pending), batch_size),
-            desc=f"pipeline-sample-{sample_i}",
-        ):
-            chunk = pending[batch_i : batch_i + batch_size]
-            prompts = [{"stem": stem, "image_url": url} for stem, url in chunk]
+            prompts = [{"stem": stem, "image_url": url} for stem, url in pending]
             seed = sample_seed(base_seed, sample_i, seed_stride, batch_i)
             try:
                 js_map = submit_and_wait(
@@ -91,11 +97,11 @@ def collect_pipeline_multi(
                     timeout=timeout,
                 )
             except Exception as exc:  # noqa: BLE001
-                fail += len(chunk)
+                fail += len(pending)
                 print(f"batch fail sample={sample_i}: {exc}", file=sys.stderr)
                 continue
 
-            for stem, url in chunk:
+            for stem, url in pending:
                 source = js_map.get(stem)
                 if not source:
                     fail += 1

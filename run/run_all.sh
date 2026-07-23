@@ -86,7 +86,7 @@ if [[ "${SKIP_PREP:-0}" != "1" ]]; then
     echo "==> [duel] Phase A — collect 2 JS/stem (seed diversity)"
     SKIP_DUEL_SCORE=1 SKIP_PACK=1 \
       TRAIN_N="${TRAIN_N:-5000}" VAL_N="${VAL_N:-300}" DUEL_N="${DUEL_N:-200}" \
-      DPO_SAMPLES="${DPO_SAMPLES:-2}" BATCH_SIZE="${BATCH_SIZE:-48}" \
+      DPO_SAMPLES="${DPO_SAMPLES:-2}" BATCH_SIZE="${BATCH_SIZE:-96}" \
       "$SCRIPT_DIR/01_prepare_dpo_duel_scored.sh"
 
     echo "==> [duel] Stopping pipeline before scoring / training"

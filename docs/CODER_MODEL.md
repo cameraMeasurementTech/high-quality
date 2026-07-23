@@ -1,5 +1,7 @@
 # Coder base model — download and save path
 
+> **End-to-end setup** (clone → model → dataset → train): see [`GETTING_STARTED.md`](GETTING_STARTED.md).
+
 The **coder base model** for DPO/GRPO training and pipeline data generation is the subnet king weights:
 
 | Field | Value |

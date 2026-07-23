@@ -59,6 +59,9 @@ if [[ ! -d "$SHINY_GUIDE_ROOT/pipeline_service" ]]; then
   exit 1
 fi
 
+echo "==> [patch] throughput overlays (skip_render + prepare concurrency)"
+python3 "$TRAINING_ROOT/pipeline/apply_throughput_overlays.py" "$SHINY_GUIDE_ROOT" || true
+
 # --- 1b. vendored coder prompts (dataset packing without monorepo paths) ---
 VENDOR_PROMPTS="$TRAINING_ROOT/vendor/pipeline_prompts/scene_coder"
 mkdir -p "$VENDOR_PROMPTS"

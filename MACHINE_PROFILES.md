@@ -33,12 +33,12 @@ cp .env.template .env
 ## 4× H200 duel-scored workflow
 
 ```text
-Phase A — generate (all 4 GPUs, vLLM TP=4)
-  DPO_SAMPLES=2, BATCH_SIZE=48
+Phase A — generate (all 4 GPUs, vLLM TP=4, skip_render)
+  DPO_SAMPLES=2, BATCH_SIZE=96
   diversity = different seeds, same prompt/temperature
 
-Phase B — score (stop vLLM; OpenRouter + Chromium + DINO)
-  SIDECAR_COUNT=8, DUEL_CONCURRENCY=4
+Phase B — score (stop vLLM; OpenRouter + Chromium×16 + DINO)
+  SIDECAR_COUNT=16, DUEL_CONCURRENCY=8
 
 Phase C — train
   CONFIG=configs/dpo_shiny_27b_duel.yaml NUM_PROCESSES=4
