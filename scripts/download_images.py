@@ -58,6 +58,17 @@ def main() -> None:
     ap.add_argument("--workers", type=int, default=16)
     ap.add_argument("--timeout", type=float, default=30.0)
     ap.add_argument("--retries", type=int, default=4)
+    ap.add_argument(
+        "--fail-ok",
+        action="store_true",
+        help="do not exit non-zero when some downloads fail (recommended for ~99k pools)",
+    )
+    ap.add_argument(
+        "--max-fail-ratio",
+        type=float,
+        default=0.05,
+        help="with default strict mode, allow up to this fraction of failures before exit 1",
+    )
     args = ap.parse_args()
 
     pairs = load_pairs(args.list)
@@ -81,8 +92,12 @@ def main() -> None:
                 fail += 1
                 print(f"FAIL {stem}: {exc}", file=sys.stderr)
 
-    print(f"done ok={ok} skip={skip} fail={fail} -> {args.out}")
-    if fail:
+    total = ok + skip + fail
+    ratio = (fail / total) if total else 1.0
+    print(f"done ok={ok} skip={skip} fail={fail} fail_ratio={ratio:.3f} -> {args.out}")
+    if fail and not args.fail_ok and ratio > float(args.max_fail_ratio):
+        sys.exit(1)
+    if fail and ok + skip == 0:
         sys.exit(1)
 
 

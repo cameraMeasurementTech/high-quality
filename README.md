@@ -8,6 +8,9 @@ Bootstrap fetches shiny-guide, prompts, and AstroWolf into `vendor/` and `data/`
 **Full step-by-step (clone → base model → dataset → train):**  
 [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)
 
+**GPT-5 → LoRA SFT on full ~99k pool:**  
+[`docs/SFT_GPT_TEACHER.md`](docs/SFT_GPT_TEACHER.md)
+
 ```bash
 cd training
 cp .env.template .env
@@ -33,6 +36,7 @@ CONFIG=configs/dpo_shiny_27b_duel.yaml NUM_PROCESSES=4 ./run/03_dpo.sh
 | Doc | Topic |
 |-----|--------|
 | [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) | **Clone → model → dataset → train** |
+| [`docs/SFT_GPT_TEACHER.md`](docs/SFT_GPT_TEACHER.md) | **GPT-5 teacher → SFT LoRA (miner prompts)** |
 | [`STANDALONE.md`](STANDALONE.md) | Layout + self-check |
 | [`docs/CODER_MODEL.md`](docs/CODER_MODEL.md) | Where AstroWolf is downloaded/saved |
 | [`docs/DPO_DUEL_SCORING.md`](docs/DPO_DUEL_SCORING.md) | 2 JS + validator duel scoring |
@@ -41,6 +45,7 @@ CONFIG=configs/dpo_shiny_27b_duel.yaml NUM_PROCESSES=4 ./run/03_dpo.sh
 | Hardware | Profile |
 |----------|---------|
 | **4× H200 duel-scored DPO** | **`h200x4-dpo-duel`** ⭐ |
+| **4× H200 GPT-5 → SFT LoRA** | **`h200x4-sft-gpt`** |
 | 4× H200 cheap DPO | `h200x4-dpo` |
 | 2× H200 DPO | `h200x2-dpo` |
 | 1 GPU smoke | `smoke` |

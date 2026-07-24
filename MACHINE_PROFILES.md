@@ -22,12 +22,14 @@ cp .env.template .env
 | **h200x2-dpo** | 2× H200 | DPO cheap | 6k → ~2.5k pairs | 2 (`tp=2`) | 2 (stop pipeline first) |
 | **h200x4-dpo** | 4× H200 | DPO cheap | 5k → ~2k pairs | 4 (`tp=4`) | 2–4 (stop pipeline first) |
 | **h200x4-dpo-duel** ⭐ | 4× H200 | DPO duel-scored | 5k × 2 JS + S1–S4 | 4 (`tp=4`) | 4 (sequential phases) |
+| **h200x4-sft-gpt** | 4× H200 | SFT LoRA GPT-5 teacher | **full ~99k pool** | none (OpenRouter) | 4 |
 | **h100x4-grpo** | 4× H100 80GB | GRPO bf16 LoRA | 5k prompts | 2 (`tp=2`) | 4 |
 | **h200x2-grpo** | 2× H200 | GRPO bf16 LoRA | 4k prompts | 2 (`tp=2`) | 2 (tight; `num_generations: 2`) |
 | **h200x8-fullft** | 8× H200 | Full SFT | 10k validated JS | 4 (`tp=4`) | 8 + ZeRO-3 |
 | **train-only** | 2× H200/H100 | DPO LoRA | pre-built | skip | 2 |
 
-⭐ For subnet-aligned DPO on 4× H200: **`h200x4-dpo-duel`** (2 JS + validator duel scoring).  
+⭐ For subnet-aligned DPO on 4× H200: **`h200x4-dpo-duel`**.  
+⭐ GPT-5 distill → AstroWolf SFT: **`h200x4-sft-gpt`** ([docs/SFT_GPT_TEACHER.md](docs/SFT_GPT_TEACHER.md)).  
 ⭐ Cheap/fast pairs on 2× H200: **`h200x2-dpo`**.
 
 ## 4× H200 duel-scored workflow

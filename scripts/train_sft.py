@@ -24,6 +24,8 @@ from transformers import (
     TrainingArguments,
 )
 
+from paths import resolve_model_path
+
 
 def load_config(path: Path) -> dict:
     with path.open(encoding="utf-8") as f:
@@ -33,6 +35,7 @@ def load_config(path: Path) -> dict:
     for key in ("dataset_path", "output_dir", "sft_adapter_path"):
         if key in cfg and cfg[key] and not Path(cfg[key]).is_absolute():
             cfg[key] = str((root / cfg[key]).resolve())
+    cfg["model_name_or_path"] = resolve_model_path(cfg["model_name_or_path"])
     return cfg
 
 
@@ -99,11 +102,16 @@ def load_model_and_processor(cfg: dict):
     return model, processor
 
 
-def build_collator(processor, max_length: int):
-    """Collate HF rows {image, messages(json)} into model inputs with labels."""
+def build_collator(processor, max_length: int, mask_prompt: bool = True):
+    """Collate HF rows {image, messages(json)} into model inputs with labels.
+
+    When mask_prompt=True (default), only assistant tokens contribute to loss —
+    system/user (including image tokens) are set to -100.
+    """
 
     def collate(batch):
         texts: list[str] = []
+        prompt_texts: list[str] = []
         images = []
         for row in batch:
             messages = row["messages"]
@@ -119,9 +127,18 @@ def build_collator(processor, max_length: int):
                         part.clear()
                         part["type"] = "image"
                         part["image"] = row["image"]
-            text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)
+            text = processor.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=False
+            )
             texts.append(text)
             images.append(row["image"])
+            if mask_prompt:
+                prompt_only = [m for m in messages if m.get("role") != "assistant"]
+                prompt_texts.append(
+                    processor.apply_chat_template(
+                        prompt_only, tokenize=False, add_generation_prompt=True
+                    )
+                )
 
         inputs = processor(
             text=texts,
@@ -132,7 +149,24 @@ def build_collator(processor, max_length: int):
             return_tensors="pt",
         )
         labels = inputs["input_ids"].clone()
-        labels[labels == processor.tokenizer.pad_token_id] = -100
+        pad_id = processor.tokenizer.pad_token_id
+        labels[labels == pad_id] = -100
+
+        if mask_prompt and prompt_texts:
+            prompt_tok = processor.tokenizer(
+                prompt_texts,
+                padding=True,
+                truncation=True,
+                max_length=max_length,
+                return_tensors="pt",
+                add_special_tokens=False,
+            )
+            prompt_lens = (prompt_tok["attention_mask"].sum(dim=1)).tolist()
+            for i, plen in enumerate(prompt_lens):
+                # Mask leading prompt tokens; leave assistant completion for loss.
+                n = min(int(plen), labels.shape[1])
+                labels[i, :n] = -100
+
         inputs["labels"] = labels
         return inputs
 
@@ -150,7 +184,11 @@ def main() -> None:
         ds = ds.select(range(min(int(cfg["max_samples"]), len(ds))))
 
     model, processor = load_model_and_processor(cfg)
-    collator = build_collator(processor, int(cfg.get("max_seq_length", 16384)))
+    collator = build_collator(
+        processor,
+        int(cfg.get("max_seq_length", 16384)),
+        mask_prompt=bool(cfg.get("mask_prompt", True)),
+    )
 
     out_dir = Path(cfg["output_dir"])
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -163,6 +201,8 @@ def main() -> None:
         learning_rate=float(cfg.get("learning_rate", 1e-5)),
         lr_scheduler_type=cfg.get("lr_scheduler_type", "cosine"),
         warmup_ratio=float(cfg.get("warmup_ratio", 0.03)),
+        weight_decay=float(cfg.get("weight_decay", 0.0)),
+        max_grad_norm=float(cfg.get("max_grad_norm", 1.0)),
         logging_steps=int(cfg.get("logging_steps", 10)),
         save_steps=int(cfg.get("save_steps", 200)),
         save_total_limit=int(cfg.get("save_total_limit", 3)),

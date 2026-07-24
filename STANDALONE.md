@@ -58,7 +58,22 @@ Full detail: [`docs/DPO_DUEL_SCORING.md`](docs/DPO_DUEL_SCORING.md)
 
 Same image + same coder prompts + same temperature; **only the RNG seed changes** (production multigen style). Do **not** use different temperatures as the primary diversity method.
 
-## Quick start — cheap DPO (no OpenRouter judge)
+## GPT-5 teacher → SFT LoRA (full ~99k pool)
+
+```bash
+./run/00_configure_profile.sh h200x4-sft-gpt
+# OPENROUTER_API_KEY + HF_TOKEN in .env
+./run/00_bootstrap_assets.sh && INSTALL_SYSTEM=1 ./run/00_install_all.sh
+source .env && source .venv/bin/activate
+
+# Prep — always starts from data/prompts.txt (~99k); FULL_POOL=1 is default
+./run/01_prepare_sft_openrouter.sh
+
+# Train LoRA on 4× H200
+CONFIG=configs/sft_shiny_27b_gpt_teacher.yaml NUM_PROCESSES=4 ./run/02_sft.sh
+```
+
+Full guide: [`docs/SFT_GPT_TEACHER.md`](docs/SFT_GPT_TEACHER.md)
 
 ```bash
 ./run/00_configure_profile.sh h200x4-dpo

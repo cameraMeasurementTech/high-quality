@@ -74,6 +74,11 @@ def main() -> None:
     ap.add_argument("--duel", type=int, default=200)
     ap.add_argument("--seed", type=int, default=7)
     ap.add_argument(
+        "--train-remainder",
+        action="store_true",
+        help="Ignore --train; after val+duel holdouts, put ALL remaining pool stems in train (~99k-scale)",
+    )
+    ap.add_argument(
         "--exclude",
         type=Path,
         nargs="*",
@@ -95,7 +100,18 @@ def main() -> None:
     urls = load_urls(pool)
     exclude = load_exclude_stems(args.exclude)
     candidates = [(url_to_stem(u), u) for u in urls if url_to_stem(u) not in exclude]
-    need = args.train + args.val + args.duel
+
+    if args.train_remainder:
+        train_n = max(0, len(candidates) - args.val - args.duel)
+        if train_n < 1:
+            raise SystemExit(
+                f"not enough stems for val={args.val}+duel={args.duel} "
+                f"(pool usable={len(candidates)})"
+            )
+    else:
+        train_n = args.train
+
+    need = train_n + args.val + args.duel
     if need > len(candidates):
         raise SystemExit(f"need {need} stems but only {len(candidates)} available after exclude")
 
@@ -104,7 +120,7 @@ def main() -> None:
 
     duel = candidates[: args.duel]
     val = candidates[args.duel : args.duel + args.val]
-    train = candidates[args.duel + args.val : args.duel + args.val + args.train]
+    train = candidates[args.duel + args.val : args.duel + args.val + train_n]
 
     write_stem_url(out / "train.txt", train)
     write_stem_url(out / "val.txt", val)
@@ -114,6 +130,7 @@ def main() -> None:
         "seed": args.seed,
         "pool": str(pool),
         "pool_urls": len(urls),
+        "train_remainder": bool(args.train_remainder),
         "exclude_files": [str(p) for p in args.exclude],
         "exclude_stems": len(exclude),
         "counts": {"train": len(train), "val": len(val), "duel": len(duel)},

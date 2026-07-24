@@ -24,6 +24,7 @@ Machine profiles — pick one matching your GPU box:
   h200x2-dpo     2× H200 141GB — DPO bf16 LoRA (recommended default)
   h200x4-dpo     4× H200 — cheap DPO data prep (TP=4, max_num_seqs=96)
   h200x4-dpo-duel 4× H200 — duel-scored DPO (2 JS + S1–S4 judge) ⭐
+  h200x4-sft-gpt  4× H200 — GPT-5 OpenRouter teacher → SFT LoRA on AstroWolf
   h100x4-grpo    4× H100 80GB — GRPO bf16 LoRA + rollouts
   h200x2-grpo    2× H200 — GRPO bf16 LoRA (tight; num_generations=2)
   h200x8-fullft  8× H200 — full fine-tune SFT (use_lora: false, 8 GPU)
@@ -142,6 +143,27 @@ case "$PROFILE" in
     TRAIN_METHOD="DPO bf16 LoRA on duel-scored pairs (S1–S4)"
     DATA_NOTE="TRAIN_N=5000 × 2 JS (seed diversity) → duel score → aim ≥3500–4500 pairs"
     GPU_NOTE="Phase A: TP=4 skip_render JS collect BATCH=96; stop vLLM; Phase B: sidecars×16; Phase C: train ×4"
+    ;;
+  h200x4-sft-gpt)
+    upsert_env MACHINE_PROFILE h200x4-sft-gpt "$ENV_FILE"
+    upsert_env TRAIN sft "$ENV_FILE"
+    upsert_env FULL_POOL 1 "$ENV_FILE"
+    upsert_env TRAIN_N 0 "$ENV_FILE"
+    upsert_env VAL_N 500 "$ENV_FILE"
+    upsert_env DUEL_N 200 "$ENV_FILE"
+    upsert_env TEACHER_MODEL openai/gpt-5-chat "$ENV_FILE"
+    upsert_env TEACHER_BASE_URL https://openrouter.ai/api/v1 "$ENV_FILE"
+    upsert_env TEACHER_TEMPERATURE 0.4 "$ENV_FILE"
+    upsert_env TEACHER_WORKERS 16 "$ENV_FILE"
+    upsert_env TEACHER_MAX_TOKENS 24576 "$ENV_FILE"
+    upsert_env CONFIG configs/sft_shiny_27b_gpt_teacher.yaml "$ENV_FILE"
+    upsert_env NUM_PROCESSES 4 "$ENV_FILE"
+    upsert_env DL_WORKERS 64 "$ENV_FILE"
+    upsert_env VAL_WORKERS 16 "$ENV_FILE"
+    upsert_env SKIP_EXPORT 1 "$ENV_FILE"
+    TRAIN_METHOD="SFT LoRA (r=32) on AstroWolf from GPT-5 teacher — full ~99k pool"
+    DATA_NOTE="FULL_POOL=1 → ~98.9k train stems → GPT-5 → validate → sft_gpt_teacher"
+    GPU_NOTE="Prep: CPU+disk+OpenRouter (no GPU). Train LoRA: 4× H200 NUM_PROCESSES=4"
     ;;
   h100x4-grpo)
     upsert_env MACHINE_PROFILE h100x4-grpo "$ENV_FILE"

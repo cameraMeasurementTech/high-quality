@@ -155,62 +155,107 @@ def collect_from_openai(
     max_tokens: int,
     temperature: float,
     skip_existing: bool,
+    workers: int = 4,
+    save_request: bool = False,
 ) -> tuple[int, int]:
+    """Call OpenRouter/OpenAI with the *same* messages the miner coder receives."""
+    import concurrent.futures
+
     CODER_SYSTEM_PROMPT, CODER_USER_TEMPLATE_IMAGE_ONLY = load_coder_prompts()
 
-    ok = fail = 0
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     if "openrouter.ai" in base_url:
         headers["HTTP-Referer"] = "https://github.com/404-Repo/404-gen-subnet"
-        headers["X-Title"] = "404-gen-training"
+        headers["X-Title"] = "404-gen-training-sft-teacher"
 
-    with httpx.Client(timeout=600.0, headers=headers) as client:
-        for stem, url in tqdm(pairs, desc="openai-teacher"):
-            dest = out_dir / f"{stem}.js"
-            if skip_existing and dest.is_file() and dest.stat().st_size > 0:
-                ok += 1
-                continue
-            img_path = images_dir / f"{stem}.png"
-            if not img_path.is_file():
-                fail += 1
-                print(f"FAIL {stem}: missing image {img_path}", file=sys.stderr)
-                continue
-            b64 = base64.b64encode(img_path.read_bytes()).decode("ascii")
-            data_url = f"data:image/png;base64,{b64}"
-            payload = {
+    def one(stem: str, url: str) -> tuple[str, str | None, str | None]:
+        dest = out_dir / f"{stem}.js"
+        if skip_existing and dest.is_file() and dest.stat().st_size > 0:
+            return stem, "skip", None
+        img_path = images_dir / f"{stem}.png"
+        if not img_path.is_file():
+            return stem, None, f"missing image {img_path}"
+        b64 = base64.b64encode(img_path.read_bytes()).decode("ascii")
+        data_url = f"data:image/png;base64,{b64}"
+        # Miner parity: system string + user [image_url, text] (image first).
+        payload = {
+            "model": model,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            "messages": [
+                {"role": "system", "content": CODER_SYSTEM_PROMPT},
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image_url", "image_url": {"url": data_url}},
+                        {"type": "text", "text": CODER_USER_TEMPLATE_IMAGE_ONLY},
+                    ],
+                },
+            ],
+        }
+        if save_request:
+            slim = {
                 "model": model,
                 "temperature": temperature,
                 "max_tokens": max_tokens,
+                "stem": stem,
+                "image_path": str(img_path.resolve()),
                 "messages": [
-                    {"role": "system", "content": CODER_SYSTEM_PROMPT},
+                    {"role": "system", "content": CODER_SYSTEM_PROMPT[:200] + "…"},
                     {
                         "role": "user",
                         "content": [
-                            {"type": "image_url", "image_url": {"url": data_url}},
-                            {"type": "text", "text": CODER_USER_TEMPLATE_IMAGE_ONLY},
+                            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,<{len(b64)} chars>"}},
+                            {"type": "text", "text": CODER_USER_TEMPLATE_IMAGE_ONLY[:200] + "…"},
                         ],
                     },
                 ],
             }
-            try:
+            (out_dir / f"{stem}.request_meta.json").write_text(
+                json.dumps(slim, indent=2) + "\n", encoding="utf-8"
+            )
+        try:
+            with httpx.Client(timeout=600.0, headers=headers) as client:
                 r = client.post(f"{base_url.rstrip('/')}/chat/completions", json=payload)
                 r.raise_for_status()
                 content = r.json()["choices"][0]["message"]["content"]
                 if isinstance(content, list):
                     content = "".join(
-                        part.get("text", "") if isinstance(part, dict) else str(part) for part in content
+                        part.get("text", "") if isinstance(part, dict) else str(part)
+                        for part in content
                     )
                 source = strip_fences(str(content))
                 write_js(
                     out_dir,
                     stem,
                     source,
-                    {"source": "openai", "model": model, "url": url},
+                    {
+                        "source": "openai",
+                        "model": model,
+                        "url": url,
+                        "temperature": temperature,
+                        "miner_parity": True,
+                        "base_url": base_url,
+                    },
                 )
+                return stem, "ok", None
+        except Exception as exc:  # noqa: BLE001
+            return stem, None, str(exc)
+
+    ok = fail = 0
+    out_dir.mkdir(parents=True, exist_ok=True)
+    workers = max(1, int(workers))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
+        futs = [ex.submit(one, stem, url) for stem, url in pairs]
+        for fut in tqdm(
+            concurrent.futures.as_completed(futs), total=len(futs), desc="openai-teacher"
+        ):
+            stem, status, err = fut.result()
+            if status in {"ok", "skip"}:
                 ok += 1
-            except Exception as exc:  # noqa: BLE001
+            else:
                 fail += 1
-                print(f"FAIL {stem}: {exc}", file=sys.stderr)
+                print(f"FAIL {stem}: {err}", file=sys.stderr)
     return ok, fail
 
 
@@ -224,15 +269,26 @@ def main() -> None:
     ap.add_argument("--list", type=Path, help="stem\\turl list (pipeline/openai)")
     ap.add_argument("--run-dirs", type=Path, nargs="+", help="dirs with *.js (from-runs)")
     ap.add_argument("--base-url", type=str, default="http://127.0.0.1:10006")
-    ap.add_argument("--model", type=str, default="google/gemini-2.5-pro-preview")
+    ap.add_argument("--model", type=str, default=os.environ.get("TEACHER_MODEL", "openai/gpt-5-chat"))
     ap.add_argument("--api-key-env", type=str, default="OPENROUTER_API_KEY")
     ap.add_argument("--images", type=Path, default=default_data_root() / "images")
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--timeout", type=float, default=900.0)
-    ap.add_argument("--max-tokens", type=int, default=24576)
-    ap.add_argument("--temperature", type=float, default=0.6)
+    ap.add_argument("--max-tokens", type=int, default=int(os.environ.get("TEACHER_MAX_TOKENS", "24576")))
+    ap.add_argument("--temperature", type=float, default=float(os.environ.get("TEACHER_TEMPERATURE", "0.4")))
     ap.add_argument("--batch-size", type=int, default=32)
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument(
+        "--workers",
+        type=int,
+        default=int(os.environ.get("TEACHER_WORKERS", "4")),
+        help="parallel OpenRouter requests",
+    )
+    ap.add_argument(
+        "--save-request",
+        action="store_true",
+        help="write slim *.request_meta.json next to each JS (miner payload summary)",
+    )
     ap.add_argument("--skip-existing", action="store_true", default=True)
     ap.add_argument("--no-skip-existing", action="store_false", dest="skip_existing")
     args = ap.parse_args()
@@ -277,8 +333,10 @@ def main() -> None:
         args.max_tokens,
         args.temperature,
         args.skip_existing,
+        workers=args.workers,
+        save_request=args.save_request,
     )
-    print(f"openai ok={ok} fail={fail} -> {args.out}")
+    print(f"openai ok={ok} fail={fail} model={args.model} -> {args.out}")
     if fail and ok == 0:
         sys.exit(1)
 

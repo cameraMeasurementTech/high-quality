@@ -1,0 +1,41 @@
+# SFT LoRA on AstroWolf — GPT-5 teacher, tuned for ~99k prompt pool
+# (effective N after validate.js often ~40–80k).
+#
+# Dataset: ./run/01_prepare_sft_openrouter.sh  (FULL_POOL=1)
+# Train:   CONFIG=configs/sft_shiny_27b_gpt_teacher.yaml NUM_PROCESSES=4 ./run/02_sft.sh
+#
+# LoRA (not full FT): preserves AstroWolf priors while absorbing teacher JS.
+# Effective global batch ≈ per_device * grad_accum * NUM_PROCESSES
+#   1 * 8 * 4 = 32
+
+model_name_or_path: "Tooony133/Qwen-3.6-27B-AstroWolf"
+dataset_path: "data/hf/sft_gpt_teacher/dataset"
+output_dir: "data/checkpoints/sft_shiny_27b_gpt"
+
+use_lora: true
+load_in_4bit: false
+lora_r: 32
+lora_alpha: 64
+lora_dropout: 0.05
+mask_prompt: true
+
+num_train_epochs: 1
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 8
+learning_rate: 5.0e-6
+warmup_ratio: 0.02
+lr_scheduler_type: cosine
+weight_decay: 0.0
+max_grad_norm: 1.0
+max_seq_length: 16384
+gradient_checkpointing: true
+attn_implementation: sdpa
+
+logging_steps: 20
+save_steps: 500
+save_total_limit: 4
+report_to: none
+dataloader_num_workers: 4
+
+# Smoke only:
+# max_samples: 64
